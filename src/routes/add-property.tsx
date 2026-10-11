@@ -1,3 +1,5 @@
+import { VoiceFill } from '@/components/manzil/VoiceFill';
+import { toast } from 'sonner';
 import { AMENITIES, MAX_PHOTOS } from '@/lib/manzil/listing-detail';
 import { uploadListingPhoto } from '@/lib/manzil/phase4';
 import { toMarla } from '@/lib/manzil/phase3-rules';
@@ -96,6 +98,15 @@ function AddProperty({ onNavigate, editId }: { onNavigate: (p: string, arg?: str
       <div className="card wide">
         <h1>{editId ? 'Edit property' : 'Add property'}</h1>
         <p className="muted">List a new property on the marketplace</p>
+        <VoiceFill onApply={(v) => {
+          if (v.title && !title) setTitle(v.title);
+          if (v.city) setCity(v.city); if (v.society) setSociety(v.society); if (v.block) setBlock(v.block);
+          if (v.size) { setSize(String(v.size)); setUnit(v.unit ?? 'marla'); }
+          if (v.price) setPrice(String(v.price)); if (v.category) setCategory(v.category); if (v.purpose) setPurpose(v.purpose);
+          if (v.bedrooms) setBedrooms(String(v.bedrooms)); if (v.bathrooms) setBathrooms(String(v.bathrooms));
+          if (v.phone) setPhone(v.phone); if (v.amenities) setAmenities((p) => [...new Set([...p, ...v.amenities!])]);
+          toast.success('Form filled — please check the details before saving');
+        }} />
         <form onSubmit={submit}>
           <label>
             Title
