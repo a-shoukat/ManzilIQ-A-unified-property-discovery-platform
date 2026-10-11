@@ -44,7 +44,7 @@ export function detectFraud(
   for (const b of bookings) if (b.customer_id) byCustomer.set(b.customer_id, [...(byCustomer.get(b.customer_id) ?? []), new Date(b.created_at).getTime()]);
   for (const [cid, times] of byCustomer) {
     times.sort((a, b) => a - b);
-    for (let i = 0; i + 2 < times.length; i++) if (times[i + 2] - times[i] <= 24 * 3600e3) {
+    for (let i = 0; i + 2 < times.length; i++) if ((times[i + 2] ?? 0) - (times[i] ?? 0) <= 24 * 3600e3) {
       alerts.push({ kind: 'rapid-bookings', severity: 'medium', title: '3+ bookings by one account within 24 hours', detail: `Account ${cid.slice(0, 8)}…` });
       break;
     }
