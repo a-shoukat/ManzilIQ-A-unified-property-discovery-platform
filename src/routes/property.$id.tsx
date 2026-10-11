@@ -1,3 +1,4 @@
+import { Gallery, ListingMeta, ContactReveal, Amenities, ReportListing, SimilarListings } from '@/components/manzil/ListingExtras';
 import { sendInquiry } from '@/lib/manzil/phase3';
 import { formatSize } from '@/lib/manzil/phase3-rules';
 import { Button } from '@/components/ui/button';
@@ -82,14 +83,9 @@ function PropertyDetail({
         ← Back
       </Button>
       <div className="detail-hero">
-        <div className="prop-img large">
-          {p.image_url || p.id.startsWith('demo-') ? (
-            <img src={p.image_url || (p.category === 'commercial' ? commercial : p.bedrooms ? residence : plot)} alt={p.title} width={1024} height={768} />
-          ) : (
-            <div className="prop-img-fallback">{p.category === 'commercial' ? '🏢' : '🏠'}</div>
-          )}
-        </div>
+        <Gallery p={p} fallback={p.id.startsWith('demo-') ? (p.category === 'commercial' ? commercial : p.bedrooms ? residence : plot) : null} />
         <div>
+          <ListingMeta p={p} />
           <h1>{p.title}</h1>
           <p className="muted">
             {p.city}
@@ -101,6 +97,8 @@ function PropertyDetail({
               {has(p.id) ? '✓ In comparison' : '+ Add to compare'}
             </Button>
             <Button variant="outline" size="sm" onClick={() => void wish.toggle(p.id)}>{wish.has(p.id) ? '♥ Saved' : '♡ Save'}</Button>
+            <ContactReveal p={p} onNavigate={onNavigate} />
+            <ReportListing p={p} />
             {canManageListing(p, profile) && <>
               <Button size="sm" variant="outline" onClick={() => onNavigate('edit-property', p.id)}>Edit</Button>
               <AlertDialog>
@@ -116,6 +114,7 @@ function PropertyDetail({
         </div>
       </div>
       {p.description && <p className="desc">{p.description}</p>}
+      <Amenities p={p} />
       <InquiryBox p={p} />
       <div className="spec-table">
         {rows.map(([k, v]) => (
@@ -125,6 +124,7 @@ function PropertyDetail({
           </div>
         ))}
       </div>
+      <SimilarListings p={p} onNavigate={onNavigate} />
     </div>
   );
 }
