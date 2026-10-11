@@ -69,6 +69,10 @@ export interface Property {
   status: PropertyStatus;
   owner_id: string | null;
   created_at: string;
+  images?: string[] | null;
+  amenities?: string[] | null;
+  is_featured?: boolean | null;
+  contact_phone?: string | null;
 }
 
 export type PlotStatus = 'available' | 'assigned' | 'reserved' | 'sold' | 'blocked';

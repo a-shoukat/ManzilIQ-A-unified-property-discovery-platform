@@ -9,3 +9,4 @@
 - [x] Request publishing of the imported app; deployment completion remains unverified.
 - [x] Phase 3a: Kanal unit, inquiries, buyer cancellation request + letter, dispute freeze/unfreeze, dealer commissions, fraud alerts.
 - [x] Phase 3b: dealer books for a customer, plot map upload (needs reference/phase3-features.sql run by owner).
+- [x] Phase 4: gallery, amenities, similar, contact reveal, report, featured, freshness, saved-search alerts (needs reference/phase4-features.sql run by owner).
