@@ -1,3 +1,4 @@
+import { useAuth } from './auth';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { Property } from '@/lib/manzil/types';
 
@@ -17,12 +18,21 @@ const CompareContext = createContext<CompareState>({
 
 export const useCompare = () => useContext(CompareContext);
 
-const KEY = 'manziliq_compare';
+export const compareKey = (userId: string | null | undefined) => `manziliq_compare:${userId ?? 'guest'}`;
 
 export function CompareProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<Property[]>([]);
   const [ready, setReady] = useState(false);
+  const { session, loading } = useAuth();
+  const userId = session?.user.id ?? null;
+  const KEY = compareKey(userId);
+  const [prevUser, setPrevUser] = useState<string | null>(null);
   useEffect(() => {
+    if (loading) return;
+    setReady(false);
+    if (prevUser && !userId) localStorage.removeItem(compareKey(prevUser));
+    setPrevUser(userId);
+    localStorage.removeItem('manziliq_compare');
     try {
       const saved = JSON.parse(localStorage.getItem(KEY) ?? '[]');
       if (Array.isArray(saved)) setItems(saved.slice(0, 3));
@@ -30,11 +40,12 @@ export function CompareProvider({ children }: { children: ReactNode }) {
       setItems([]);
     }
     setReady(true);
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [KEY, loading]);
 
   useEffect(() => {
     if (ready) localStorage.setItem(KEY, JSON.stringify(items));
-  }, [items, ready]);
+  }, [items, ready, KEY]);
 
   const toggle = (p: Property) => {
     setItems((prev) => {
