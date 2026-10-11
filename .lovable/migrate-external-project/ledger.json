@@ -1,0 +1,15 @@
+{
+  "source": "code-archive",
+  "capabilities": [
+    {"capability":"Application code and routes","source":"manziliq-v15-final.zip","outcome":"migrate","status":"in_progress","next_action":"Adapt all pages to TanStack and modernize presentation"},
+    {"capability":"Database schema","source":"supabase/schema.sql, 18 tables","outcome":"migrate","status":"pending","next_action":"Resolve database connection while leaving original database untouched"},
+    {"capability":"Existing records","source":"No export supplied","outcome":"migrate","status":"pending","next_action":"Obtain filtered CSV or JSON exports if copying to Cloud"},
+    {"capability":"Authentication identities and authorization","source":"Supabase Auth and profiles","outcome":"migrate","status":"pending","next_action":"Database connection and user identity verification required"},
+    {"capability":"Stored files","source":"Supabase storage","outcome":"preserve","status":"pending","next_action":"Verify original storage connection and file bytes"},
+    {"capability":"Gemini AI","source":"Optional browser API key","outcome":"preserve","status":"pending","next_action":"Remove exposed-key pattern; secure configuration required for live Gemini"},
+    {"capability":"Payments","source":"Simulated payment recording","outcome":"preserve","status":"pending","next_action":"Preserve simulation; verify with connected database"},
+    {"capability":"Public endpoints, callbacks, webhooks and schedules","source":"Browser-only source","outcome":"preserve","status":"inspection","next_action":"Confirm source callsites"},
+    {"capability":"Secrets","source":"Only variable names provided","outcome":"preserve","status":"pending","next_action":"Configure securely; never copy credentials"},
+    {"capability":"Cutover and production verification","source":"Unpublished Lovable app","outcome":"migrate","status":"pending","next_action":"Verify preview then publish; report connection blockers"}
+  ]
+}
