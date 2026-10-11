@@ -140,3 +140,19 @@ export function formatPrice(n: number): string {
   if (n >= 100000) return `PKR ${(n / 100000).toFixed(1)} Lakh`;
   return `PKR ${n.toLocaleString()}`;
 }
+
+export async function updateProperty(id: string, patch: Partial<Property>): Promise<void> {
+  const supabase = getSupabase();
+  if (!supabase) throw new Error('Database not connected');
+  const { data, error } = await supabase.from('properties').update(patch).eq('id', id).select('id');
+  if (error) throw error;
+  if (!data || data.length === 0) throw new Error('You do not have permission to edit this listing.');
+}
+
+export async function deleteProperty(id: string): Promise<void> {
+  const supabase = getSupabase();
+  if (!supabase) throw new Error('Database not connected');
+  const { data, error } = await supabase.from('properties').delete().eq('id', id).select('id');
+  if (error) throw error;
+  if (!data || data.length === 0) throw new Error('You do not have permission to delete this listing.');
+}

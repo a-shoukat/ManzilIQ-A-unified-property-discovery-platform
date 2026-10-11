@@ -1,13 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
-import { useState } from 'react';
-import { createProperty } from '@/lib/manzil/properties';
+import { useEffect, useState } from 'react';
+import { createProperty, fetchProperty, updateProperty } from '@/lib/manzil/properties';
+import { errorText } from '@/lib/manzil/errors';
 import { useAuth } from '@/lib/manzil/auth';
 import type { PropertyCategory, PropertyPurpose } from '@/lib/manzil/types';
 
 /** Manual property entry — for dealers / societies (full inventory mgmt in v4) */
-function AddProperty({ onNavigate }: { onNavigate: (p: string) => void }) {
+function AddProperty({ onNavigate, editId }: { onNavigate: (p: string, arg?: string) => void; editId?: string }) {
   const { session } = useAuth();
   const [title, setTitle] = useState('');
   const [city, setCity] = useState('');
@@ -23,14 +24,25 @@ function AddProperty({ onNavigate }: { onNavigate: (p: string) => void }) {
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [existingStatus, setExistingStatus] = useState<'available' | 'reserved' | 'sold'>('available');
+
+  useEffect(() => {
+    if (!editId) return;
+    void fetchProperty(editId).then((p) => {
+      if (!p) return;
+      setTitle(p.title); setCity(p.city); setArea(p.area ?? ''); setSociety(p.society_name ?? ''); setBlock(p.block ?? '');
+      setSize(String(p.plot_size_marla)); setCategory(p.category); setPurpose(p.purpose); setPrice(String(p.price));
+      setBedrooms(p.bedrooms != null ? String(p.bedrooms) : ''); setBathrooms(p.bathrooms != null ? String(p.bathrooms) : '');
+      setDescription(p.description ?? ''); setExistingStatus(p.status);
+    });
+  }, [editId]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     try {
-      await createProperty(
-        {
+      const fields = {
           title,
           city,
           area: area || null,
@@ -43,14 +55,12 @@ function AddProperty({ onNavigate }: { onNavigate: (p: string) => void }) {
           bedrooms: bedrooms ? parseInt(bedrooms, 10) : null,
           bathrooms: bathrooms ? parseInt(bathrooms, 10) : null,
           description: description || null,
-          image_url: null,
-          status: 'available',
-        },
-        session?.user.id ?? "",
-      );
-      onNavigate('marketplace');
+          status: existingStatus,
+        };
+      if (editId) { await updateProperty(editId, fields); onNavigate('property', editId); }
+      else { await createProperty({ ...fields, image_url: null }, session?.user.id ?? ""); onNavigate('marketplace'); }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to add property');
+      setError(errorText(err, editId ? 'Failed to save changes' : 'Failed to add property'));
     } finally {
       setLoading(false);
     }
@@ -59,7 +69,7 @@ function AddProperty({ onNavigate }: { onNavigate: (p: string) => void }) {
   return (
     <div className="container">
       <div className="card wide">
-        <h1>Add property</h1>
+        <h1>{editId ? 'Edit property' : 'Add property'}</h1>
         <p className="muted">List a new property on the marketplace</p>
         <form onSubmit={submit}>
           <label>
@@ -128,7 +138,7 @@ function AddProperty({ onNavigate }: { onNavigate: (p: string) => void }) {
           </label>
           {error && <div className="error">{error}</div>}
           <Button variant="legacy" className="btn" disabled={loading}>
-            {loading ? 'Adding…' : 'Add property'}
+            {loading ? 'Saving…' : editId ? 'Save changes' : 'Add property'}
           </Button>
         </form>
       </div>
@@ -136,5 +146,9 @@ function AddProperty({ onNavigate }: { onNavigate: (p: string) => void }) {
   );
 }
 
-export const Route = createFileRoute("/add-property")({ head: () => pageHead("Add Property"), component: RoutePage });
-function RoutePage() { const onNavigate = useAppNavigation(); return <PageFrame ><AddProperty onNavigate={onNavigate} /></PageFrame>; }
+export const Route = createFileRoute("/add-property")({
+  validateSearch: (s: Record<string, unknown>): { edit?: string } => (typeof s['edit'] === 'string' ? { edit: s['edit'] } : {}),
+  head: () => pageHead("Add Property"),
+  component: RoutePage,
+});
+function RoutePage() { const onNavigate = useAppNavigation(); const { edit } = Route.useSearch(); return <PageFrame ><AddProperty key={edit ?? 'new'} onNavigate={onNavigate} editId={edit} /></PageFrame>; }

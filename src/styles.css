@@ -1132,3 +1132,5 @@ textarea {
 
 .listing-skeleton { aspect-ratio: 4 / 5; border-radius: 18px; background: linear-gradient(90deg, var(--muted) 25%, var(--accent) 50%, var(--muted) 75%); background-size: 200% 100%; animation: listing-shimmer 1.2s infinite linear; }
 @keyframes listing-shimmer { to { background-position: -200% 0; } }
+.listing-heart{position:absolute;bottom:12px;right:48px;width:29px;height:29px;border:0;background:var(--card);color:var(--foreground);border-radius:4px;display:grid;place-items:center;padding:0;}
+.listing-heart.selected{color:var(--destructive);}

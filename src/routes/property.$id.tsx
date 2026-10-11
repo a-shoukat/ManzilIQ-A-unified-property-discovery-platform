@@ -2,7 +2,13 @@ import { Button } from '@/components/ui/button';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
 import { useEffect, useState } from 'react';
-import { fetchProperty, formatPrice } from '@/lib/manzil/properties';
+import { fetchProperty, formatPrice, deleteProperty } from '@/lib/manzil/properties';
+import { canManageListing, canDeleteListing } from '@/lib/manzil/listing-rules';
+import { useWishlist } from '@/lib/manzil/wishlist';
+import { useAuth } from '@/lib/manzil/auth';
+import { errorText } from '@/lib/manzil/errors';
+import { toast } from 'sonner';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useCompare } from '@/lib/manzil/compare';
 import type { Property } from '@/lib/manzil/types';
 import residence from '@/assets/residence.jpg';
@@ -19,6 +25,15 @@ function PropertyDetail({
   const [p, setP] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const { toggle, has } = useCompare();
+  const wish = useWishlist();
+  const { profile } = useAuth();
+  const [deleting, setDeleting] = useState(false);
+  const removeListing = async (prop: Property) => {
+    if (!canDeleteListing(prop)) { toast.error('This property is reserved or sold. Resolve its booking before deleting.'); return; }
+    setDeleting(true);
+    try { await deleteProperty(prop.id); toast.success('Listing deleted'); onNavigate('marketplace'); }
+    catch (err) { toast.error(errorText(err, 'Could not delete listing')); setDeleting(false); }
+  };
 
   useEffect(() => {
     fetchProperty(id).then((prop) => {
@@ -83,6 +98,18 @@ function PropertyDetail({
             <Button variant="legacy" className={`btn small ${has(p.id) ? 'secondary' : ''}`} onClick={() => toggle(p)}>
               {has(p.id) ? '✓ In comparison' : '+ Add to compare'}
             </Button>
+            <Button variant="outline" size="sm" onClick={() => void wish.toggle(p.id)}>{wish.has(p.id) ? '♥ Saved' : '♡ Save'}</Button>
+            {canManageListing(p, profile) && <>
+              <Button size="sm" variant="outline" onClick={() => onNavigate(`add-property?edit=${p.id}`)}>Edit</Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild><Button size="sm" variant="destructive" disabled={deleting}>{deleting ? 'Deleting…' : 'Delete'}</Button></AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader><AlertDialogTitle>Delete this listing?</AlertDialogTitle>
+                    <AlertDialogDescription>“{p.title}” will be removed from the marketplace. This cannot be undone.</AlertDialogDescription></AlertDialogHeader>
+                  <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => void removeListing(p)}>Delete</AlertDialogAction></AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </>}
           </div>
         </div>
       </div>
