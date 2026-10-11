@@ -5,6 +5,9 @@ import { useEffect, useState } from 'react';
 import { fetchProperty, formatPrice } from '@/lib/manzil/properties';
 import { useCompare } from '@/lib/manzil/compare';
 import type { Property } from '@/lib/manzil/types';
+import residence from '@/assets/residence.jpg';
+import plot from '@/assets/plot.jpg';
+import commercial from '@/assets/commercial.jpg';
 
 function PropertyDetail({
   id,
@@ -63,8 +66,8 @@ function PropertyDetail({
       </Button>
       <div className="detail-hero">
         <div className="prop-img large">
-          {p.image_url ? (
-            <img src={p.image_url} alt={p.title} />
+          {p.image_url || p.id.startsWith('demo-') ? (
+            <img src={p.image_url || (p.category === 'commercial' ? commercial : p.bedrooms ? residence : plot)} alt={p.title} width={1024} height={768} />
           ) : (
             <div className="prop-img-fallback">{p.category === 'commercial' ? '🏢' : '🏠'}</div>
           )}

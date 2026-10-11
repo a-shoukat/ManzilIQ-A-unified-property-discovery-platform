@@ -72,7 +72,7 @@ function AdminVerification({ onNavigate }: { onNavigate: (p: string) => void }) 
     <div key={i.id} className="queue-card">
       <div className="queue-head">
         <div>
-          <strong>{i.role === 'dealer' ? i.detail?.firm_name ?? i.email : i.detail?.society_name ?? i.email}</strong>
+          <strong>{i.role === 'dealer' ? i.detail?.['firm_name'] ?? i.email : i.detail?.['society_name'] ?? i.email}</strong>
           <div className="muted small">
             {i.role === 'dealer' ? 'Dealer' : 'Society'} · {i.email}
           </div>

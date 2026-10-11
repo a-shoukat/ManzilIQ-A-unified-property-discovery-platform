@@ -38,7 +38,7 @@ function PriceEstimator({ onNavigate }: { onNavigate: (p: string) => void }) {
           <div>
             <h1 style={{ margin: 0 }}>AI price estimator</h1>
             <p className="muted" style={{ margin: 0 }}>
-              {isAiConfigured() ? 'Gemini AI enabled' : 'Using local comparables (add VITE_GEMINI_API_KEY for AI)'}
+              {isAiConfigured() ? 'AI-assisted valuation' : 'Valuation based on local comparables and regional baselines'}
             </p>
           </div>
           <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('dashboard')}>Dashboard</Button>

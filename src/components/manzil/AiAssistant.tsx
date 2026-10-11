@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Sparkles, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { askAssistant, QUICK_PROMPTS, type ChatMessage } from '@/lib/manzil/ai';
 
@@ -47,7 +48,7 @@ export default function AiAssistant({ onNavigate }: { onNavigate: (p: string) =>
   return (
     <>
       <Button variant="legacy" className="ai-fab" onClick={() => setOpen(!open)} aria-label="AI Assistant">
-        {open ? '✕' : '🤖'}
+        {open ? <X size={22}/> : <Sparkles size={22}/>}
       </Button>
       {open && (
         <div className="ai-panel">

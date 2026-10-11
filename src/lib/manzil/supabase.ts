@@ -12,7 +12,7 @@ export const isSupabaseConfigured = (): boolean =>
 let client: SupabaseClient | null = null;
 
 export function getSupabase(): SupabaseClient | null {
-  if (!isSupabaseConfigured()) return null;
+  if (!isSupabaseConfigured() || typeof window === 'undefined') return null;
   if (!client) {
     client = createClient(supabaseUrl as string, supabaseAnonKey as string, {
       auth: { persistSession: true, autoRefreshToken: true },
