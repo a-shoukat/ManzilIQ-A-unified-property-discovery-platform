@@ -32,7 +32,7 @@ function client(updateReturn: unknown) {
   const update = vi.fn(() => ({ eq }));
   const maybeSingle = vi.fn().mockResolvedValue({ data: null, error: null });
   const from = vi.fn((table: string) =>
-    table === 'payments' ? { update } : { select: () => ({ maybeSingle }) },
+    table === 'payments' ? { update } : { select: () => ({ eq: () => ({ maybeSingle }) }) },
   );
   vi.mocked(getSupabase).mockReturnValueOnce({ from } as unknown as NonNullable<ReturnType<typeof getSupabase>>);
   return { update, afterUpdate };
