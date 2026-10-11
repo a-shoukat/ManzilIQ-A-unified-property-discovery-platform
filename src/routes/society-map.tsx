@@ -8,11 +8,11 @@ import type { Plot } from '@/lib/manzil/types';
 import { useSocietyId } from './society';
 
 const STATUS_COLOR: Record<Plot['status'], string> = {
-  available: '#16a34a',
-  assigned: '#2563eb',
-  reserved: '#d97706',
-  sold: '#64748b',
-  blocked: '#dc2626',
+  available: 'var(--success)',
+  assigned: 'var(--primary)',
+  reserved: 'var(--warning)',
+  sold: 'var(--muted-foreground)',
+  blocked: 'var(--destructive)',
 };
 
 /** WBS: Society Portal — Interactive Plot Map (5 features) */

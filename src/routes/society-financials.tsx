@@ -105,7 +105,7 @@ function SocietyFinancials({ onNavigate }: { onNavigate: (p: string) => void }) 
               <h3>Defaulters</h3>
               {summary.defaulters.length === 0 ? <p className="muted small">No defaulters. 🎉</p> : (
                 summary.defaulters.map((d) => (
-                  <div key={d.ref} className="queue-head" style={{ borderBottom: '1px solid #1e293b', padding: '8px 0' }}>
+                  <div key={d.ref} className="queue-head" style={{ borderBottom: '1px solid var(--border)', padding: '8px 0' }}>
                     <span>{d.ref}</span>
                     <strong className="stat-bad">{formatPrice(d.amount)}</strong>
                   </div>
@@ -125,7 +125,7 @@ function SocietyFinancials({ onNavigate }: { onNavigate: (p: string) => void }) 
               <Button variant="legacy" className="btn small" type="submit">Save plan</Button>
             </form>
             {plans.map((pl) => (
-              <div key={pl.id} className="queue-head" style={{ borderBottom: '1px solid #1e293b', padding: '8px 0', marginTop: 8 }}>
+              <div key={pl.id} className="queue-head" style={{ borderBottom: '1px solid var(--border)', padding: '8px 0', marginTop: 8 }}>
                 <span>{pl.name} · {pl.duration_months} months · {pl.down_payment_pct}% down</span>
                 <Button variant="legacy" className="link inline danger-text" onClick={async () => { await deletePlan(pl.id); if (societyId) load(societyId); }}>Delete</Button>
               </div>

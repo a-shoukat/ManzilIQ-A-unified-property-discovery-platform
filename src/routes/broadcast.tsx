@@ -134,7 +134,7 @@ function Broadcast({ onNavigate }: { onNavigate: (p: string) => void }) {
         <div className="card">
           <h3>Message templates</h3>
           {templates.map((t) => (
-            <div key={t.id} className="queue-head" style={{ borderBottom: '1px solid #1e293b', padding: '8px 0' }}>
+            <div key={t.id} className="queue-head" style={{ borderBottom: '1px solid var(--border)', padding: '8px 0' }}>
               <div>
                 <strong>{t.title}</strong>
                 <div className="muted small">{t.body.slice(0, 80)}{t.body.length > 80 ? '…' : ''}</div>

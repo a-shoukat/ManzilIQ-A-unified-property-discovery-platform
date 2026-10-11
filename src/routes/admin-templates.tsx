@@ -109,7 +109,7 @@ function LegalTemplates({ onNavigate }: { onNavigate: (p: string) => void }) {
           <h3>Version history</h3>
           {versions.length === 0 && <p className="muted small">No versions yet.</p>}
           {versions.map((v) => (
-            <div key={v.id} className="queue-head" style={{ borderBottom: '1px solid #1e293b', padding: '8px 0' }}>
+            <div key={v.id} className="queue-head" style={{ borderBottom: '1px solid var(--border)', padding: '8px 0' }}>
               <span>v{v.version} · {new Date(v.created_at).toLocaleDateString()}</span>
               <span className={`badge ${v.published ? 'ok' : 'warn'}`}>{v.published ? 'published' : 'draft'}</span>
             </div>
@@ -118,7 +118,7 @@ function LegalTemplates({ onNavigate }: { onNavigate: (p: string) => void }) {
       </div>
 
       {preview && (
-        <div className="card wide" style={{ marginTop: 16, background: '#fff', color: '#000' }}>
+        <div className="card wide" style={{ marginTop: 16, background: 'var(--card)', color: 'var(--foreground)' }}>
           <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', margin: 0 }}>
             {renderTemplatePreview(body)}
           </pre>
