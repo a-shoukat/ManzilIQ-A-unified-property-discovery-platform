@@ -13,8 +13,8 @@ import {
 import { notify } from '@/lib/manzil/notify';
 import { generateDocument } from '@/lib/manzil/legal';
 import type { Booking } from '@/lib/manzil/types';
-import { BookingCard } from './MyBookings';
-import { useSocietyId } from '../society/SocietyHub';
+import { BookingCard } from './my-bookings';
+import { useSocietyId } from './society';
 
 interface Props {
   onNavigate: (p: string) => void;

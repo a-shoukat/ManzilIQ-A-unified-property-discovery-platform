@@ -15,7 +15,7 @@ function MarketTrends({ onNavigate }: { onNavigate: (p: string) => void }) {
 
   const maxT = Math.max(1, ...(data?.overall.map((t) => t.avgPerMarla) ?? [1]));
   const trend = data && data.overall.length >= 2
-    ? data.overall[data.overall.length - 1].avgPerMarla - data.overall[0].avgPerMarla
+    ? (data.overall.at(-1)?.avgPerMarla ?? 0) - (data.overall[0]?.avgPerMarla ?? 0)
     : 0;
 
   return (

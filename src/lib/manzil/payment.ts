@@ -33,8 +33,8 @@ export async function generateSchedule(booking: Booking, totalPrice: number): Pr
     months = (custom as InstallmentPlan).duration_months;
     downPct = Number((custom as InstallmentPlan).down_payment_pct);
   } else if (booking.installment_plan && DEFAULT_PLANS[booking.installment_plan]) {
-    months = DEFAULT_PLANS[booking.installment_plan].months;
-    downPct = DEFAULT_PLANS[booking.installment_plan].downPct;
+    months = DEFAULT_PLANS[booking.installment_plan]?.months ?? 12;
+    downPct = DEFAULT_PLANS[booking.installment_plan]?.downPct ?? 20;
   }
 
   const down = Math.round((totalPrice * downPct) / 100);
@@ -75,7 +75,7 @@ export async function generateSchedule(booking: Booking, totalPrice: number): Pr
   }
   // token already paid counts toward down payment
   if (booking.token_amount > 0 && rows.length > 0) {
-    const first = rows[0].amount ?? 0;
+    const first = rows[0]?.amount ?? 0;
     if (booking.token_amount >= first) {
       rows[0] = { ...rows[0], amount: 0, status: 'confirmed', paid_at: new Date().toISOString() };
     } else {

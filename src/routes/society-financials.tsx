@@ -13,7 +13,7 @@ import {
 } from '@/lib/manzil/payment';
 import { formatPrice } from '@/lib/manzil/properties';
 import type { Payment } from '@/lib/manzil/types';
-import { useSocietyId } from '../society/SocietyHub';
+import { useSocietyId } from './society';
 
 /** WBS: Payment & Financial System — society side (plans, tracking, reporting) */
 function SocietyFinancials({ onNavigate }: { onNavigate: (p: string) => void }) {

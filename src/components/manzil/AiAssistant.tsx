@@ -36,7 +36,7 @@ export default function AiAssistant({ onNavigate }: { onNavigate: (p: string) =>
     try {
       const history: ChatMessage[] = [...msgs, userMsg].map(({ role, text }) => ({ role, text }));
       const reply = await askAssistant(history, t);
-      setMsgs((p) => [...p, { id: idRef.current++, role: 'assistant', text: reply.text, action: reply.action }]);
+      setMsgs((p) => [...p, { id: idRef.current++, role: 'assistant', text: reply.text, ...(reply.action ? {action:reply.action} : {}) }]);
     } catch {
       setMsgs((p) => [...p, { id: idRef.current++, role: 'assistant', text: 'Kuch ghalat ho gaya — dobara try karein.' }]);
     } finally {

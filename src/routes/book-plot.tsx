@@ -21,7 +21,7 @@ function BookPlot({ onNavigate }: { onNavigate: (p: string) => void }) {
   const [dealers, setDealers] = useState<{ id: string; email: string; firm: string }[]>([]);
   const [dealerId, setDealerId] = useState('');
   const [token, setToken] = useState('');
-  const [plan, setPlan] = useState(INSTALLMENT_PLANS[0]);
+  const [plan, setPlan] = useState(INSTALLMENT_PLANS[0] ?? 'Lump sum (full payment)');
   const [payMethod, setPayMethod] = useState('JazzCash');
   const [done, setDone] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(false);
@@ -30,7 +30,7 @@ function BookPlot({ onNavigate }: { onNavigate: (p: string) => void }) {
   useEffect(() => {
     fetchApprovedSocieties().then((list) => {
       setSocieties(list.map((s) => ({ id: s.id, name: s.name })));
-      if (list.length > 0) setSocietyId(list[0].id);
+      if (list[0]) setSocietyId(list[0].id);
     });
   }, []);
 

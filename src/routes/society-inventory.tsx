@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { deletePlot, fetchPlots, parsePlotCsv, setPlotStatus, upsertPlot } from '@/lib/manzil/society';
 import { formatPrice } from '@/lib/manzil/properties';
 import type { Plot, PropertyCategory } from '@/lib/manzil/types';
-import { useSocietyId } from './SocietyHub';
+import { useSocietyId } from './society';
 
 /** WBS: Society Portal — Plot Inventory Management (7 features) */
 function Inventory({ onNavigate }: { onNavigate: (p: string) => void }) {
@@ -86,11 +86,11 @@ function Inventory({ onNavigate }: { onNavigate: (p: string) => void }) {
     for (const r of rows) {
       try {
         await upsertPlot(societyId, {
-          block: (r.block || 'A').toUpperCase(),
-          plot_no: r.plot_no,
-          size_marla: parseFloat(r.size_marla) || 0,
-          category: (r.category as PropertyCategory) || 'residential',
-          base_price: parseFloat(r.base_price) || 0,
+          block: (r['block'] || 'A').toUpperCase(),
+          plot_no: (r['plot_no'] ?? ''),
+          size_marla: parseFloat((r['size_marla'] ?? '0')) || 0,
+          category: (r['category'] as PropertyCategory) || 'residential',
+          base_price: parseFloat((r['base_price'] ?? '0')) || 0,
         });
         ok++;
       } catch {

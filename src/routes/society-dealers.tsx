@@ -11,7 +11,7 @@ import {
   fetchSocietyDealers,
   revokeLot,
 } from '@/lib/manzil/society';
-import type { Lot } from '@/lib/manzil/types';import { useSocietyId } from './SocietyHub';
+import type { Lot } from '@/lib/manzil/types';import { useSocietyId } from './society';
 
 /** WBS: Society Portal — Dealer Management (6) + Lot Assignment (society side) */
 function Dealers({ onNavigate }: { onNavigate: (p: string) => void }) {

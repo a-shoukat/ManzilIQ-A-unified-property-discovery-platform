@@ -33,7 +33,7 @@ async function localBrain(input: string): Promise<{ text: string; action?: { lab
     const cityM = q.match(/in\s+([a-z\s]+)/);
     const commercial = /commercial/.test(q);
     const res = await estimateLocal({
-      city: cityM ? cityM[1].trim() : '',
+      city: cityM ? (cityM[1] ?? '').trim() : '',
       area: '',
       sizeMarla: Number(m[1]),
       category: commercial ? 'commercial' : 'residential',
@@ -53,7 +53,7 @@ async function localBrain(input: string): Promise<{ text: string; action?: { lab
     if (supabase) {
       const cityM = q.match(/in\s+([a-z\s]+)/);
       let query = supabase.from('properties').select('title, city, price, plot_size_marla').limit(3);
-      if (cityM) query = query.ilike('city', `%${cityM[1].trim()}%`);
+      if (cityM) query = query.ilike('city', `%${(cityM[1] ?? '').trim()}%`);
       const { data } = await query;
       const rows = (data as { title: string; city: string; price: number; plot_size_marla: number }[] | null) ?? [];
       text = rows.length

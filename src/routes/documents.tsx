@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/manzil/auth';
 import { fetchDocuments, generateDocument } from '@/lib/manzil/legal';
 import { fetchAllBookings, fetchSocietyBookings } from '@/lib/manzil/booking';
 import { DOC_TITLES, type Booking, type GeneratedDocType, type GeneratedDocument } from '@/lib/manzil/types';
-import { useSocietyId } from '../society/SocietyHub';
+import { useSocietyId } from './society';
 
 const docTypeOptions = Object.keys(DOC_TITLES) as GeneratedDocType[];
 

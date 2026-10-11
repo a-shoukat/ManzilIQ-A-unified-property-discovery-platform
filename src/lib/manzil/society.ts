@@ -53,7 +53,7 @@ export async function setPlotStatus(id: string, status: Plot['status']): Promise
 export function parsePlotCsv(text: string): { rows: Record<string, string>[]; error?: string } {
   const lines = text.trim().split(/\r?\n/);
   if (lines.length < 2) return { rows: [], error: 'CSV is empty' };
-  const headers = lines[0].split(',').map((h) => h.trim().toLowerCase());
+  const headers = (lines[0] ?? '').split(',').map((h) => h.trim().toLowerCase());
   const need = ['block', 'plot_no', 'size_marla'];
   for (const n of need) {
     if (!headers.includes(n)) return { rows: [], error: `Missing column: ${n}` };

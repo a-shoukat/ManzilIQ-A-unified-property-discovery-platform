@@ -145,7 +145,7 @@ export async function marketTrends(): Promise<{ byCity: MarketTrend[]; overall: 
   return {
     byCity: [...cityMap.entries()]
       .map(([key, v]) => ({
-        city: key.split('|')[0],
+        city: key.split('|')[0] ?? 'Unknown',
         category: v.category,
         avgPerMarla: Math.round(v.sum / v.n),
         listings: v.n,
@@ -188,7 +188,7 @@ export async function customerActivity(customerId: string): Promise<ActivityItem
 /** Download rows as CSV. */
 export function downloadCSV(filename: string, rows: Record<string, unknown>[]): void {
   if (rows.length === 0) return;
-  const headers = Object.keys(rows[0]);
+  const headers = Object.keys(rows[0] ?? {});
   const esc = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`;
   const csv = [headers.join(','), ...rows.map((r) => headers.map((h) => esc(r[h])).join(','))].join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });

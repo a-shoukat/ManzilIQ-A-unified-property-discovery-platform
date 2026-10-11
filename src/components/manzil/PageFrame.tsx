@@ -33,7 +33,7 @@ export function PageFrame({children, publicPage=false}: {children:ReactNode; pub
  const { session, profile, loading, signOut } = useAuth();
  const {items} = useCompare();
  const location = useLocation();
- const current = location.pathname === '/' ? 'marketplace' : location.pathname.split('/')[1];
+ const current = location.pathname === '/' ? 'marketplace' : (location.pathname.split('/')[1] ?? 'marketplace');
  const [open,setOpen] = useState(false);
  const isSociety = profile?.role === 'society_admin' || profile?.role === 'super_admin';
  const isDealer = profile?.role === 'dealer' || profile?.role === 'super_admin';
@@ -43,7 +43,7 @@ export function PageFrame({children, publicPage=false}: {children:ReactNode; pub
  return <div className="app-shell">
   {open && <div className="mobile-scrim" onClick={()=>setOpen(false)}/>}
   <aside className={`sidebar${open?' open':''}`}>
-   <Button variant="legacy" className="brand" onClick={()=>go('marketplace')}><span className="brand-symbol"><Building2 size={24}/></span><span>Manzil<span className="brand-iq">IQ</span></span><Button asChild variant="ghost" size="icon" className="mobile-close"><span onClick={(e)=>{e.stopPropagation();setOpen(false)}}><X/></span></Button></Button>
+   <Button variant="legacy" className="brand" onClick={()=>go('marketplace')}><span className="brand-symbol"><Building2 size={24}/></span><span>Manzil<span className="brand-iq">IQ</span></span></Button>
    <div className="workspace-label">YOUR PROPERTY PARTNER</div>
    <div className="nav-group"><div className="nav-section-label">DISCOVER</div>{links(mainLinks)}</div>
    <div className="nav-group"><div className="nav-section-label">MY WORKSPACE</div>{links(portfolioLinks)}</div>

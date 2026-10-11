@@ -44,7 +44,7 @@ Transferor: ____________   Transferee: ____________`,
 function LegalTemplates({ onNavigate }: { onNavigate: (p: string) => void }) {
   const [templates, setTemplates] = useState<LegalTemplate[]>([]);
   const [key, setKey] = useState('allotment');
-  const [body, setBody] = useState(DEFAULT_BODIES.allotment);
+  const [body, setBody] = useState(DEFAULT_BODIES['allotment'] ?? '');
   const [preview, setPreview] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
@@ -56,7 +56,7 @@ function LegalTemplates({ onNavigate }: { onNavigate: (p: string) => void }) {
 
   useEffect(() => {
     const latest = templates.find((t) => t.key === key);
-    setBody(latest ? latest.body : DEFAULT_BODIES[key]);
+    setBody(latest ? latest.body : (DEFAULT_BODIES[key] ?? ''));
     setPreview(false);
   }, [key, templates]);
 
@@ -92,7 +92,7 @@ function LegalTemplates({ onNavigate }: { onNavigate: (p: string) => void }) {
 
       <div className="panel-grid">
         <div className="card">
-          <h3>Edit — v{versions.length > 0 ? versions[0].version + 1 : 1} (new)</h3>
+          <h3>Edit — v{versions.length > 0 ? (versions[0]?.version ?? 0) + 1 : 1} (new)</h3>
           <p className="muted small">
             Placeholders: {'{{customer_name}} {{cnic}} {{plot}} {{society}} {{amount}} {{date}} {{reference_no}}'}
           </p>

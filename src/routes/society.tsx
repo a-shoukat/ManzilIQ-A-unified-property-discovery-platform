@@ -16,7 +16,7 @@ export function useSocietyId(): { societyId: string | null; societies: { id: str
     } else if (profile?.role === 'super_admin') {
       fetchApprovedSocieties().then((list) => {
         setSocieties(list.map((s) => ({ id: s.id, name: s.name })));
-        if (list.length > 0) setSocietyId(list[0].id);
+        if (list[0]) setSocietyId(list[0].id);
       });
     }
   }, [profile]);

@@ -30,22 +30,18 @@ interface Sample {
 
 /** Solve (A)x = b via Gaussian elimination with partial pivoting. */
 function solveLinear(A: number[][], b: number[]): number[] {
-  const n = b.length;
-  const M = A.map((row, i) => [...row, b[i]]);
-  for (let col = 0; col < n; col++) {
-    let pivot = col;
-    for (let r = col + 1; r < n; r++) {
-      if (Math.abs(M[r][col]) > Math.abs(M[pivot][col])) pivot = r;
-    }
-    if (Math.abs(M[pivot][col]) < 1e-12) continue;
-    [M[col], M[pivot]] = [M[pivot], M[col]];
-    for (let r = 0; r < n; r++) {
-      if (r === col) continue;
-      const f = M[r][col] / M[col][col];
-      for (let c = col; c <= n; c++) M[r][c] -= f * M[col][c];
-    }
-  }
-  return M.map((row, i) => (Math.abs(row[i]) < 1e-12 ? 0 : row[n] / row[i]));
+ const n=b.length;
+ const M=A.map((row,i)=>[...row,b[i] ?? 0]);
+ const value=(r:number,c:number)=>M[r]?.[c] ?? 0;
+ for(let col=0;col<n;col++){
+  let pivot=col;
+  for(let r=col+1;r<n;r++) if(Math.abs(value(r,col))>Math.abs(value(pivot,col))) pivot=r;
+  if(Math.abs(value(pivot,col))<1e-12) continue;
+  const row=M[col];const pivotRow=M[pivot]; if(!row||!pivotRow)continue;
+  M[col]=pivotRow;M[pivot]=row;
+  for(let r=0;r<n;r++) {if(r===col)continue;const current=M[r];if(!current)continue;const f=value(r,col)/value(col,col);for(let c=col;c<=n;c++)current[c]=value(r,c)-f*value(col,c);}
+ }
+ return M.map((row,i)=>Math.abs(row[i] ?? 0)<1e-12?0:(row[n] ?? 0)/(row[i] ?? 1));
 }
 
 /**
@@ -136,12 +132,13 @@ export async function estimateLocal(input: EstimateInput): Promise<EstimateResul
     ys.push(y);
     const f = feat(s);
     for (let i = 0; i < cols; i++) {
-      Xty[i] += f[i] * y;
-      for (let j = 0; j < cols; j++) XtX[i][j] += f[i] * f[j];
+      Xty[i] = (Xty[i] ?? 0) + (f[i] ?? 0) * y;
+      const row = XtX[i];
+      if (row) for (let j = 0; j < cols; j++) row[j] = (row[j] ?? 0) + (f[i] ?? 0) * (f[j] ?? 0);
     }
   }
   // ridge regularization (skip intercept)
-  for (let i = 1; i < cols; i++) XtX[i][i] += 2.0;
+  for (let i = 1; i < cols; i++) { const row = XtX[i]; if (row) row[i] = (row[i] ?? 0) + 2.0; }
 
   const beta = solveLinear(XtX, Xty);
 
@@ -156,14 +153,14 @@ export async function estimateLocal(input: EstimateInput): Promise<EstimateResul
     society: inSoc,
   };
   const qf = feat(q);
-  const logPred = qf.reduce((s, v, i) => s + v * beta[i], 0);
+  const logPred = qf.reduce((s, v, i) => s + v * (beta[i] ?? 0), 0);
 
   // residual std for the band
   let sse = 0;
   const yMean = ys.reduce((a, b) => a + b, 0) / ys.length;
   let sst = 0;
   for (const s of samples) {
-    const r = Math.log(s.price) - feat(s).reduce((a, v, i) => a + v * beta[i], 0);
+    const r = Math.log(s.price) - feat(s).reduce((a, v, i) => a + v * (beta[i] ?? 0), 0);
     sse += r * r;
     const d = Math.log(s.price) - yMean;
     sst += d * d;
@@ -178,19 +175,19 @@ export async function estimateLocal(input: EstimateInput): Promise<EstimateResul
   const drivers: string[] = [];
   const socIdx = societies.indexOf(inSoc);
   const cityIdx = cities.indexOf(inCity);
-  if (socIdx >= 0 && Math.abs(beta[4 + cities.length + socIdx]) > 0.02) {
-    const pct = Math.round((Math.exp(beta[4 + cities.length + socIdx]) - 1) * 100);
+  if (socIdx >= 0 && Math.abs((beta[4 + cities.length + socIdx] ?? 0)) > 0.02) {
+    const pct = Math.round((Math.exp((beta[4 + cities.length + socIdx] ?? 0)) - 1) * 100);
     drivers.push(`society "${input.society}" ${pct >= 0 ? '+' : ''}${pct}%`);
-  } else if (cityIdx >= 0 && Math.abs(beta[4 + cityIdx]) > 0.02) {
-    const pct = Math.round((Math.exp(beta[4 + cityIdx]) - 1) * 100);
+  } else if (cityIdx >= 0 && Math.abs((beta[4 + cityIdx] ?? 0)) > 0.02) {
+    const pct = Math.round((Math.exp((beta[4 + cityIdx] ?? 0)) - 1) * 100);
     drivers.push(`city "${input.city}" ${pct >= 0 ? '+' : ''}${pct}%`);
   }
-  if (Math.abs(beta[2]) > 0.02) {
-    const pct = Math.round((Math.exp(beta[2]) - 1) * 100);
+  if (Math.abs((beta[2] ?? 0)) > 0.02) {
+    const pct = Math.round((Math.exp((beta[2] ?? 0)) - 1) * 100);
     drivers.push(`commercial ${pct >= 0 ? '+' : ''}${pct}%`);
   }
-  if (q.bedrooms > 0 && Math.abs(beta[3]) > 0.005) {
-    const pct = Math.round((Math.exp(beta[3] * q.bedrooms) - 1) * 100);
+  if (q.bedrooms > 0 && Math.abs((beta[3] ?? 0)) > 0.005) {
+    const pct = Math.round((Math.exp((beta[3] ?? 0) * q.bedrooms) - 1) * 100);
     drivers.push(`${q.bedrooms} bedrooms ${pct >= 0 ? '+' : ''}${pct}%`);
   }
 
@@ -207,43 +204,5 @@ export async function estimateLocal(input: EstimateInput): Promise<EstimateResul
   };
 }
 
-const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
-
-export function isAiConfigured(): boolean {
-  return !!GEMINI_KEY && !GEMINI_KEY.includes('your-');
-}
-
-/** Gemini-powered estimate with the regression model as baseline/fallback. */
-export async function estimatePrice(input: EstimateInput): Promise<EstimateResult> {
-  const local = await estimateLocal(input);
-  if (!isAiConfigured()) return local;
-
-  try {
-    const prompt = `You are a Pakistani real-estate valuer. Estimate the market price in PKR for: ${input.sizeMarla} marla ${input.category} property in ${input.area}, ${input.city}${input.society ? ` (${input.society})` : ''}${input.bedrooms ? `, ${input.bedrooms} bedrooms` : ''}. A regression model on local listings suggests PKR ${local.mid.toLocaleString()} (confidence ${local.confidence}%). Reply ONLY with JSON: {"low": number, "mid": number, "high": number, "confidence": number 0-100, "reasoning": "one short sentence"}. No markdown, no extra text.`;
-
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-      },
-    );
-    if (!res.ok) throw new Error('Gemini request failed');
-    const json = await res.json();
-    const text: string = json.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-    const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
-    if (!parsed.mid) throw new Error('Bad AI response');
-    return {
-      low: Math.round(Number(parsed.low)),
-      mid: Math.round(Number(parsed.mid)),
-      high: Math.round(Number(parsed.high)),
-      method: 'ai',
-      reasoning: String(parsed.reasoning ?? ''),
-      samples: local.samples,
-      confidence: Math.min(Math.max(Number(parsed.confidence) || local.confidence, 0), 99),
-    };
-  } catch {
-    return local;
-  }
-}
+export function isAiConfigured(): boolean { return false; }
+export async function estimatePrice(input: EstimateInput): Promise<EstimateResult> { return estimateLocal(input); }

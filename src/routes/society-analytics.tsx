@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { societySalesStats, downloadCSV, type SocietySalesStats } from '@/lib/manzil/analytics';
 import { fetchSocietyPayments, financialSummary } from '@/lib/manzil/payment';
 import { formatPrice } from '@/lib/manzil/properties';
-import { useSocietyId } from '../society/SocietyHub';
+import { useSocietyId } from './society';
 
 /** Module 12 — Society sales analytics + payment reports (CSV) */
 function SocietyAnalytics({ onNavigate }: { onNavigate: (p: string) => void }) {

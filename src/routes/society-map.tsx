@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { fetchPlots } from '@/lib/manzil/society';
 import { formatPrice } from '@/lib/manzil/properties';
 import type { Plot } from '@/lib/manzil/types';
-import { useSocietyId } from './SocietyHub';
+import { useSocietyId } from './society';
 
 const STATUS_COLOR: Record<Plot['status'], string> = {
   available: '#16a34a',

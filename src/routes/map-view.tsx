@@ -32,7 +32,7 @@ function MapView({ onNavigate }: { onNavigate: (p: string) => void }) {
     fetchApprovedSocieties().then((list) => {
       const mapped = list.map((s) => ({ id: s.id, name: s.name }));
       setSocieties(mapped);
-      if (mapped.length > 0) setSocietyId(mapped[0].id);
+      if (mapped[0]) setSocietyId(mapped[0].id);
       else setLoading(false);
     });
   }, []);
@@ -59,7 +59,7 @@ function MapView({ onNavigate }: { onNavigate: (p: string) => void }) {
     return true;
   });
 
-  const embedCode = `<iframe src="${typeof window !== 'undefined' ? window.location.origin : ''}/#/map-view?society=${societyId}" width="100%" height="600" style="border:0" title="Society plot map"></iframe>`;
+  const embedCode = `<iframe src="${typeof window !== 'undefined' ? window.location.origin : ''}/map-view?society=${societyId}" width="100%" height="600" style="border:0" title="Society plot map"></iframe>`;
 
   return (
     <div className="container">
