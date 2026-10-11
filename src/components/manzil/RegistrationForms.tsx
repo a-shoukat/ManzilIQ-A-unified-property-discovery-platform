@@ -159,12 +159,14 @@ export function DealerRegistrationForm({ onDone }: Props) {
   );
 }
 
-/** Customer registration — WBS: Customer Portal · Account Registration (5) */
+/** Customer registration with CNIC verification — reviewed by super admin. */
 export function CustomerRegistrationForm({ onDone }: Props) {
+  const [fullName, setFullName] = useState('');
   const [cnic, setCnic] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
-  const [photo, setPhoto] = useState<File | null>(null);
+  const [front, setFront] = useState<File | null>(null);
+  const [back, setBack] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -172,21 +174,26 @@ export function CustomerRegistrationForm({ onDone }: Props) {
     e.preventDefault();
     const supabase = getSupabase();
     if (!supabase) return;
+    if (!front || !back) { setError('Please upload both sides of your CNIC.'); return; }
     setLoading(true);
     setError(null);
     try {
       const { data: ud } = await supabase.auth.getUser();
       const user = ud.user;
       if (!user) throw new Error('Not signed in');
-      const photoUrl = photo ? await uploadDocument(photo) : null;
-      const { error: dErr } = await supabase.from('customer_details').insert({
+      const frontUrl = await uploadDocument(front);
+      const backUrl = await uploadDocument(back);
+      const { error: dErr } = await supabase.from('customer_details').upsert({
         profile_id: user.id,
-        cnic_number: cnic || null,
-        contact_phone: phone || null,
+        cnic_number: cnic,
+        contact_phone: phone,
         address: address || null,
-        photo_url: photoUrl,
+        photo_url: frontUrl,
+        cnic_front_url: frontUrl,
+        cnic_back_url: backUrl,
       });
       if (dErr) throw dErr;
+      await supabase.from('profiles').update({ verification_status: 'pending', full_name: fullName }).eq('id', user.id);
       onDone();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
@@ -198,25 +205,36 @@ export function CustomerRegistrationForm({ onDone }: Props) {
   return (
     <form onSubmit={submit}>
       <label>
-        CNIC number
-        <input value={cnic} onChange={(e) => setCnic(e.target.value)} placeholder="35202-1234567-1" />
+        Full name (as on CNIC)
+        <input required value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Muhammad Ali" />
       </label>
       <label>
-        Contact info (phone)
-        <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="03xx-xxxxxxx" />
+        CNIC number
+        <input required pattern="[0-9]{5}-?[0-9]{7}-?[0-9]" title="Format: 35202-1234567-1" value={cnic} onChange={(e) => setCnic(e.target.value)} placeholder="35202-1234567-1" />
+      </label>
+      <label>
+        Phone number
+        <input required type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="03xx-xxxxxxx" />
       </label>
       <label>
         Address
         <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="City, area" />
       </label>
       <label>
-        Profile photo (upload)
-        <input type="file" accept=".jpg,.jpeg,.png" onChange={(e) => setPhoto(e.target.files?.[0] ?? null)} />
+        CNIC front photo
+        <input required type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={(e) => setFront(e.target.files?.[0] ?? null)} />
+      </label>
+      <label>
+        CNIC back photo
+        <input required type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={(e) => setBack(e.target.files?.[0] ?? null)} />
       </label>
       {error && <div className="error">{error}</div>}
       <Button variant="legacy" className="btn" disabled={loading}>
-        {loading ? 'Saving…' : 'Complete registration'}
+        {loading ? 'Submitting…' : 'Submit for verification'}
       </Button>
+      <p className="muted" style={{ marginTop: 12 }}>
+        Our team reviews your CNIC, usually within one working day. You'll get a notification once approved.
+      </p>
     </form>
   );
 }
