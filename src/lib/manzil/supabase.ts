@@ -1,7 +1,10 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env['VITE_SUPABASE_URL'] as string | undefined;
-const supabaseAnonKey = (import.meta.env['VITE_SUPABASE_PUBLISHABLE_KEY'] || import.meta.env['VITE_SUPABASE_ANON_KEY']) as string | undefined;
+// Public (publishable) connection details for the existing ManzilIQ project.
+const supabaseUrl = ((import.meta.env['VITE_SUPABASE_URL'] as string | undefined) ||
+  'https://ctctmtgwfibuxyzemkee.supabase.co') as string;
+const supabaseAnonKey = ((import.meta.env['VITE_SUPABASE_PUBLISHABLE_KEY'] || import.meta.env['VITE_SUPABASE_ANON_KEY']) as string | undefined) ||
+  'sb_publishable_n0Fv19C41yHXgHYDkuBwGw_LJUS8VKo';
 
 export const isSupabaseConfigured = (): boolean =>
   !!supabaseUrl &&
