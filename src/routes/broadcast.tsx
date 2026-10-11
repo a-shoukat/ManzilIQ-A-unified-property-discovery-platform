@@ -91,7 +91,7 @@ function Broadcast({ onNavigate }: { onNavigate: (p: string) => void }) {
     }
   };
 
-  const useTemplate = (t: MessageTemplate) => {
+  const applyTemplate = (t: MessageTemplate) => {
     setTitle(t.title);
     setBody(t.body);
   };
@@ -140,7 +140,7 @@ function Broadcast({ onNavigate }: { onNavigate: (p: string) => void }) {
                 <div className="muted small">{t.body.slice(0, 80)}{t.body.length > 80 ? '…' : ''}</div>
               </div>
               <div className="link-row" style={{ margin: 0 }}>
-                <Button variant="legacy" className="link inline" onClick={() => useTemplate(t)}>Use</Button>
+                <Button variant="legacy" className="link inline" onClick={() => applyTemplate(t)}>Use</Button>
                 {t.owner_id && (
                   <Button variant="legacy" className="link inline danger-text" onClick={async () => { await deleteTemplate(t.id); loadTemplates(); }}>Delete</Button>
                 )}

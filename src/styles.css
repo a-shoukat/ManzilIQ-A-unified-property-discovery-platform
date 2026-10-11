@@ -1129,3 +1129,6 @@ textarea {
   .workspace{margin-left:210px;}
   .mobile-menu{display:none;}
 }
+
+.listing-skeleton { aspect-ratio: 4 / 5; border-radius: 18px; background: linear-gradient(90deg, var(--muted) 25%, var(--accent) 50%, var(--muted) 75%); background-size: 200% 100%; animation: listing-shimmer 1.2s infinite linear; }
+@keyframes listing-shimmer { to { background-position: -200% 0; } }
