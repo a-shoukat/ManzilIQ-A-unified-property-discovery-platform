@@ -20,17 +20,21 @@ export const useCompare = () => useContext(CompareContext);
 const KEY = 'manziliq_compare';
 
 export function CompareProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<Property[]>(() => {
+  const [items, setItems] = useState<Property[]>([]);
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
     try {
-      return JSON.parse(localStorage.getItem(KEY) ?? '[]');
+      const saved = JSON.parse(localStorage.getItem(KEY) ?? '[]');
+      if (Array.isArray(saved)) setItems(saved.slice(0, 3));
     } catch {
-      return [];
+      setItems([]);
     }
-  });
+    setReady(true);
+  }, []);
 
   useEffect(() => {
-    localStorage.setItem(KEY, JSON.stringify(items));
-  }, [items]);
+    if (ready) localStorage.setItem(KEY, JSON.stringify(items));
+  }, [items, ready]);
 
   const toggle = (p: Property) => {
     setItems((prev) => {

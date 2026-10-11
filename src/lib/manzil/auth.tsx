@@ -97,12 +97,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     refresh().finally(() => setLoading(false));
-    const { data: listener } = supabase.auth.onAuthStateChange(async (_e, s) => {
+    const { data: listener } = supabase.auth.onAuthStateChange((_e, s) => {
       setSession(s);
       if (s?.user) {
-        const { profile: p, details: d } = await loadProfile(s.user.id);
-        setProfile(p);
-        setDetails(d);
+        setTimeout(() => {
+          loadProfile(s.user.id).then(({ profile: p, details: d }) => {
+            setProfile(p);
+            setDetails(d);
+          });
+        }, 0);
       } else {
         setProfile(null);
         setDetails(null);
