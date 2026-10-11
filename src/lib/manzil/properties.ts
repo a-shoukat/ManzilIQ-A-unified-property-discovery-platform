@@ -81,10 +81,28 @@ export const DEMO_PROPERTIES: Property[] = [
   },
 ];
 
-export async function fetchProperties(): Promise<{
-  list: Property[];
-  demo: boolean;
-}> {
+type PropertyList = { list: Property[]; demo: boolean };
+const CACHE_KEY = 'manziliq.properties.v1';
+let inflight: Promise<PropertyList> | null = null;
+
+/** Last list shown on this device, for an instant first paint on repeat visits. */
+export function readCachedProperties(): PropertyList | null {
+  if (typeof window === 'undefined') return null;
+  try { const raw = sessionStorage.getItem(CACHE_KEY); return raw ? (JSON.parse(raw) as PropertyList) : null; } catch { return null; }
+}
+
+/** Deduplicated fetch: concurrent callers share one request; result is cached for the session. */
+export function fetchProperties(): Promise<PropertyList> {
+  if (!inflight) {
+    inflight = loadProperties().then((r) => {
+      try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(r)); } catch { /* storage full */ }
+      return r;
+    }).finally(() => { setTimeout(() => { inflight = null; }, 30_000); });
+  }
+  return inflight;
+}
+
+async function loadProperties(): Promise<PropertyList> {
   const supabase = getSupabase();
   if (!supabase) return { list: DEMO_PROPERTIES, demo: true };
   const { data, error } = await supabase
@@ -103,7 +121,7 @@ export async function fetchProperty(id: string): Promise<Property | null> {
   }
   const supabase = getSupabase();
   if (!supabase) return null;
-  const { data } = await supabase.from('properties').select('*').eq('id', id).single();
+  const { data } = await supabase.from('properties').select('*').eq('id', id).maybeSingle();
   return (data as Property) ?? null;
 }
 
