@@ -1,3 +1,4 @@
+import { formatSize } from '@/lib/manzil/phase3-rules';
 import { Button } from '@/components/ui/button';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
@@ -66,7 +67,7 @@ function PropertyDetail({
     ['Area', p.area ?? '—'],
     ['Society', p.society_name ?? '—'],
     ['Block', p.block ?? '—'],
-    ['Plot size', `${p.plot_size_marla} Marla`],
+    ['Plot size', formatSize(p.plot_size_marla)],
     ['Category', p.category],
     ['Purpose', p.purpose],
     ['Bedrooms', p.bedrooms != null ? String(p.bedrooms) : '—'],
