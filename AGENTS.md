@@ -14,3 +14,4 @@
 - Treat reference/source-schema.sql as reference only; never execute it automatically against an existing database.
 - Use semantic design tokens in src/styles.css for imported and new UI, and use the shared Button component for controls.
 - Never send private AI provider keys from the browser; retain local assistance until a secure server integration is configured.
+- Centralize imported page role checks in the shared access module; this keeps all original role boundaries consistent across deep links.
