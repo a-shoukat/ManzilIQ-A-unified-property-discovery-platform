@@ -41,18 +41,18 @@ export function PageFrame({children, publicPage=false}: {children:ReactNode; pub
  const isSociety = profile?.role === 'society_admin' || profile?.role === 'super_admin';
  const isDealer = profile?.role === 'dealer' || profile?.role === 'super_admin';
  const go = (key:string) => { onNavigate(key); setOpen(false); };
- const links = (list:typeof mainLinks) => list.map(({key,label,icon:Icon}) => <Button variant="legacy" key={key} className={`side-link${current===key?' active':''}`} onClick={()=>go(key)}><Icon size={18}/><span>{label}</span>{key==='compare' && items.length>0 && <span className="side-count">{items.length}</span>}</Button>);
- const allowed = canAccessPage(current, profile?.role);
- return <div className="app-shell">
-  {open && <div className="mobile-scrim" onClick={()=>setOpen(false)}/>}
-  <aside className={`sidebar${open?' open':''}`}>
-   <Button variant="legacy" className="brand" onClick={()=>go('marketplace')}><span className="brand-symbol"><Building2 size={24}/></span><span>Manzil<span className="brand-iq">IQ</span></span></Button>
-   <div className="workspace-label">YOUR PROPERTY PARTNER</div>
-   <div className="nav-group"><div className="nav-section-label">DISCOVER</div>{links(mainLinks)}</div>
-   <div className="nav-group"><div className="nav-section-label">MY WORKSPACE</div>{links(portfolioLinks)}</div>
-   <div className="nav-group"><div className="nav-section-label">INSIGHTS</div>{links([{key:'market-trends',label:'Market trends',icon:ChartNoAxesCombined}])}
-    {isSociety && links([{key:'society',label:'Society management',icon:Building2},{key:'society-analytics',label:'Society analytics',icon:ChartNoAxesCombined}])}
-    {isDealer && links([{key:'dealer',label:'Dealer workspace',icon:Users}])}
+  const links = (list:typeof mainLinks) => list.filter(({key}) => !session || canAccessPage(key, profile?.role)).map(({key,label,icon:Icon}) => <Button variant="legacy" key={key} className={`side-link${current===key?' active':''}`} onClick={()=>go(key)}><Icon size={18}/><span>{label}</span>{key==='compare' && items.length>0 && <span className="side-count">{items.length}</span>}</Button>);
+  const allowed = canAccessPage(current, profile?.role);
+  return <div className="app-shell">
+   {open && <div className="mobile-scrim" onClick={()=>setOpen(false)}/>}
+   <aside className={`sidebar${open?' open':''}`}>
+    <Button variant="legacy" className="brand" onClick={()=>go('marketplace')}><span className="brand-symbol"><Building2 size={24}/></span><span>Manzil<span className="brand-iq">IQ</span></span></Button>
+    <div className="workspace-label">YOUR PROPERTY PARTNER</div>
+    <div className="nav-group"><div className="nav-section-label">DISCOVER</div>{links(mainLinks)}</div>
+    <div className="nav-group"><div className="nav-section-label">MY WORKSPACE</div>{links(portfolioLinks)}</div>
+    <div className="nav-group"><div className="nav-section-label">INSIGHTS</div>{links([{key:'market-trends',label:'Market trends',icon:ChartNoAxesCombined}])}
+     {isSociety && links([{key:'society',label:'Society management',icon:Building2},{key:'society-inventory',label:'Plot inventory',icon:LayoutGrid},{key:'society-bookings',label:'Booking requests',icon:CalendarDays},{key:'society-dealers',label:'Dealers',icon:Users},{key:'society-financials',label:'Financials',icon:Wallet},{key:'society-analytics',label:'Society analytics',icon:ChartNoAxesCombined}])}
+     {isDealer && links([{key:'dealer',label:'Dealer workspace',icon:Users},{key:'dealer-lots',label:'My lots',icon:LayoutGrid},{key:'dealer-leads',label:'Leads',icon:Users},{key:'dealer-analytics',label:'Performance',icon:ChartNoAxesCombined}])}
     {profile?.role==='super_admin' && links([{key:'admin',label:'Administration',icon:ShieldCheck},{key:'admin-users',label:'Users',icon:Users},{key:'admin-verification',label:'Approvals',icon:ShieldCheck},{key:'admin-bookings',label:'All bookings',icon:CalendarDays},{key:'admin-disputes',label:'Disputes',icon:ShieldCheck},{key:'admin-templates',label:'Templates',icon:FileText},{key:'admin-analytics',label:'Platform analytics',icon:ChartNoAxesCombined},{key:'broadcast',label:'Broadcast',icon:Bell}])}
    </div>
    <div className="sidebar-bottom"><div className="advisor-note"><Sparkles size={19}/><strong>A little clarity goes a long way.</strong><span>Find your next move with ManzilIQ.</span><Button variant="legacy" className="advisor-link" onClick={()=>go('price-estimator')}>Explore price estimates <ArrowUpRight size={16}/></Button></div>
