@@ -10,33 +10,453 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AddPropertyRouteImport } from './routes/add-property'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin-analytics'
+import { Route as AdminBookingsRouteImport } from './routes/admin-bookings'
+import { Route as AdminDisputesRouteImport } from './routes/admin-disputes'
+import { Route as AdminTemplatesRouteImport } from './routes/admin-templates'
+import { Route as AdminVerificationRouteImport } from './routes/admin-verification'
+import { Route as BookPlotRouteImport } from './routes/book-plot'
+import { Route as BroadcastRouteImport } from './routes/broadcast'
+import { Route as CompareRouteImport } from './routes/compare'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as DealerRouteImport } from './routes/dealer'
+import { Route as DealerAnalyticsRouteImport } from './routes/dealer-analytics'
+import { Route as DealerDiscoverRouteImport } from './routes/dealer-discover'
+import { Route as DealerLeadsRouteImport } from './routes/dealer-leads'
+import { Route as DealerLotsRouteImport } from './routes/dealer-lots'
+import { Route as DocumentsRouteImport } from './routes/documents'
+import { Route as InboxRouteImport } from './routes/inbox'
+import { Route as MapViewRouteImport } from './routes/map-view'
+import { Route as MarketTrendsRouteImport } from './routes/market-trends'
+import { Route as MyActivityRouteImport } from './routes/my-activity'
+import { Route as MyBookingsRouteImport } from './routes/my-bookings'
+import { Route as MyPaymentsRouteImport } from './routes/my-payments'
+import { Route as PriceEstimatorRouteImport } from './routes/price-estimator'
+import { Route as SocietyRouteImport } from './routes/society'
+import { Route as SocietyAnalyticsRouteImport } from './routes/society-analytics'
+import { Route as SocietyBookingsRouteImport } from './routes/society-bookings'
+import { Route as SocietyDealersRouteImport } from './routes/society-dealers'
+import { Route as SocietyFinancialsRouteImport } from './routes/society-financials'
+import { Route as SocietyInventoryRouteImport } from './routes/society-inventory'
+import { Route as SocietyMapRouteImport } from './routes/society-map'
+import { Route as PropertyIdRouteImport } from './routes/property.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AddPropertyRoute = AddPropertyRouteImport.update({
+  id: '/add-property',
+  path: '/add-property',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/admin-analytics',
+  path: '/admin-analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminBookingsRoute = AdminBookingsRouteImport.update({
+  id: '/admin-bookings',
+  path: '/admin-bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDisputesRoute = AdminDisputesRouteImport.update({
+  id: '/admin-disputes',
+  path: '/admin-disputes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminTemplatesRoute = AdminTemplatesRouteImport.update({
+  id: '/admin-templates',
+  path: '/admin-templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminVerificationRoute = AdminVerificationRouteImport.update({
+  id: '/admin-verification',
+  path: '/admin-verification',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookPlotRoute = BookPlotRouteImport.update({
+  id: '/book-plot',
+  path: '/book-plot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BroadcastRoute = BroadcastRouteImport.update({
+  id: '/broadcast',
+  path: '/broadcast',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareRoute = CompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealerRoute = DealerRouteImport.update({
+  id: '/dealer',
+  path: '/dealer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealerAnalyticsRoute = DealerAnalyticsRouteImport.update({
+  id: '/dealer-analytics',
+  path: '/dealer-analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealerDiscoverRoute = DealerDiscoverRouteImport.update({
+  id: '/dealer-discover',
+  path: '/dealer-discover',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealerLeadsRoute = DealerLeadsRouteImport.update({
+  id: '/dealer-leads',
+  path: '/dealer-leads',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealerLotsRoute = DealerLotsRouteImport.update({
+  id: '/dealer-lots',
+  path: '/dealer-lots',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocumentsRoute = DocumentsRouteImport.update({
+  id: '/documents',
+  path: '/documents',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InboxRoute = InboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MapViewRoute = MapViewRouteImport.update({
+  id: '/map-view',
+  path: '/map-view',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketTrendsRoute = MarketTrendsRouteImport.update({
+  id: '/market-trends',
+  path: '/market-trends',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyActivityRoute = MyActivityRouteImport.update({
+  id: '/my-activity',
+  path: '/my-activity',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyBookingsRoute = MyBookingsRouteImport.update({
+  id: '/my-bookings',
+  path: '/my-bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyPaymentsRoute = MyPaymentsRouteImport.update({
+  id: '/my-payments',
+  path: '/my-payments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PriceEstimatorRoute = PriceEstimatorRouteImport.update({
+  id: '/price-estimator',
+  path: '/price-estimator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SocietyRoute = SocietyRouteImport.update({
+  id: '/society',
+  path: '/society',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SocietyAnalyticsRoute = SocietyAnalyticsRouteImport.update({
+  id: '/society-analytics',
+  path: '/society-analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SocietyBookingsRoute = SocietyBookingsRouteImport.update({
+  id: '/society-bookings',
+  path: '/society-bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SocietyDealersRoute = SocietyDealersRouteImport.update({
+  id: '/society-dealers',
+  path: '/society-dealers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SocietyFinancialsRoute = SocietyFinancialsRouteImport.update({
+  id: '/society-financials',
+  path: '/society-financials',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SocietyInventoryRoute = SocietyInventoryRouteImport.update({
+  id: '/society-inventory',
+  path: '/society-inventory',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SocietyMapRoute = SocietyMapRouteImport.update({
+  id: '/society-map',
+  path: '/society-map',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PropertyIdRoute = PropertyIdRouteImport.update({
+  id: '/property/$id',
+  path: '/property/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/add-property': typeof AddPropertyRoute
+  '/admin': typeof AdminRoute
+  '/admin-analytics': typeof AdminAnalyticsRoute
+  '/admin-bookings': typeof AdminBookingsRoute
+  '/admin-disputes': typeof AdminDisputesRoute
+  '/admin-templates': typeof AdminTemplatesRoute
+  '/admin-verification': typeof AdminVerificationRoute
+  '/book-plot': typeof BookPlotRoute
+  '/broadcast': typeof BroadcastRoute
+  '/compare': typeof CompareRoute
+  '/dashboard': typeof DashboardRoute
+  '/dealer': typeof DealerRoute
+  '/dealer-analytics': typeof DealerAnalyticsRoute
+  '/dealer-discover': typeof DealerDiscoverRoute
+  '/dealer-leads': typeof DealerLeadsRoute
+  '/dealer-lots': typeof DealerLotsRoute
+  '/documents': typeof DocumentsRoute
+  '/inbox': typeof InboxRoute
+  '/map-view': typeof MapViewRoute
+  '/market-trends': typeof MarketTrendsRoute
+  '/my-activity': typeof MyActivityRoute
+  '/my-bookings': typeof MyBookingsRoute
+  '/my-payments': typeof MyPaymentsRoute
+  '/price-estimator': typeof PriceEstimatorRoute
+  '/society': typeof SocietyRoute
+  '/society-analytics': typeof SocietyAnalyticsRoute
+  '/society-bookings': typeof SocietyBookingsRoute
+  '/society-dealers': typeof SocietyDealersRoute
+  '/society-financials': typeof SocietyFinancialsRoute
+  '/society-inventory': typeof SocietyInventoryRoute
+  '/society-map': typeof SocietyMapRoute
+  '/property/$id': typeof PropertyIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/add-property': typeof AddPropertyRoute
+  '/admin': typeof AdminRoute
+  '/admin-analytics': typeof AdminAnalyticsRoute
+  '/admin-bookings': typeof AdminBookingsRoute
+  '/admin-disputes': typeof AdminDisputesRoute
+  '/admin-templates': typeof AdminTemplatesRoute
+  '/admin-verification': typeof AdminVerificationRoute
+  '/book-plot': typeof BookPlotRoute
+  '/broadcast': typeof BroadcastRoute
+  '/compare': typeof CompareRoute
+  '/dashboard': typeof DashboardRoute
+  '/dealer': typeof DealerRoute
+  '/dealer-analytics': typeof DealerAnalyticsRoute
+  '/dealer-discover': typeof DealerDiscoverRoute
+  '/dealer-leads': typeof DealerLeadsRoute
+  '/dealer-lots': typeof DealerLotsRoute
+  '/documents': typeof DocumentsRoute
+  '/inbox': typeof InboxRoute
+  '/map-view': typeof MapViewRoute
+  '/market-trends': typeof MarketTrendsRoute
+  '/my-activity': typeof MyActivityRoute
+  '/my-bookings': typeof MyBookingsRoute
+  '/my-payments': typeof MyPaymentsRoute
+  '/price-estimator': typeof PriceEstimatorRoute
+  '/society': typeof SocietyRoute
+  '/society-analytics': typeof SocietyAnalyticsRoute
+  '/society-bookings': typeof SocietyBookingsRoute
+  '/society-dealers': typeof SocietyDealersRoute
+  '/society-financials': typeof SocietyFinancialsRoute
+  '/society-inventory': typeof SocietyInventoryRoute
+  '/society-map': typeof SocietyMapRoute
+  '/property/$id': typeof PropertyIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/add-property': typeof AddPropertyRoute
+  '/admin': typeof AdminRoute
+  '/admin-analytics': typeof AdminAnalyticsRoute
+  '/admin-bookings': typeof AdminBookingsRoute
+  '/admin-disputes': typeof AdminDisputesRoute
+  '/admin-templates': typeof AdminTemplatesRoute
+  '/admin-verification': typeof AdminVerificationRoute
+  '/book-plot': typeof BookPlotRoute
+  '/broadcast': typeof BroadcastRoute
+  '/compare': typeof CompareRoute
+  '/dashboard': typeof DashboardRoute
+  '/dealer': typeof DealerRoute
+  '/dealer-analytics': typeof DealerAnalyticsRoute
+  '/dealer-discover': typeof DealerDiscoverRoute
+  '/dealer-leads': typeof DealerLeadsRoute
+  '/dealer-lots': typeof DealerLotsRoute
+  '/documents': typeof DocumentsRoute
+  '/inbox': typeof InboxRoute
+  '/map-view': typeof MapViewRoute
+  '/market-trends': typeof MarketTrendsRoute
+  '/my-activity': typeof MyActivityRoute
+  '/my-bookings': typeof MyBookingsRoute
+  '/my-payments': typeof MyPaymentsRoute
+  '/price-estimator': typeof PriceEstimatorRoute
+  '/society': typeof SocietyRoute
+  '/society-analytics': typeof SocietyAnalyticsRoute
+  '/society-bookings': typeof SocietyBookingsRoute
+  '/society-dealers': typeof SocietyDealersRoute
+  '/society-financials': typeof SocietyFinancialsRoute
+  '/society-inventory': typeof SocietyInventoryRoute
+  '/society-map': typeof SocietyMapRoute
+  '/property/$id': typeof PropertyIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/add-property'
+    | '/admin'
+    | '/admin-analytics'
+    | '/admin-bookings'
+    | '/admin-disputes'
+    | '/admin-templates'
+    | '/admin-verification'
+    | '/book-plot'
+    | '/broadcast'
+    | '/compare'
+    | '/dashboard'
+    | '/dealer'
+    | '/dealer-analytics'
+    | '/dealer-discover'
+    | '/dealer-leads'
+    | '/dealer-lots'
+    | '/documents'
+    | '/inbox'
+    | '/map-view'
+    | '/market-trends'
+    | '/my-activity'
+    | '/my-bookings'
+    | '/my-payments'
+    | '/price-estimator'
+    | '/society'
+    | '/society-analytics'
+    | '/society-bookings'
+    | '/society-dealers'
+    | '/society-financials'
+    | '/society-inventory'
+    | '/society-map'
+    | '/property/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/add-property'
+    | '/admin'
+    | '/admin-analytics'
+    | '/admin-bookings'
+    | '/admin-disputes'
+    | '/admin-templates'
+    | '/admin-verification'
+    | '/book-plot'
+    | '/broadcast'
+    | '/compare'
+    | '/dashboard'
+    | '/dealer'
+    | '/dealer-analytics'
+    | '/dealer-discover'
+    | '/dealer-leads'
+    | '/dealer-lots'
+    | '/documents'
+    | '/inbox'
+    | '/map-view'
+    | '/market-trends'
+    | '/my-activity'
+    | '/my-bookings'
+    | '/my-payments'
+    | '/price-estimator'
+    | '/society'
+    | '/society-analytics'
+    | '/society-bookings'
+    | '/society-dealers'
+    | '/society-financials'
+    | '/society-inventory'
+    | '/society-map'
+    | '/property/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/add-property'
+    | '/admin'
+    | '/admin-analytics'
+    | '/admin-bookings'
+    | '/admin-disputes'
+    | '/admin-templates'
+    | '/admin-verification'
+    | '/book-plot'
+    | '/broadcast'
+    | '/compare'
+    | '/dashboard'
+    | '/dealer'
+    | '/dealer-analytics'
+    | '/dealer-discover'
+    | '/dealer-leads'
+    | '/dealer-lots'
+    | '/documents'
+    | '/inbox'
+    | '/map-view'
+    | '/market-trends'
+    | '/my-activity'
+    | '/my-bookings'
+    | '/my-payments'
+    | '/price-estimator'
+    | '/society'
+    | '/society-analytics'
+    | '/society-bookings'
+    | '/society-dealers'
+    | '/society-financials'
+    | '/society-inventory'
+    | '/society-map'
+    | '/property/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AddPropertyRoute: typeof AddPropertyRoute
+  AdminRoute: typeof AdminRoute
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminBookingsRoute: typeof AdminBookingsRoute
+  AdminDisputesRoute: typeof AdminDisputesRoute
+  AdminTemplatesRoute: typeof AdminTemplatesRoute
+  AdminVerificationRoute: typeof AdminVerificationRoute
+  BookPlotRoute: typeof BookPlotRoute
+  BroadcastRoute: typeof BroadcastRoute
+  CompareRoute: typeof CompareRoute
+  DashboardRoute: typeof DashboardRoute
+  DealerRoute: typeof DealerRoute
+  DealerAnalyticsRoute: typeof DealerAnalyticsRoute
+  DealerDiscoverRoute: typeof DealerDiscoverRoute
+  DealerLeadsRoute: typeof DealerLeadsRoute
+  DealerLotsRoute: typeof DealerLotsRoute
+  DocumentsRoute: typeof DocumentsRoute
+  InboxRoute: typeof InboxRoute
+  MapViewRoute: typeof MapViewRoute
+  MarketTrendsRoute: typeof MarketTrendsRoute
+  MyActivityRoute: typeof MyActivityRoute
+  MyBookingsRoute: typeof MyBookingsRoute
+  MyPaymentsRoute: typeof MyPaymentsRoute
+  PriceEstimatorRoute: typeof PriceEstimatorRoute
+  SocietyRoute: typeof SocietyRoute
+  SocietyAnalyticsRoute: typeof SocietyAnalyticsRoute
+  SocietyBookingsRoute: typeof SocietyBookingsRoute
+  SocietyDealersRoute: typeof SocietyDealersRoute
+  SocietyFinancialsRoute: typeof SocietyFinancialsRoute
+  SocietyInventoryRoute: typeof SocietyInventoryRoute
+  SocietyMapRoute: typeof SocietyMapRoute
+  PropertyIdRoute: typeof PropertyIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +468,267 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/add-property': {
+      id: '/add-property'
+      path: '/add-property'
+      fullPath: '/add-property'
+      preLoaderRoute: typeof AddPropertyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-analytics': {
+      id: '/admin-analytics'
+      path: '/admin-analytics'
+      fullPath: '/admin-analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-bookings': {
+      id: '/admin-bookings'
+      path: '/admin-bookings'
+      fullPath: '/admin-bookings'
+      preLoaderRoute: typeof AdminBookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-disputes': {
+      id: '/admin-disputes'
+      path: '/admin-disputes'
+      fullPath: '/admin-disputes'
+      preLoaderRoute: typeof AdminDisputesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-templates': {
+      id: '/admin-templates'
+      path: '/admin-templates'
+      fullPath: '/admin-templates'
+      preLoaderRoute: typeof AdminTemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-verification': {
+      id: '/admin-verification'
+      path: '/admin-verification'
+      fullPath: '/admin-verification'
+      preLoaderRoute: typeof AdminVerificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/book-plot': {
+      id: '/book-plot'
+      path: '/book-plot'
+      fullPath: '/book-plot'
+      preLoaderRoute: typeof BookPlotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/broadcast': {
+      id: '/broadcast'
+      path: '/broadcast'
+      fullPath: '/broadcast'
+      preLoaderRoute: typeof BroadcastRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare': {
+      id: '/compare'
+      path: '/compare'
+      fullPath: '/compare'
+      preLoaderRoute: typeof CompareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dealer': {
+      id: '/dealer'
+      path: '/dealer'
+      fullPath: '/dealer'
+      preLoaderRoute: typeof DealerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dealer-analytics': {
+      id: '/dealer-analytics'
+      path: '/dealer-analytics'
+      fullPath: '/dealer-analytics'
+      preLoaderRoute: typeof DealerAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dealer-discover': {
+      id: '/dealer-discover'
+      path: '/dealer-discover'
+      fullPath: '/dealer-discover'
+      preLoaderRoute: typeof DealerDiscoverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dealer-leads': {
+      id: '/dealer-leads'
+      path: '/dealer-leads'
+      fullPath: '/dealer-leads'
+      preLoaderRoute: typeof DealerLeadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dealer-lots': {
+      id: '/dealer-lots'
+      path: '/dealer-lots'
+      fullPath: '/dealer-lots'
+      preLoaderRoute: typeof DealerLotsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/documents': {
+      id: '/documents'
+      path: '/documents'
+      fullPath: '/documents'
+      preLoaderRoute: typeof DocumentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inbox': {
+      id: '/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof InboxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/map-view': {
+      id: '/map-view'
+      path: '/map-view'
+      fullPath: '/map-view'
+      preLoaderRoute: typeof MapViewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/market-trends': {
+      id: '/market-trends'
+      path: '/market-trends'
+      fullPath: '/market-trends'
+      preLoaderRoute: typeof MarketTrendsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-activity': {
+      id: '/my-activity'
+      path: '/my-activity'
+      fullPath: '/my-activity'
+      preLoaderRoute: typeof MyActivityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-bookings': {
+      id: '/my-bookings'
+      path: '/my-bookings'
+      fullPath: '/my-bookings'
+      preLoaderRoute: typeof MyBookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-payments': {
+      id: '/my-payments'
+      path: '/my-payments'
+      fullPath: '/my-payments'
+      preLoaderRoute: typeof MyPaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/price-estimator': {
+      id: '/price-estimator'
+      path: '/price-estimator'
+      fullPath: '/price-estimator'
+      preLoaderRoute: typeof PriceEstimatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/society': {
+      id: '/society'
+      path: '/society'
+      fullPath: '/society'
+      preLoaderRoute: typeof SocietyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/society-analytics': {
+      id: '/society-analytics'
+      path: '/society-analytics'
+      fullPath: '/society-analytics'
+      preLoaderRoute: typeof SocietyAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/society-bookings': {
+      id: '/society-bookings'
+      path: '/society-bookings'
+      fullPath: '/society-bookings'
+      preLoaderRoute: typeof SocietyBookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/society-dealers': {
+      id: '/society-dealers'
+      path: '/society-dealers'
+      fullPath: '/society-dealers'
+      preLoaderRoute: typeof SocietyDealersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/society-financials': {
+      id: '/society-financials'
+      path: '/society-financials'
+      fullPath: '/society-financials'
+      preLoaderRoute: typeof SocietyFinancialsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/society-inventory': {
+      id: '/society-inventory'
+      path: '/society-inventory'
+      fullPath: '/society-inventory'
+      preLoaderRoute: typeof SocietyInventoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/society-map': {
+      id: '/society-map'
+      path: '/society-map'
+      fullPath: '/society-map'
+      preLoaderRoute: typeof SocietyMapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/property/$id': {
+      id: '/property/$id'
+      path: '/property/$id'
+      fullPath: '/property/$id'
+      preLoaderRoute: typeof PropertyIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AddPropertyRoute: AddPropertyRoute,
+  AdminRoute: AdminRoute,
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminBookingsRoute: AdminBookingsRoute,
+  AdminDisputesRoute: AdminDisputesRoute,
+  AdminTemplatesRoute: AdminTemplatesRoute,
+  AdminVerificationRoute: AdminVerificationRoute,
+  BookPlotRoute: BookPlotRoute,
+  BroadcastRoute: BroadcastRoute,
+  CompareRoute: CompareRoute,
+  DashboardRoute: DashboardRoute,
+  DealerRoute: DealerRoute,
+  DealerAnalyticsRoute: DealerAnalyticsRoute,
+  DealerDiscoverRoute: DealerDiscoverRoute,
+  DealerLeadsRoute: DealerLeadsRoute,
+  DealerLotsRoute: DealerLotsRoute,
+  DocumentsRoute: DocumentsRoute,
+  InboxRoute: InboxRoute,
+  MapViewRoute: MapViewRoute,
+  MarketTrendsRoute: MarketTrendsRoute,
+  MyActivityRoute: MyActivityRoute,
+  MyBookingsRoute: MyBookingsRoute,
+  MyPaymentsRoute: MyPaymentsRoute,
+  PriceEstimatorRoute: PriceEstimatorRoute,
+  SocietyRoute: SocietyRoute,
+  SocietyAnalyticsRoute: SocietyAnalyticsRoute,
+  SocietyBookingsRoute: SocietyBookingsRoute,
+  SocietyDealersRoute: SocietyDealersRoute,
+  SocietyFinancialsRoute: SocietyFinancialsRoute,
+  SocietyInventoryRoute: SocietyInventoryRoute,
+  SocietyMapRoute: SocietyMapRoute,
+  PropertyIdRoute: PropertyIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
