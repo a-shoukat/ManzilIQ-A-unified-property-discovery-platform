@@ -59,3 +59,11 @@ drop policy if exists "listing photos write" on storage.objects;
 create policy "listing photos write" on storage.objects for all to authenticated
   using (bucket_id = 'listing-photos' and (storage.foldername(name))[1] = auth.uid()::text)
   with check (bucket_id = 'listing-photos' and (storage.foldername(name))[1] = auth.uid()::text);
+
+-- Lets the app notify super admins about reports (returns ids only).
+create or replace function public.list_super_admins() returns setof uuid
+language sql stable security definer set search_path = public as $$
+  select id from public.profiles where role = 'super_admin'
+$$;
+revoke all on function public.list_super_admins() from public;
+grant execute on function public.list_super_admins() to authenticated;
