@@ -93,15 +93,15 @@
 }
 .page {
   min-height: calc(100vh - 100px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
+  display: block;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 32px 40px 48px;
 }
 
 .card {
   width: 100%;
-  max-width: 380px;
+  max-width: none;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -230,21 +230,12 @@ input:focus {
 }
 
 .card.wide {
-  max-width: 560px;
-}
-
-/* Full-bleed workspace layouts (admin dashboard) */
-.page.page-full {
-  display: block;
-  align-items: stretch;
-  justify-content: stretch;
-  padding: 26px 30px 40px;
-}
-
-.card.card-full {
   max-width: none;
-  width: 100%;
-  padding: 26px 28px 30px;
+}
+
+/* Keep form fields readable inside full-width cards */
+.card form {
+  max-width: 760px;
 }
 
 .topbar {
