@@ -28,6 +28,7 @@ import { Route as DealerLeadsRouteImport } from './routes/dealer-leads'
 import { Route as DealerLotsRouteImport } from './routes/dealer-lots'
 import { Route as DocumentsRouteImport } from './routes/documents'
 import { Route as InboxRouteImport } from './routes/inbox'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as MapViewRouteImport } from './routes/map-view'
 import { Route as MarketTrendsRouteImport } from './routes/market-trends'
 import { Route as MyActivityRouteImport } from './routes/my-activity'
@@ -138,6 +139,11 @@ const InboxRoute = InboxRouteImport.update({
   path: '/inbox',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MapViewRoute = MapViewRouteImport.update({
   id: '/map-view',
   path: '/map-view',
@@ -229,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/dealer-lots': typeof DealerLotsRoute
   '/documents': typeof DocumentsRoute
   '/inbox': typeof InboxRoute
+  '/login': typeof LoginRoute
   '/map-view': typeof MapViewRoute
   '/market-trends': typeof MarketTrendsRoute
   '/my-activity': typeof MyActivityRoute
@@ -264,6 +271,7 @@ export interface FileRoutesByTo {
   '/dealer-lots': typeof DealerLotsRoute
   '/documents': typeof DocumentsRoute
   '/inbox': typeof InboxRoute
+  '/login': typeof LoginRoute
   '/map-view': typeof MapViewRoute
   '/market-trends': typeof MarketTrendsRoute
   '/my-activity': typeof MyActivityRoute
@@ -300,6 +308,7 @@ export interface FileRoutesById {
   '/dealer-lots': typeof DealerLotsRoute
   '/documents': typeof DocumentsRoute
   '/inbox': typeof InboxRoute
+  '/login': typeof LoginRoute
   '/map-view': typeof MapViewRoute
   '/market-trends': typeof MarketTrendsRoute
   '/my-activity': typeof MyActivityRoute
@@ -337,6 +346,7 @@ export interface FileRouteTypes {
     | '/dealer-lots'
     | '/documents'
     | '/inbox'
+    | '/login'
     | '/map-view'
     | '/market-trends'
     | '/my-activity'
@@ -372,6 +382,7 @@ export interface FileRouteTypes {
     | '/dealer-lots'
     | '/documents'
     | '/inbox'
+    | '/login'
     | '/map-view'
     | '/market-trends'
     | '/my-activity'
@@ -407,6 +418,7 @@ export interface FileRouteTypes {
     | '/dealer-lots'
     | '/documents'
     | '/inbox'
+    | '/login'
     | '/map-view'
     | '/market-trends'
     | '/my-activity'
@@ -443,6 +455,7 @@ export interface RootRouteChildren {
   DealerLotsRoute: typeof DealerLotsRoute
   DocumentsRoute: typeof DocumentsRoute
   InboxRoute: typeof InboxRoute
+  LoginRoute: typeof LoginRoute
   MapViewRoute: typeof MapViewRoute
   MarketTrendsRoute: typeof MarketTrendsRoute
   MyActivityRoute: typeof MyActivityRoute
@@ -594,6 +607,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InboxRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/map-view': {
       id: '/map-view'
       path: '/map-view'
@@ -715,6 +735,7 @@ const rootRouteChildren: RootRouteChildren = {
   DealerLotsRoute: DealerLotsRoute,
   DocumentsRoute: DocumentsRoute,
   InboxRoute: InboxRoute,
+  LoginRoute: LoginRoute,
   MapViewRoute: MapViewRoute,
   MarketTrendsRoute: MarketTrendsRoute,
   MyActivityRoute: MyActivityRoute,
