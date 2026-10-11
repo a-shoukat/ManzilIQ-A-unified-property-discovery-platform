@@ -12,7 +12,7 @@ export function canAccessPage(page:string, role:UserRole | undefined):boolean {
  return !roles || (role !== undefined && roles.includes(role));
 }
 /** Pages a signed-in but not-yet-approved account may still open. */
-const OPEN_WHILE_PENDING = new Set(['dashboard','inbox','documents','login','marketplace','map-view','price-estimator','compare','market-trends']);
+const OPEN_WHILE_PENDING = new Set(['dashboard','inbox','documents','login','marketplace','map-view','price-estimator','compare','market-trends','profile','wishlist']);
 export function needsApproval(page:string, role:UserRole|undefined, status:string|undefined):boolean {
  if (!role || role==='super_admin' || status==='approved') return false;
  return !OPEN_WHILE_PENDING.has(page);
