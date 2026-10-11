@@ -55,16 +55,31 @@ async function loadProfile(userId: string): Promise<{
     .eq('id', userId)
     .single();
 
-  if (!profile) return { profile: null, details: null };
+  let profileRow = profile;
+  if (!profileRow) {
+    const { data: u } = await supabase.auth.getUser();
+    const meta = (u.user?.user_metadata ?? {}) as { role?: string; full_name?: string };
+    const role: UserRole = meta.role === 'dealer' || meta.role === 'society_admin' ? meta.role : 'buyer';
+    if (u.user?.id === userId && u.user.email) {
+      const { data: created } = await supabase
+        .from('profiles')
+        .insert({ id: userId, email: u.user.email, role, verification_status: 'pending' })
+        .select('*')
+        .single();
+      profileRow = created;
+    }
+  }
+  if (!profileRow) return { profile: null, details: null };
+  const profileData = profileRow;
 
-  const table = DETAIL_TABLE[profile.role as UserRole] ?? 'customer_details';
+  const table = DETAIL_TABLE[profileData.role as UserRole] ?? 'customer_details';
   const { data: details } = await supabase
     .from(table)
     .select('*')
     .eq('profile_id', userId)
-    .single();
+    .maybeSingle();
 
-  return { profile: profile as Profile, details: details ?? null };
+  return { profile: profileData as Profile, details: details ?? null };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {

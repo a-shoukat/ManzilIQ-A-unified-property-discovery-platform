@@ -1092,3 +1092,11 @@ textarea {
 .ph-home{background:linear-gradient(135deg,var(--primary),color-mix(in oklab,var(--primary) 50%,var(--accent)))}
 .ph-plot{background:linear-gradient(135deg,color-mix(in oklab,var(--accent) 70%,var(--primary)),var(--primary))}
 .ph-commercial{background:linear-gradient(135deg,color-mix(in oklab,var(--primary) 60%,var(--foreground)),color-mix(in oklab,var(--accent) 80%,var(--primary)))}
+
+.stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0}
+.stat-tile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:16px;border:1px solid var(--border);border-radius:8px;background:var(--card);text-align:left;height:auto}
+.stat-tile strong{font-size:26px;color:var(--primary)}
+.onboarding-box{border:1px solid var(--border);border-radius:8px;padding:18px;margin:16px 0;background:var(--muted)}
+.queue-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.queue-actions input{flex:1;min-width:180px}
+@media(max-width:760px){.stat-grid{grid-template-columns:1fr 1fr}.hub-grid{grid-template-columns:1fr!important}.card.wide{padding:18px}table{display:block;overflow-x:auto;max-width:100%}}

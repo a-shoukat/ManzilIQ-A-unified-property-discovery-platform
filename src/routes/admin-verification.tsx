@@ -29,17 +29,17 @@ function AdminVerification({ onNavigate }: { onNavigate: (p: string) => void }) 
     const { data: profiles } = await supabase
       .from('profiles')
       .select('*')
-      .in('role', ['dealer', 'society_admin'])
+      .in('role', ['buyer', 'dealer', 'society_admin'])
       .order('created_at', { ascending: false });
 
     const out: QueueItem[] = [];
     for (const p of profiles ?? []) {
-      const table = p.role === 'dealer' ? 'dealer_details' : 'society_details';
+      const table = p.role === 'dealer' ? 'dealer_details' : p.role === 'buyer' ? 'customer_details' : 'society_details';
       const { data: d } = await supabase
         .from(table)
         .select('*')
         .eq('profile_id', p.id)
-        .single();
+        .maybeSingle();
       out.push({ ...p, detail: d ?? null, detailTable: table });
     }
     setItems(out);
@@ -50,11 +50,24 @@ function AdminVerification({ onNavigate }: { onNavigate: (p: string) => void }) 
     load();
   }, []);
 
+  const [reasons, setReasons] = useState<Record<string, string>>({});
+  const [error, setError] = useState<string | null>(null);
   const setStatus = async (id: string, status: VerificationStatus) => {
     const supabase = getSupabase();
     if (!supabase) return;
+    const reason = reasons[id]?.trim() || null;
+    if (status !== 'approved' && !reason) { setError('Please write a reason before rejecting.'); return; }
+    setError(null);
     setActing(id);
-    await supabase.from('profiles').update({ verification_status: status }).eq('id', id);
+    const { error: uErr } = await supabase.from('profiles')
+      .update({ verification_status: status, rejection_reason: status === 'approved' ? null : reason }).eq('id', id);
+    if (uErr) { setError(uErr.message); setActing(null); return; }
+    await supabase.from('notifications').insert({
+      user_id: id,
+      type: 'verification',
+      title: status === 'approved' ? 'Your account is approved' : 'Verification not approved',
+      body: status === 'approved' ? 'Welcome to ManzilIQ — all features are now unlocked.' : `Reason: ${reason}. Please resubmit from your overview.`,
+    });
     setActing(null);
     load();
   };
@@ -72,9 +85,9 @@ function AdminVerification({ onNavigate }: { onNavigate: (p: string) => void }) 
     <div key={i.id} className="queue-card">
       <div className="queue-head">
         <div>
-          <strong>{i.role === 'dealer' ? i.detail?.['firm_name'] ?? i.email : i.detail?.['society_name'] ?? i.email}</strong>
+          <strong>{i.role === 'dealer' ? i.detail?.['firm_name'] ?? i.email : i.role === 'buyer' ? (i as QueueItem & { full_name?: string }).full_name ?? i.email : i.detail?.['society_name'] ?? i.email}</strong>
           <div className="muted small">
-            {i.role === 'dealer' ? 'Dealer' : 'Society'} · {i.email}
+            {i.role === 'dealer' ? 'Dealer' : i.role === 'buyer' ? 'Client' : 'Society'} · {i.email}
           </div>
         </div>
         <span className={`badge ${i.verification_status === 'approved' ? 'ok' : i.verification_status === 'pending' ? 'warn' : 'warn'}`}>
@@ -101,7 +114,8 @@ function AdminVerification({ onNavigate }: { onNavigate: (p: string) => void }) 
         </div>
       )}
       {i.verification_status === 'pending' && (
-        <div className="link-row">
+        <div className="queue-actions">
+          <input placeholder="Reason (required to reject)" value={reasons[i.id] ?? ''} onChange={(e) => setReasons({ ...reasons, [i.id]: e.target.value })} />
           <Button variant="legacy" className="btn small" disabled={acting === i.id} onClick={() => setStatus(i.id, 'approved')}>
             Approve
           </Button>
@@ -125,7 +139,7 @@ function AdminVerification({ onNavigate }: { onNavigate: (p: string) => void }) 
           <div>
             <h1>Verification queue</h1>
             <p className="muted" style={{ margin: 0 }}>
-              Society & dealer registrations awaiting review
+              Client, dealer & society registrations awaiting review
             </p>
           </div>
           <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('dashboard')}>
@@ -133,6 +147,8 @@ function AdminVerification({ onNavigate }: { onNavigate: (p: string) => void }) 
           </Button>
         </div>
 
+        {error && <div className="error" role="alert">{error}</div>}
+        {!loading && items.length === 0 && <p className="muted">No accounts visible. If you expected some, make sure the admin setup script has been run in your database.</p>}
         {loading ? (
           <p className="muted">Loading…</p>
         ) : (
