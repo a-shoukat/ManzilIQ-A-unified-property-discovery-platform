@@ -100,7 +100,7 @@ function PropertyDetail({
             </Button>
             <Button variant="outline" size="sm" onClick={() => void wish.toggle(p.id)}>{wish.has(p.id) ? '♥ Saved' : '♡ Save'}</Button>
             {canManageListing(p, profile) && <>
-              <Button size="sm" variant="outline" onClick={() => onNavigate(`add-property?edit=${p.id}`)}>Edit</Button>
+              <Button size="sm" variant="outline" onClick={() => onNavigate('edit-property', p.id)}>Edit</Button>
               <AlertDialog>
                 <AlertDialogTrigger asChild><Button size="sm" variant="destructive" disabled={deleting}>{deleting ? 'Deleting…' : 'Delete'}</Button></AlertDialogTrigger>
                 <AlertDialogContent>

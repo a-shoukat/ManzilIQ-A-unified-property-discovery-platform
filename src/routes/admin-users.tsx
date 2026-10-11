@@ -4,6 +4,10 @@ import { PageFrame, pageHead } from '@/components/manzil/PageFrame';
 import { useEffect, useMemo, useState } from 'react';
 import { getSupabase } from '@/lib/manzil/supabase';
 import { useAuth } from '@/lib/manzil/auth';
+import { toast } from 'sonner';
+import { createUserAsAdmin } from '@/lib/manzil/admin-users';
+import { errorText } from '@/lib/manzil/errors';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { ROLE_LABELS, type UserRole, type VerificationStatus } from '@/lib/manzil/types';
 
 interface Row { id: string; email: string; full_name?: string | null; role: UserRole; verification_status: VerificationStatus; created_at?: string }
@@ -18,6 +22,17 @@ function AdminUsers() {
   const [status, setStatus] = useState('all');
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [adding, setAdding] = useState(false);
+  const [nu, setNu] = useState({ name: '', email: '', role: 'buyer' as UserRole, password: '' });
+  const [creating, setCreating] = useState(false);
+  const createUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (nu.password.length < 8) { toast.error('Temporary password must be at least 8 characters.'); return; }
+    setCreating(true);
+    try { await createUserAsAdmin(nu); toast.success(`${nu.email} created`); setAdding(false); setNu({ name: '', email: '', role: 'buyer', password: '' }); void load(); }
+    catch (err) { toast.error(errorText(err, 'Could not create user')); }
+    finally { setCreating(false); }
+  };
 
   const load = async () => {
     const db = getSupabase(); if (!db) return;
@@ -50,7 +65,22 @@ function AdminUsers() {
     <div className="page">
       <div className="card wide">
         <h1>Users</h1>
-        <p className="muted">Manage every account: roles, approvals and access.</p>
+        <div className="topbar"><p className="muted" style={{ margin: 0 }}>Manage every account: roles, approvals and access.</p>
+          <Button onClick={() => setAdding(true)}>+ Add user</Button></div>
+        <Dialog open={adding} onOpenChange={setAdding}>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Add user</DialogTitle></DialogHeader>
+            <form onSubmit={createUser}>
+              <label>Full name<input required value={nu.name} onChange={(e) => setNu({ ...nu, name: e.target.value })} /></label>
+              <label>Email<input required type="email" value={nu.email} onChange={(e) => setNu({ ...nu, email: e.target.value })} /></label>
+              <label>Role<select value={nu.role} onChange={(e) => setNu({ ...nu, role: e.target.value as UserRole })}>
+                {EDITABLE_ROLES.map((x) => <option key={x} value={x}>{ROLE_LABELS[x]}</option>)}</select></label>
+              <label>Temporary password<input required minLength={8} value={nu.password} onChange={(e) => setNu({ ...nu, password: e.target.value })} /></label>
+              <p className="muted small">The account is created approved. Share the temporary password; they can change it in Profile & settings.</p>
+              <DialogFooter><Button type="button" variant="outline" onClick={() => setAdding(false)}>Cancel</Button><Button disabled={creating}>{creating ? 'Creating…' : 'Create user'}</Button></DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
         <div className="filter-row">
           <input placeholder="Search email or name" value={q} onChange={(e) => setQ(e.target.value)} />
           <select value={role} onChange={(e) => setRole(e.target.value)}>
