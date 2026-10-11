@@ -234,14 +234,14 @@ input:focus {
 }
 
 /* Full-bleed workspace layouts (admin dashboard) */
-.page-full {
+.page.page-full {
   display: block;
   align-items: stretch;
   justify-content: stretch;
   padding: 26px 30px 40px;
 }
 
-.card-full {
+.card.card-full {
   max-width: none;
   width: 100%;
   padding: 26px 28px 30px;
