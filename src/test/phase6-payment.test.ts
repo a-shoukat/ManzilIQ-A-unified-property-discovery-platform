@@ -21,6 +21,7 @@ const ROW: Payment = {
   paid_at: null,
   late_fee: 0,
   receipt_no: 'RCP-TEST',
+  label: 'Installment 1/1',
   booking_ref: 'BK-TEST',
   created_at: '2026-10-11T00:00:00Z',
 } as Payment;
