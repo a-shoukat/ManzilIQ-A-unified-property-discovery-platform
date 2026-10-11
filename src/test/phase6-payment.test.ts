@@ -21,17 +21,20 @@ const ROW: Payment = {
   paid_at: null,
   late_fee: 0,
   receipt_no: 'RCP-TEST',
-  label: 'Installment 1/1',
   booking_ref: 'BK-TEST',
+  created_at: '2026-10-11T00:00:00Z',
 } as Payment;
 
 function client(updateReturn: unknown) {
-  const select = vi.fn().mockResolvedValue(updateReturn);
-  const eq = vi.fn(() => ({ select }));
+  const afterUpdate = vi.fn().mockResolvedValue(updateReturn);
+  const eq = vi.fn(() => ({ select: afterUpdate }));
   const update = vi.fn(() => ({ eq }));
-  const from = vi.fn(() => ({ update }));
+  const maybeSingle = vi.fn().mockResolvedValue({ data: null, error: null });
+  const from = vi.fn((table: string) =>
+    table === 'payments' ? { update } : { select: () => ({ maybeSingle }) },
+  );
   vi.mocked(getSupabase).mockReturnValueOnce({ from } as unknown as NonNullable<ReturnType<typeof getSupabase>>);
-  return { update, select };
+  return { update, afterUpdate };
 }
 
 describe('Recording a payment (Phase 6)', () => {
