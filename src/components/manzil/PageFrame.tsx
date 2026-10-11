@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/manzil/auth';
 import { useCompare } from '@/lib/manzil/compare';
 import AiAssistant from './AiAssistant';
+import { canAccessPage } from '@/lib/manzil/access';
 
 export function pageHead(name: string) {
  const title = `${name} | ManzilIQ`;
@@ -39,7 +40,7 @@ export function PageFrame({children, publicPage=false}: {children:ReactNode; pub
  const isDealer = profile?.role === 'dealer' || profile?.role === 'super_admin';
  const go = (key:string) => { onNavigate(key); setOpen(false); };
  const links = (list:typeof mainLinks) => list.map(({key,label,icon:Icon}) => <Button variant="legacy" key={key} className={`side-link${current===key?' active':''}`} onClick={()=>go(key)}><Icon size={18}/><span>{label}</span>{key==='compare' && items.length>0 && <span className="side-count">{items.length}</span>}</Button>);
- const allowed = !profile || !((current.startsWith('admin') && profile.role!=='super_admin') || (current.startsWith('society') && !isSociety) || (current.startsWith('dealer') && !isDealer) || (current==='add-property' && !(isSociety || isDealer)));
+ const allowed = canAccessPage(current, profile?.role);
  return <div className="app-shell">
   {open && <div className="mobile-scrim" onClick={()=>setOpen(false)}/>}
   <aside className={`sidebar${open?' open':''}`}>

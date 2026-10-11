@@ -105,9 +105,6 @@ function Dashboard({ onNavigate }: { onNavigate: (p: string) => void }) {
           </Button>
         </div>
 
-        <div className="notice" style={{ marginTop: 16 }}>
-          Module 1 of 12: Authentication + Registration & Verification (all roles).
-        </div>
       </div>
     </div>
   );
