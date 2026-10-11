@@ -8,4 +8,4 @@
 - [ ] Verify signed-in admin/client flows end to end (blocked on the setup script and the admin account).
 - [x] Request publishing of the imported app; deployment completion remains unverified.
 - [x] Phase 3a: Kanal unit, inquiries, buyer cancellation request + letter, dispute freeze/unfreeze, dealer commissions, fraud alerts.
-- [ ] Phase 3b: dealer books for a customer, plot map upload (need a SQL permission + photo storage from the owner).
+- [x] Phase 3b: dealer books for a customer, plot map upload (needs reference/phase3-features.sql run by owner).
