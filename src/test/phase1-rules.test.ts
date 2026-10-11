@@ -15,8 +15,10 @@ describe('phase 1 rules', () => {
     expect(receiptTotal({ amount: 7090000, late_fee: 140000 })).toBe(7230000);
   });
   it('no Pay button on PKR 0 rows', () => {
-    expect(canPay({ amount: 0 })).toBe(false);
-    expect(canPay({ amount: 500 })).toBe(true);
+    expect(canPay({ amount: 0, paid_at: null })).toBe(false);
+    expect(canPay({ amount: 500, paid_at: null })).toBe(true);
+    // A row the customer already paid must not offer a second Pay button.
+    expect(canPay({ amount: 500, paid_at: '2026-10-11T10:00:00Z' })).toBe(false);
   });
   it('assign-lot excludes reserved, sold and booked plots', () => {
     const out = assignablePlots([plot('1', 'available'), plot('2', 'reserved'), plot('3', 'sold'), plot('4', 'available')], new Set(['4']));
