@@ -17,3 +17,10 @@ describe('client approval workflow', () => {
       expect(canAccessPage(p, 'super_admin')).toBe(true);
   });
 });
+
+describe('admin-users access', () => {
+  it('only super admin opens the users page', () => {
+    expect(canAccessPage('admin-users', 'super_admin')).toBe(true);
+    expect(canAccessPage('admin-users', 'buyer')).toBe(false);
+  });
+});
