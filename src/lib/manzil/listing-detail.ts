@@ -30,7 +30,7 @@ export function featuredFirst<T extends { is_featured?: boolean | null }>(list: 
   return [...list].sort((a, b) => Number(!!b.is_featured) - Number(!!a.is_featured));
 }
 
-export interface SearchFilters { q?: string; city?: string; category?: string; purpose?: string; maxPrice?: number }
+export interface SearchFilters { q?: string | undefined; city?: string | undefined; category?: string | undefined; purpose?: string | undefined; maxPrice?: number | undefined }
 export function matchesSearch(p: Property, f: SearchFilters): boolean {
   return (!f.q || `${p.title} ${p.area ?? ''} ${p.society_name ?? ''}`.toLowerCase().includes(f.q.toLowerCase()))
     && (!f.city || p.city === f.city) && (!f.category || p.category === f.category)
