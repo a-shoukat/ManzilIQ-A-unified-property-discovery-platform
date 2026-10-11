@@ -8,6 +8,7 @@ import { fetchProperties, readCachedProperties } from '@/lib/manzil/properties';
 import { useCompare } from '@/lib/manzil/compare';
 import type { Property } from '@/lib/manzil/types';
 import residence from '@/assets/residence.jpg';
+if (typeof window !== 'undefined') void fetchProperties();
 export const Route = createFileRoute('/')({ head:()=>pageHead('Marketplace — Find your next property'), component:Index });
 function Index() {
  const onNavigate=useAppNavigation();
