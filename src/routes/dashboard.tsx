@@ -145,8 +145,8 @@ function Dashboard({ onNavigate }: { onNavigate: (p: string) => void }) {
   const Form = form;
 
   return (
-    <div className="page">
-      <div className="card wide">
+    <div className={`page${isAdmin ? ' page-full' : ''}`}>
+      <div className={`card wide${isAdmin ? ' card-full' : ''}`}>
         <div className="topbar">
           <div>
             <h1>{isAdmin ? 'Super admin dashboard' : 'ManzilIQ'}</h1>
