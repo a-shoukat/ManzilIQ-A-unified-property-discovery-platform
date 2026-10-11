@@ -1,3 +1,4 @@
+import { MockWalletCheckout } from '@/components/manzil/MockWalletCheckout';
 import { receiptTotal, canPay } from '@/lib/manzil/payment-rules';
 import { Button } from '@/components/ui/button';
 import { createFileRoute } from '@tanstack/react-router';
@@ -26,6 +27,7 @@ function MyPayments({ onNavigate }: { onNavigate: (p: string) => void }) {
   const [proof, setProof] = useState<File | null>(null);
   const [receipt, setReceipt] = useState<Payment | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
+  const [success, setSuccess] = useState<{ txn: string; amount: number; method: string } | null>(null);
 
   const load = async () => {
     if (!session) return;
@@ -126,16 +128,34 @@ function MyPayments({ onNavigate }: { onNavigate: (p: string) => void }) {
                 {METHODS.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}
               </select>
             </label>
+            {(method === 'jazzcash' || method === 'easypaisa') ? (
+              <MockWalletCheckout key={method} method={method} amount={paying.amount + calcLateFee(paying)} onCancel={() => setPaying(null)}
+                onPaid={async (txn) => { const amt = paying.amount + calcLateFee(paying); await payInstallment(paying, method, null, txn); setSuccess({ txn, amount: amt, method: method === 'jazzcash' ? 'JazzCash' : 'EasyPaisa' }); setPaying(null); void load(); }} />
+            ) : <>
             {method === 'bank' && (
               <label>Transfer proof (upload)
                 <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => setProof(e.target.files?.[0] ?? null)} />
               </label>
             )}
-            <div className="notice" style={{ marginBottom: 12 }}>Demo mode — simulated payment.</div>
+            <div className="notice" style={{ marginBottom: 12 }}>{method === 'bank' ? 'Upload your transfer proof; the society confirms it.' : 'Recorded now; the society confirms once received.'}</div>
             <div className="link-row">
               <Button variant="legacy" className="btn small" onClick={doPay}>Confirm payment</Button>
               <Button variant="legacy" className="btn secondary small" onClick={() => setPaying(null)}>Cancel</Button>
             </div>
+            </>}
+          </div>
+        </div>
+      )}
+
+      {success && (
+        <div className="modal-backdrop" onClick={() => setSuccess(null)}>
+          <div className="card wallet-success" onClick={(e) => e.stopPropagation()}>
+            <div className="wallet-tick">✓</div>
+            <h3>Payment successful</h3>
+            <p className="price big">{formatPrice(success.amount)}</p>
+            <p className="muted small">Paid with {success.method} (demo)</p>
+            <div className="spec-row"><span className="detail-key">Transaction ID</span><strong>{success.txn}</strong></div>
+            <div className="link-row"><Button size="sm" onClick={() => setSuccess(null)}>Done</Button></div>
           </div>
         </div>
       )}
