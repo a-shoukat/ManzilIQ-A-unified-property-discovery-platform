@@ -114,6 +114,7 @@ export async function payInstallment(
   p: Payment,
   method: PaymentMethod,
   proofFile?: File | null,
+  txnRef?: string,
 ): Promise<void> {
   const supabase = getSupabase();
   if (!supabase) throw new Error('Database not connected');
@@ -133,7 +134,7 @@ export async function payInstallment(
   if (error) throw error;
   // trigger: payment received → notify society
   if (p.society_id) {
-    notify(p.society_id, 'Payment received', `${p.label ?? 'Payment'} of PKR ${p.amount.toLocaleString()} received (${p.booking_ref ?? ''}).`, 'payment_received').catch(() => {});
+    notify(p.society_id, 'Payment received', `${p.label ?? 'Payment'} of PKR ${p.amount.toLocaleString()} received (${p.booking_ref ?? ''})${txnRef ? ` · Txn ${txnRef}` : ''}.`, 'payment_received').catch(() => {});
   }
   // auto-generate installment receipt
   try {

@@ -11,3 +11,4 @@
 - [x] Phase 3b: dealer books for a customer, plot map upload (needs reference/phase3-features.sql run by owner).
 - [x] Phase 4: gallery, amenities, similar, contact reveal, report, featured, freshness, saved-search alerts (needs reference/phase4-features.sql run by owner).
 - [x] Phase 5: Urdu/English voice form-fill on Add/Edit listing (browser speech + local parser).
+- [x] Phase 6 (demo): mock JazzCash/EasyPaisa checkout with OTP, decline test, transaction ID. Real gateways/SMS/Google login pending owner accounts.
