@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/manzil/auth';
 import type { PropertyCategory, PropertyPurpose } from '@/lib/manzil/types';
 
 /** Manual property entry — for dealers / societies (full inventory mgmt in v4) */
-function AddProperty({ onNavigate, editId }: { onNavigate: (p: string, arg?: string) => void; editId?: string }) {
+function AddProperty({ onNavigate, editId }: { onNavigate: (p: string, arg?: string) => void; editId?: string | undefined }) {
   const { session } = useAuth();
   const [title, setTitle] = useState('');
   const [city, setCity] = useState('');

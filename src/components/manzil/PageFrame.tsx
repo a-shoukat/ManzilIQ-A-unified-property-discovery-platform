@@ -18,6 +18,7 @@ export function useAppNavigation() {
  const navigate = useNavigate();
  return (page: string, arg?: string) => {
   if (page === 'property' && arg) { void navigate({ to:'/property/$id', params:{id:arg} }); return; }
+  if (page === 'edit-property' && arg) { void navigate({ to:'/add-property', search:{ edit:arg } }); return; }
   const destination = page === 'marketplace' || page === 'browse' ? '/' : `/${page}`;
   void navigate({ to:destination });
  };
