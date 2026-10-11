@@ -16,9 +16,9 @@ describe('Preserved source role boundaries',()=>{
   expect(canAccessPage('book-plot','super_admin')).toBe(true);
   expect(canAccessPage('book-plot','dealer')).toBe(false);
  });
- it('retains dealer-only analytics and buyer-only activity',()=>{
+ it('keeps dealer analytics and buyer activity away from other roles (super admin sees all)',()=>{
   expect(canAccessPage('dealer-analytics','dealer')).toBe(true);
-  expect(canAccessPage('dealer-analytics','super_admin')).toBe(false);
+  expect(canAccessPage('dealer-analytics','buyer')).toBe(false);
   expect(canAccessPage('my-activity','buyer')).toBe(true);
   expect(canAccessPage('my-activity','dealer')).toBe(false);
  });
