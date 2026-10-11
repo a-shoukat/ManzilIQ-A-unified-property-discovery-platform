@@ -12,11 +12,11 @@ async function enrich(b: Booking): Promise<Booking> {
   const supabase = getSupabase();
   if (!supabase) return b;
   if (b.plot_id) {
-    const { data: p } = await supabase.from('plots').select('block, plot_no').eq('id', b.plot_id).single();
+    const { data: p } = await supabase.from('plots').select('block, plot_no').eq('id', b.plot_id).maybeSingle();
     b.plot_label = p ? `${(p as { block: string }).block}-${(p as { plot_no: string }).plot_no}` : '—';
   }
   if (b.customer_id) {
-    const { data: c } = await supabase.from('profiles').select('email').eq('id', b.customer_id).single();
+    const { data: c } = await supabase.from('profiles').select('email').eq('id', b.customer_id).maybeSingle();
     b.customer_email = (c as { email: string } | null)?.email ?? '—';
   }
   return b;
@@ -88,7 +88,7 @@ export async function approveBooking(b: Booking): Promise<void> {
   let total = 0;
   if (b.plot_id) {
     await supabase.from('plots').update({ status: 'reserved' }).eq('id', b.plot_id);
-    const { data: p } = await supabase.from('plots').select('base_price').eq('id', b.plot_id).single();
+    const { data: p } = await supabase.from('plots').select('base_price').eq('id', b.plot_id).maybeSingle();
     total = Number((p as { base_price: number } | null)?.base_price ?? 0);
   }
   const { count } = await supabase.from('payments').select('id', { count: 'exact', head: true }).eq('booking_id', b.id);

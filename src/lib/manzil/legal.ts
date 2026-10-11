@@ -22,13 +22,13 @@ async function buildContext(booking: Booking): Promise<DocContext> {
 
   if (supabase) {
     if (booking.customer_id) {
-      const { data: c } = await supabase.from('customer_details').select('cnic_number').eq('profile_id', booking.customer_id).single();
+      const { data: c } = await supabase.from('customer_details').select('cnic_number').eq('profile_id', booking.customer_id).maybeSingle();
       cnic = (c as { cnic_number: string } | null)?.cnic_number ?? '—';
-      const { data: p } = await supabase.from('profiles').select('email').eq('id', booking.customer_id).single();
+      const { data: p } = await supabase.from('profiles').select('email').eq('id', booking.customer_id).maybeSingle();
       customer_name = (p as { email: string } | null)?.email ?? customer_name;
     }
     if (booking.plot_id) {
-      const { data: pl } = await supabase.from('plots').select('block, plot_no, size_marla, base_price').eq('id', booking.plot_id).single();
+      const { data: pl } = await supabase.from('plots').select('block, plot_no, size_marla, base_price').eq('id', booking.plot_id).maybeSingle();
       const pp = pl as { block: string; plot_no: string; size_marla: number; base_price: number } | null;
       if (pp) {
         plot = `${pp.block}-${pp.plot_no} (${pp.size_marla} Marla)`;
@@ -36,7 +36,7 @@ async function buildContext(booking: Booking): Promise<DocContext> {
       }
     }
     if (booking.society_id) {
-      const { data: s } = await supabase.from('society_details').select('society_name, address').eq('profile_id', booking.society_id).single();
+      const { data: s } = await supabase.from('society_details').select('society_name, address').eq('profile_id', booking.society_id).maybeSingle();
       const ss = s as { society_name: string; address: string } | null;
       if (ss) society = `${ss.society_name}, ${ss.address}`;
     }
@@ -82,7 +82,7 @@ export async function generateDocument(
   const tplKey = docType === 'allotment' ? 'allotment' : docType === 'sale_agreement' ? 'sale_agreement' : docType === 'transfer_deed' ? 'transfer_deed' : null;
   let body = FALLBACK_BODIES[docType];
   if (tplKey) {
-    const { data: tpl } = await supabase.from('legal_templates').select('body').eq('key', tplKey).eq('published', true).order('version', { ascending: false }).limit(1).single();
+    const { data: tpl } = await supabase.from('legal_templates').select('body').eq('key', tplKey).eq('published', true).order('version', { ascending: false }).limit(1).maybeSingle();
     if ((tpl as { body: string } | null)?.body) body = (tpl as { body: string }).body;
   }
   const rendered = fill(body, ctx);
@@ -141,7 +141,7 @@ export async function fetchDocuments(filter: {
   const list = (data as GeneratedDocument[]) ?? [];
   for (const d of list) {
     if (d.booking_id) {
-      const { data: b } = await supabase.from('bookings').select('reference_no').eq('id', d.booking_id).single();
+      const { data: b } = await supabase.from('bookings').select('reference_no').eq('id', d.booking_id).maybeSingle();
       d.booking_ref = (b as { reference_no: string } | null)?.reference_no ?? '—';
     }
   }

@@ -103,7 +103,7 @@ export async function fetchMyPayments(customerId: string): Promise<Payment[]> {
   const { data } = await supabase.from('payments').select('*').eq('customer_id', customerId).order('due_date');
   const list = (data as Payment[]) ?? [];
   for (const p of list) {
-    const { data: b } = await supabase.from('bookings').select('reference_no').eq('id', p.booking_id).single();
+    const { data: b } = await supabase.from('bookings').select('reference_no').eq('id', p.booking_id).maybeSingle();
     p.booking_ref = (b as { reference_no: string } | null)?.reference_no ?? '—';
   }
   return list;
@@ -136,7 +136,7 @@ export async function payInstallment(
   }
   // auto-generate installment receipt
   try {
-    const { data: b } = await supabase.from('bookings').select('*').eq('id', p.booking_id).single();
+    const { data: b } = await supabase.from('bookings').select('*').eq('id', p.booking_id).maybeSingle();
     if (b) await generateDocument(b as Booking, 'installment_receipt');
   } catch (e) {
     console.error('receipt gen failed:', e);
@@ -156,7 +156,7 @@ export async function fetchSocietyPayments(societyId: string): Promise<Payment[]
   const { data } = await supabase.from('payments').select('*').eq('society_id', societyId).order('due_date');
   const list = (data as Payment[]) ?? [];
   for (const p of list) {
-    const { data: b } = await supabase.from('bookings').select('reference_no').eq('id', p.booking_id).single();
+    const { data: b } = await supabase.from('bookings').select('reference_no').eq('id', p.booking_id).maybeSingle();
     p.booking_ref = (b as { reference_no: string } | null)?.reference_no ?? '—';
   }
   return list;
