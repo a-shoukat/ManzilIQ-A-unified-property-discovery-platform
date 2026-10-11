@@ -51,3 +51,29 @@ export async function myBookingsForDispute(userId: string) {
   const { data } = await sb.from('bookings').select('reference_no, plot_id, society_id').or(`customer_id.eq.${userId},dealer_id.eq.${userId},society_id.eq.${userId}`).limit(200);
   return (data as { reference_no: string; plot_id: string | null; society_id: string | null }[]) ?? [];
 }
+
+export async function findBuyerByEmail(email: string): Promise<string | null> {
+  const sb = getSupabase();
+  if (!sb) throw new Error('Database not connected');
+  const { data, error } = await sb.rpc('find_buyer_by_email', { _email: email });
+  if (error) throw error;
+  return (data as string | null) ?? null;
+}
+
+const MAP_BUCKET = 'society-maps';
+export async function fetchSocietyMapUrl(societyId: string): Promise<string | null> {
+  const sb = getSupabase();
+  if (!sb) return null;
+  const { data } = await sb.storage.from(MAP_BUCKET).list(societyId, { limit: 1, search: 'master-plan' });
+  const f = data?.[0];
+  if (!f) return null;
+  return `${sb.storage.from(MAP_BUCKET).getPublicUrl(`${societyId}/${f.name}`).data.publicUrl}?v=${encodeURIComponent(f.updated_at ?? '')}`;
+}
+export async function uploadSocietyMap(societyId: string, file: File): Promise<void> {
+  const sb = getSupabase();
+  if (!sb) throw new Error('Database not connected');
+  if (!file.type.startsWith('image/')) throw new Error('Please choose an image (JPG or PNG)');
+  if (file.size > 10 * 1024 * 1024) throw new Error('Image must be under 10 MB');
+  const { error } = await sb.storage.from(MAP_BUCKET).upload(`${societyId}/master-plan`, file, { upsert: true, contentType: file.type });
+  if (error) throw error;
+}

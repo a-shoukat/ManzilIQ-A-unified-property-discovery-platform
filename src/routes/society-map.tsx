@@ -1,3 +1,7 @@
+import { fetchSocietyMapUrl, uploadSocietyMap } from '@/lib/manzil/phase3';
+import { formatSize } from '@/lib/manzil/phase3-rules';
+import { toast } from 'sonner';
+import { errorText } from '@/lib/manzil/errors';
 import { Button } from '@/components/ui/button';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
@@ -23,9 +27,18 @@ function PlotMap({ onNavigate }: { onNavigate: (p: string) => void }) {
   const [zoom, setZoom] = useState(1);
   const [selected, setSelected] = useState<Plot | null>(null);
 
+  const [mapUrl, setMapUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   useEffect(() => {
-    if (societyId) fetchPlots(societyId).then(setPlots);
+    if (societyId) { fetchPlots(societyId).then(setPlots); fetchSocietyMapUrl(societyId).then(setMapUrl); }
   }, [societyId]);
+  const onUpload = async (f: File | undefined) => {
+    if (!f || !societyId) return;
+    setUploading(true);
+    try { await uploadSocietyMap(societyId, f); setMapUrl(await fetchSocietyMapUrl(societyId)); toast.success('Plot map uploaded'); }
+    catch (e) { toast.error(errorText(e, 'Upload failed')); }
+    setUploading(false);
+  };
 
   const blocks = [...new Set(plots.map((p) => p.block))].sort();
   const activeBlock = block || blocks[0] || '';
@@ -39,6 +52,17 @@ function PlotMap({ onNavigate }: { onNavigate: (p: string) => void }) {
           <p className="muted" style={{ margin: 0 }}>Color-coded availability</p>
         </div>
         <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('society')}>Society portal</Button>
+      </div>
+
+      <div className="card card-full" style={{ marginBottom: 16 }}>
+        <div className="queue-head">
+          <div><strong>Society master plan</strong><div className="muted small">Upload your layout / plot map image (JPG or PNG, up to 10 MB).</div></div>
+          <label className="btn small" style={{ cursor: 'pointer', margin: 0 }}>
+            {uploading ? 'Uploading…' : mapUrl ? 'Replace map' : 'Upload map'}
+            <input type="file" accept="image/*" hidden disabled={uploading} onChange={(e) => void onUpload(e.target.files?.[0])} />
+          </label>
+        </div>
+        {mapUrl && <a href={mapUrl} target="_blank" rel="noreferrer"><img src={mapUrl} alt="Society master plan" style={{ marginTop: 12, width: '100%', maxHeight: 520, objectFit: 'contain', borderRadius: 12 }} /></a>}
       </div>
 
       <div className="map-toolbar">
@@ -87,7 +111,7 @@ function PlotMap({ onNavigate }: { onNavigate: (p: string) => void }) {
             <Button variant="legacy" className="btn secondary small" onClick={() => setSelected(null)}>Close</Button>
           </div>
           <div className="detail-grid">
-            <div className="detail-item"><span className="detail-key">Size</span><span>{selected.size_marla} Marla</span></div>
+            <div className="detail-item"><span className="detail-key">Size</span><span>{formatSize(selected.size_marla)}</span></div>
             <div className="detail-item"><span className="detail-key">Category</span><span>{selected.category}</span></div>
             <div className="detail-item"><span className="detail-key">Base price</span><span>{formatPrice(selected.base_price)}</span></div>
             <div className="detail-item"><span className="detail-key">Status</span><span>{selected.status}</span></div>
