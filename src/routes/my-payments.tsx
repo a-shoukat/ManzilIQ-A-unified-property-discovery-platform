@@ -1,3 +1,4 @@
+import { receiptTotal, canPay } from '@/lib/manzil/payment-rules';
 import { Button } from '@/components/ui/button';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
@@ -100,7 +101,7 @@ function MyPayments({ onNavigate }: { onNavigate: (p: string) => void }) {
                       </span>
                     </td>
                     <td className="row-actions">
-                      {p.status === 'pending' && (
+                      {p.status === 'pending' && canPay(p) && (
                         <Button variant="legacy" className="link inline" onClick={() => setPaying(p)}>Pay</Button>
                       )}
                       {p.status === 'confirmed' && (
@@ -147,8 +148,9 @@ function MyPayments({ onNavigate }: { onNavigate: (p: string) => void }) {
             <div className="spec-table">
               <div className="spec-row"><span className="detail-key">Booking</span><span>{receipt.booking_ref}</span></div>
               <div className="spec-row"><span className="detail-key">Label</span><span>{receipt.label}</span></div>
-              <div className="spec-row"><span className="detail-key">Amount</span><span>{formatPrice(receipt.amount)}</span></div>
-              <div className="spec-row"><span className="detail-key">Late fee</span><span>{formatPrice(receipt.late_fee)}</span></div>
+              <div className="spec-row"><span className="detail-key">Installment amount</span><span>{formatPrice(receipt.amount)}</span></div>
+              <div className="spec-row"><span className="detail-key">Late fee</span><span>{receipt.late_fee > 0 ? formatPrice(receipt.late_fee) : '—'}</span></div>
+              <div className="spec-row"><span className="detail-key"><strong>Total paid</strong></span><strong>{formatPrice(receiptTotal(receipt))}</strong></div>
               <div className="spec-row"><span className="detail-key">Method</span><span>{receipt.method}</span></div>
               <div className="spec-row"><span className="detail-key">Paid at</span><span>{receipt.paid_at ? new Date(receipt.paid_at).toLocaleString() : '—'}</span></div>
             </div>

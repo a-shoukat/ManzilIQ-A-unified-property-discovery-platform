@@ -1,3 +1,4 @@
+import { errorText } from '@/lib/manzil/errors';
 import { Button } from '@/components/ui/button';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
@@ -61,7 +62,7 @@ function Inventory({ onNavigate }: { onNavigate: (p: string) => void }) {
       resetForm();
       load(societyId);
     } catch (err) {
-      setMsg(err instanceof Error ? err.message : 'Save failed');
+      setMsg(errorText(err, 'Save failed'));
     }
   };
 

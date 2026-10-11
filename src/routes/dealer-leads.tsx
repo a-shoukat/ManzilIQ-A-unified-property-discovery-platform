@@ -1,3 +1,6 @@
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
+import { errorText } from '@/lib/manzil/errors';
 import { Button } from '@/components/ui/button';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
@@ -26,6 +29,20 @@ function Leads({ onNavigate }: { onNavigate: (p: string) => void }) {
   const [openLead, setOpenLead] = useState<string | null>(null);
   const [activities, setActivities] = useState<LeadActivity[]>([]);
   const [msg, setMsg] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const removeLead = async (lead: Lead) => {
+    setDeleting(lead.id);
+    try {
+      await deleteLead(lead.id);
+      setLeads((prev) => prev.filter((l) => l.id !== lead.id));
+      if (openLead === lead.id) setOpenLead(null);
+      toast.success('Lead deleted');
+    } catch (err) {
+      toast.error(errorText(err, 'Could not delete lead'));
+    } finally {
+      setDeleting(null);
+    }
+  };
 
   // new lead form
   const [showForm, setShowForm] = useState(false);
@@ -188,9 +205,21 @@ function Leads({ onNavigate }: { onNavigate: (p: string) => void }) {
                 <Button variant="legacy" className="btn secondary small" onClick={() => openDetail(lead.id)}>
                   {openLead === lead.id ? 'Hide' : 'History'}
                 </Button>
-                <Button variant="legacy" className="link inline danger-text" onClick={async () => { if (confirm('Delete lead?')) { await deleteLead(lead.id); load(); } }}>
-                  Delete
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="legacy" className="link inline danger-text" disabled={deleting === lead.id}>{deleting === lead.id ? 'Deleting…' : 'Delete'}</Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete this lead?</AlertDialogTitle>
+                      <AlertDialogDescription>{lead.customer_name} and its activity history will be removed. This cannot be undone.</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => void removeLead(lead)}>Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
 

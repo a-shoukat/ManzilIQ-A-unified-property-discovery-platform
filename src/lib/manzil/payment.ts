@@ -1,3 +1,4 @@
+import { firstDueDate } from './payment-rules';
 import { getSupabase } from './supabase';
 import { uploadDocument } from './storage';
 import { notify } from './notify';
@@ -28,7 +29,7 @@ export async function generateSchedule(booking: Booking, totalPrice: number): Pr
     .select('*')
     .eq('society_id', booking.society_id)
     .eq('name', booking.installment_plan ?? '')
-    .single();
+    .maybeSingle();
   if (custom) {
     months = (custom as InstallmentPlan).duration_months;
     downPct = Number((custom as InstallmentPlan).down_payment_pct);
@@ -42,7 +43,7 @@ export async function generateSchedule(booking: Booking, totalPrice: number): Pr
   const monthly = months <= 1 ? rest : Math.round(rest / months);
 
   const rows: Partial<Payment>[] = [];
-  const start = new Date();
+  const start = firstDueDate(new Date());
   if (down > 0) {
     rows.push({
       booking_id: booking.id,
