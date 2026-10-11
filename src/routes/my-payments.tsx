@@ -50,11 +50,7 @@ function MyPayments({ onNavigate }: { onNavigate: (p: string) => void }) {
     if (!paying) return;
     try {
       await payInstallment(paying, method, method === 'bank' ? proof : null);
-      setMsg(
-        method === 'cash' || method === 'cheque'
-          ? 'Recorded — society will confirm on receipt.'
-          : 'Payment confirmed.',
-      );
+      setMsg('Payment recorded — the society confirms it once received.');
       setPaying(null);
       setProof(null);
       load();
@@ -99,7 +95,7 @@ function MyPayments({ onNavigate }: { onNavigate: (p: string) => void }) {
                     <td>{late > 0 ? formatPrice(late) : '—'}</td>
                     <td>
                       <span className={`badge ${p.status === 'confirmed' ? 'ok' : 'warn'}`}>
-                        {p.status}
+                        {p.status === 'pending' && p.paid_at ? 'awaiting confirmation' : p.status}
                       </span>
                     </td>
                     <td className="row-actions">
@@ -155,6 +151,7 @@ function MyPayments({ onNavigate }: { onNavigate: (p: string) => void }) {
             <p className="price big">{formatPrice(success.amount)}</p>
             <p className="muted small">Paid with {success.method} (demo)</p>
             <div className="spec-row"><span className="detail-key">Transaction ID</span><strong>{success.txn}</strong></div>
+            <p className="muted small">The society confirms this payment once it is received.</p>
             <div className="link-row"><Button size="sm" onClick={() => setSuccess(null)}>Done</Button></div>
           </div>
         </div>
