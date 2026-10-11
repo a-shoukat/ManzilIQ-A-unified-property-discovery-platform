@@ -77,7 +77,7 @@ export function parseListing(text: string): ParsedListing {
   if (soc && !/^(in|mein|میں|ki|کی)$/.test(soc[1]!)) out.society = titleCase(`${soc[1]} ${/town|ٹاؤن/.test(soc[0]) ? 'Town' : 'Society'}`);
 
   const ph = s.replace(/[\s-]/g, '').match(/(03\d{9}|\+923\d{9})/);
-  if (ph) out.phone = ph[1];
+  if (ph?.[1]) out.phone = ph[1];
 
   const am = AMENITY_WORDS.filter(([, w]) => w.some((x) => s.includes(x))).map(([n]) => n);
   if (am.length) out.amenities = am;
