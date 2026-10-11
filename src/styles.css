@@ -233,6 +233,20 @@ input:focus {
   max-width: 560px;
 }
 
+/* Full-bleed workspace layouts (admin dashboard) */
+.page-full {
+  display: block;
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 26px 30px 40px;
+}
+
+.card-full {
+  max-width: none;
+  width: 100%;
+  padding: 26px 28px 30px;
+}
+
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -577,8 +591,8 @@ textarea {
 
 .hub-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
   margin-top: 16px;
 }
 
@@ -1093,7 +1107,7 @@ textarea {
 .ph-plot{background:linear-gradient(135deg,color-mix(in oklab,var(--accent) 70%,var(--primary)),var(--primary))}
 .ph-commercial{background:linear-gradient(135deg,color-mix(in oklab,var(--primary) 60%,var(--foreground)),color-mix(in oklab,var(--accent) 80%,var(--primary)))}
 
-.stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0}
 .stat-tile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:16px;border:1px solid var(--border);border-radius:8px;background:var(--card);text-align:left;height:auto}
 .stat-tile strong{font-size:26px;color:var(--primary)}
 .onboarding-box{border:1px solid var(--border);border-radius:8px;padding:18px;margin:16px 0;background:var(--muted)}
