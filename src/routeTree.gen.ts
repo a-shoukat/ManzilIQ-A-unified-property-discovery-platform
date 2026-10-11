@@ -36,6 +36,7 @@ import { Route as MyActivityRouteImport } from './routes/my-activity'
 import { Route as MyBookingsRouteImport } from './routes/my-bookings'
 import { Route as MyPaymentsRouteImport } from './routes/my-payments'
 import { Route as PriceEstimatorRouteImport } from './routes/price-estimator'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as SocietyRouteImport } from './routes/society'
 import { Route as SocietyAnalyticsRouteImport } from './routes/society-analytics'
 import { Route as SocietyBookingsRouteImport } from './routes/society-bookings'
@@ -43,6 +44,7 @@ import { Route as SocietyDealersRouteImport } from './routes/society-dealers'
 import { Route as SocietyFinancialsRouteImport } from './routes/society-financials'
 import { Route as SocietyInventoryRouteImport } from './routes/society-inventory'
 import { Route as SocietyMapRouteImport } from './routes/society-map'
+import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as PropertyIdRouteImport } from './routes/property.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -180,6 +182,11 @@ const PriceEstimatorRoute = PriceEstimatorRouteImport.update({
   path: '/price-estimator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SocietyRoute = SocietyRouteImport.update({
   id: '/society',
   path: '/society',
@@ -213,6 +220,11 @@ const SocietyInventoryRoute = SocietyInventoryRouteImport.update({
 const SocietyMapRoute = SocietyMapRouteImport.update({
   id: '/society-map',
   path: '/society-map',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WishlistRoute = WishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PropertyIdRoute = PropertyIdRouteImport.update({
@@ -249,6 +261,7 @@ export interface FileRoutesByFullPath {
   '/my-bookings': typeof MyBookingsRoute
   '/my-payments': typeof MyPaymentsRoute
   '/price-estimator': typeof PriceEstimatorRoute
+  '/profile': typeof ProfileRoute
   '/society': typeof SocietyRoute
   '/society-analytics': typeof SocietyAnalyticsRoute
   '/society-bookings': typeof SocietyBookingsRoute
@@ -256,6 +269,7 @@ export interface FileRoutesByFullPath {
   '/society-financials': typeof SocietyFinancialsRoute
   '/society-inventory': typeof SocietyInventoryRoute
   '/society-map': typeof SocietyMapRoute
+  '/wishlist': typeof WishlistRoute
   '/property/$id': typeof PropertyIdRoute
 }
 export interface FileRoutesByTo {
@@ -286,6 +300,7 @@ export interface FileRoutesByTo {
   '/my-bookings': typeof MyBookingsRoute
   '/my-payments': typeof MyPaymentsRoute
   '/price-estimator': typeof PriceEstimatorRoute
+  '/profile': typeof ProfileRoute
   '/society': typeof SocietyRoute
   '/society-analytics': typeof SocietyAnalyticsRoute
   '/society-bookings': typeof SocietyBookingsRoute
@@ -293,6 +308,7 @@ export interface FileRoutesByTo {
   '/society-financials': typeof SocietyFinancialsRoute
   '/society-inventory': typeof SocietyInventoryRoute
   '/society-map': typeof SocietyMapRoute
+  '/wishlist': typeof WishlistRoute
   '/property/$id': typeof PropertyIdRoute
 }
 export interface FileRoutesById {
@@ -324,6 +340,7 @@ export interface FileRoutesById {
   '/my-bookings': typeof MyBookingsRoute
   '/my-payments': typeof MyPaymentsRoute
   '/price-estimator': typeof PriceEstimatorRoute
+  '/profile': typeof ProfileRoute
   '/society': typeof SocietyRoute
   '/society-analytics': typeof SocietyAnalyticsRoute
   '/society-bookings': typeof SocietyBookingsRoute
@@ -331,6 +348,7 @@ export interface FileRoutesById {
   '/society-financials': typeof SocietyFinancialsRoute
   '/society-inventory': typeof SocietyInventoryRoute
   '/society-map': typeof SocietyMapRoute
+  '/wishlist': typeof WishlistRoute
   '/property/$id': typeof PropertyIdRoute
 }
 export interface FileRouteTypes {
@@ -363,6 +381,7 @@ export interface FileRouteTypes {
     | '/my-bookings'
     | '/my-payments'
     | '/price-estimator'
+    | '/profile'
     | '/society'
     | '/society-analytics'
     | '/society-bookings'
@@ -370,6 +389,7 @@ export interface FileRouteTypes {
     | '/society-financials'
     | '/society-inventory'
     | '/society-map'
+    | '/wishlist'
     | '/property/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -400,6 +420,7 @@ export interface FileRouteTypes {
     | '/my-bookings'
     | '/my-payments'
     | '/price-estimator'
+    | '/profile'
     | '/society'
     | '/society-analytics'
     | '/society-bookings'
@@ -407,6 +428,7 @@ export interface FileRouteTypes {
     | '/society-financials'
     | '/society-inventory'
     | '/society-map'
+    | '/wishlist'
     | '/property/$id'
   id:
     | '__root__'
@@ -437,6 +459,7 @@ export interface FileRouteTypes {
     | '/my-bookings'
     | '/my-payments'
     | '/price-estimator'
+    | '/profile'
     | '/society'
     | '/society-analytics'
     | '/society-bookings'
@@ -444,6 +467,7 @@ export interface FileRouteTypes {
     | '/society-financials'
     | '/society-inventory'
     | '/society-map'
+    | '/wishlist'
     | '/property/$id'
   fileRoutesById: FileRoutesById
 }
@@ -475,6 +499,7 @@ export interface RootRouteChildren {
   MyBookingsRoute: typeof MyBookingsRoute
   MyPaymentsRoute: typeof MyPaymentsRoute
   PriceEstimatorRoute: typeof PriceEstimatorRoute
+  ProfileRoute: typeof ProfileRoute
   SocietyRoute: typeof SocietyRoute
   SocietyAnalyticsRoute: typeof SocietyAnalyticsRoute
   SocietyBookingsRoute: typeof SocietyBookingsRoute
@@ -482,6 +507,7 @@ export interface RootRouteChildren {
   SocietyFinancialsRoute: typeof SocietyFinancialsRoute
   SocietyInventoryRoute: typeof SocietyInventoryRoute
   SocietyMapRoute: typeof SocietyMapRoute
+  WishlistRoute: typeof WishlistRoute
   PropertyIdRoute: typeof PropertyIdRoute
 }
 
@@ -676,6 +702,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PriceEstimatorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/society': {
       id: '/society'
       path: '/society'
@@ -725,6 +758,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SocietyMapRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/wishlist': {
+      id: '/wishlist'
+      path: '/wishlist'
+      fullPath: '/wishlist'
+      preLoaderRoute: typeof WishlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/property/$id': {
       id: '/property/$id'
       path: '/property/$id'
@@ -763,6 +803,7 @@ const rootRouteChildren: RootRouteChildren = {
   MyBookingsRoute: MyBookingsRoute,
   MyPaymentsRoute: MyPaymentsRoute,
   PriceEstimatorRoute: PriceEstimatorRoute,
+  ProfileRoute: ProfileRoute,
   SocietyRoute: SocietyRoute,
   SocietyAnalyticsRoute: SocietyAnalyticsRoute,
   SocietyBookingsRoute: SocietyBookingsRoute,
@@ -770,6 +811,7 @@ const rootRouteChildren: RootRouteChildren = {
   SocietyFinancialsRoute: SocietyFinancialsRoute,
   SocietyInventoryRoute: SocietyInventoryRoute,
   SocietyMapRoute: SocietyMapRoute,
+  WishlistRoute: WishlistRoute,
   PropertyIdRoute: PropertyIdRoute,
 }
 export const routeTree = rootRouteImport

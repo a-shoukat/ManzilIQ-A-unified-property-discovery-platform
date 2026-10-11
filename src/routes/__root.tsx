@@ -15,6 +15,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/lib/manzil/auth";
 import { CompareProvider } from "@/lib/manzil/compare";
+import { WishlistProvider } from "@/lib/manzil/wishlist";
 
 function NotFoundComponent() {
   return (
@@ -125,7 +126,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <AuthProvider><CompareProvider><Outlet /><Toaster richColors position="top-center" /></CompareProvider></AuthProvider>
+      <AuthProvider><CompareProvider><WishlistProvider><Outlet /><Toaster richColors position="top-center" /></WishlistProvider></CompareProvider></AuthProvider>
     </QueryClientProvider>
   );
 }
