@@ -1118,3 +1118,14 @@ textarea {
 .filter-row input{flex:1;min-width:200px}
 .table-wrap{overflow-x:auto}
 @media (max-width:760px){.attention-grid{grid-template-columns:1fr}}
+
+/* One consistent page width across every tab */
+@media (max-width:760px){.page{padding:22px 16px 30px}}
+
+/* Keep the side menu visible on tablet and small desktop widths */
+@media (min-width:641px) and (max-width:760px){
+  .sidebar{transform:none;width:210px;}
+  .sidebar:not(.open){visibility:visible;}
+  .workspace{margin-left:210px;}
+  .mobile-menu{display:none;}
+}
