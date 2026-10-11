@@ -130,7 +130,9 @@ export async function payInstallment(
     .update({
       method,
       proof_url: proofUrl,
-      status: method === 'cash' || method === 'cheque' ? 'pending' : 'confirmed',
+      // The customer's own row can never be self-confirmed (enforced by the database
+      // policy in reference/phase6-features.sql); the society or super admin confirms it.
+      status: 'pending',
       paid_at: new Date().toISOString(),
       late_fee: lateFee,
     })
