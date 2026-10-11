@@ -1,3 +1,4 @@
+import { myBookingsForDispute } from '@/lib/manzil/phase3';
 import { Button } from '@/components/ui/button';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
@@ -24,6 +25,8 @@ function Disputes({ onNavigate }: { onNavigate: (p: string) => void }) {
   const [fSubject, setFSubject] = useState('');
   const [fDesc, setFDesc] = useState('');
   const [fBooking, setFBooking] = useState('');
+  const [myBks, setMyBks] = useState<{ reference_no: string; plot_id: string | null }[]>([]);
+  useEffect(() => { if (session) myBookingsForDispute(session.user.id).then(setMyBks); }, [session]);
   const [resolution, setResolution] = useState<Record<string, string>>({});
   const [msg, setMsg] = useState<string | null>(null);
 
@@ -48,6 +51,7 @@ function Disputes({ onNavigate }: { onNavigate: (p: string) => void }) {
         subject: fSubject,
         description: fDesc,
         booking_ref: fBooking || null,
+        plot_id: myBks.find((x) => x.reference_no === fBooking)?.plot_id ?? null,
       });
       setMsg('Dispute filed. Admin will review it.');
       setShowForm(false);
@@ -88,7 +92,10 @@ function Disputes({ onNavigate }: { onNavigate: (p: string) => void }) {
               </select>
             </label>
             <label>Subject<input required value={fSubject} onChange={(e) => setFSubject(e.target.value)} /></label>
-            <label>Booking ref (optional)<input value={fBooking} onChange={(e) => setFBooking(e.target.value)} placeholder="BK-…" /></label>
+            <label>Booking (optional)
+              {myBks.length ? <select value={fBooking} onChange={(e) => setFBooking(e.target.value)}><option value="">— None —</option>{myBks.map((x) => <option key={x.reference_no} value={x.reference_no}>{x.reference_no}</option>)}</select>
+                : <input value={fBooking} onChange={(e) => setFBooking(e.target.value)} placeholder="BK-…" />}
+            </label>
             <label>Description<textarea required rows={3} value={fDesc} onChange={(e) => setFDesc(e.target.value)} /></label>
             <Button variant="legacy" className="btn small" type="submit">Submit</Button>
           </form>
@@ -130,12 +137,17 @@ function Disputes({ onNavigate }: { onNavigate: (p: string) => void }) {
                 </label>
                 <div className="link-row">
                   <Button variant="legacy" className="btn small" onClick={() => act(d, 'in_review')}>Take up</Button>
-                  <Button variant="legacy" className="btn small" onClick={() => act(d, 'resolved')}>Resolve & notify</Button>
+                  <Button variant="legacy" className="btn small" onClick={async () => { await act(d, 'resolved'); if (d.plot_id) { try { await freezePlotForDispute(d.plot_id, false); } catch { /* not frozen */ } } }}>Resolve, unfreeze & notify</Button>
                   <Button variant="legacy" className="btn secondary small" onClick={() => act(d, 'escalated')}>Escalate</Button>
                   {d.plot_id && (
-                    <Button variant="legacy" className="btn danger small" onClick={async () => { await freezePlotForDispute(d.plot_id ?? "", true); setMsg('Plot frozen during dispute.'); }}>
+                    <>
+                    <Button variant="legacy" className="btn danger small" onClick={async () => { try { await freezePlotForDispute(d.plot_id ?? "", true); setMsg('Plot frozen — it cannot be booked or assigned until unfrozen.'); } catch (e) { setMsg(e instanceof Error ? e.message : 'Freeze failed'); } }}>
                       Freeze plot
                     </Button>
+                    <Button variant="legacy" className="btn secondary small" onClick={async () => { try { await freezePlotForDispute(d.plot_id ?? "", false); setMsg('Plot unfrozen.'); } catch (e) { setMsg(e instanceof Error ? e.message : 'Unfreeze failed'); } }}>
+                      Unfreeze
+                    </Button>
+                    </>
                   )}
                 </div>
               </div>
