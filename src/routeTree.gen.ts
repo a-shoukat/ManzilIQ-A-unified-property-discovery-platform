@@ -16,6 +16,7 @@ import { Route as AdminAnalyticsRouteImport } from './routes/admin-analytics'
 import { Route as AdminBookingsRouteImport } from './routes/admin-bookings'
 import { Route as AdminDisputesRouteImport } from './routes/admin-disputes'
 import { Route as AdminTemplatesRouteImport } from './routes/admin-templates'
+import { Route as AdminUsersRouteImport } from './routes/admin-users'
 import { Route as AdminVerificationRouteImport } from './routes/admin-verification'
 import { Route as BookPlotRouteImport } from './routes/book-plot'
 import { Route as BroadcastRouteImport } from './routes/broadcast'
@@ -77,6 +78,11 @@ const AdminDisputesRoute = AdminDisputesRouteImport.update({
 const AdminTemplatesRoute = AdminTemplatesRouteImport.update({
   id: '/admin-templates',
   path: '/admin-templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/admin-users',
+  path: '/admin-users',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminVerificationRoute = AdminVerificationRouteImport.update({
@@ -223,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/admin-bookings': typeof AdminBookingsRoute
   '/admin-disputes': typeof AdminDisputesRoute
   '/admin-templates': typeof AdminTemplatesRoute
+  '/admin-users': typeof AdminUsersRoute
   '/admin-verification': typeof AdminVerificationRoute
   '/book-plot': typeof BookPlotRoute
   '/broadcast': typeof BroadcastRoute
@@ -259,6 +266,7 @@ export interface FileRoutesByTo {
   '/admin-bookings': typeof AdminBookingsRoute
   '/admin-disputes': typeof AdminDisputesRoute
   '/admin-templates': typeof AdminTemplatesRoute
+  '/admin-users': typeof AdminUsersRoute
   '/admin-verification': typeof AdminVerificationRoute
   '/book-plot': typeof BookPlotRoute
   '/broadcast': typeof BroadcastRoute
@@ -296,6 +304,7 @@ export interface FileRoutesById {
   '/admin-bookings': typeof AdminBookingsRoute
   '/admin-disputes': typeof AdminDisputesRoute
   '/admin-templates': typeof AdminTemplatesRoute
+  '/admin-users': typeof AdminUsersRoute
   '/admin-verification': typeof AdminVerificationRoute
   '/book-plot': typeof BookPlotRoute
   '/broadcast': typeof BroadcastRoute
@@ -334,6 +343,7 @@ export interface FileRouteTypes {
     | '/admin-bookings'
     | '/admin-disputes'
     | '/admin-templates'
+    | '/admin-users'
     | '/admin-verification'
     | '/book-plot'
     | '/broadcast'
@@ -370,6 +380,7 @@ export interface FileRouteTypes {
     | '/admin-bookings'
     | '/admin-disputes'
     | '/admin-templates'
+    | '/admin-users'
     | '/admin-verification'
     | '/book-plot'
     | '/broadcast'
@@ -406,6 +417,7 @@ export interface FileRouteTypes {
     | '/admin-bookings'
     | '/admin-disputes'
     | '/admin-templates'
+    | '/admin-users'
     | '/admin-verification'
     | '/book-plot'
     | '/broadcast'
@@ -443,6 +455,7 @@ export interface RootRouteChildren {
   AdminBookingsRoute: typeof AdminBookingsRoute
   AdminDisputesRoute: typeof AdminDisputesRoute
   AdminTemplatesRoute: typeof AdminTemplatesRoute
+  AdminUsersRoute: typeof AdminUsersRoute
   AdminVerificationRoute: typeof AdminVerificationRoute
   BookPlotRoute: typeof BookPlotRoute
   BroadcastRoute: typeof BroadcastRoute
@@ -521,6 +534,13 @@ declare module '@tanstack/react-router' {
       path: '/admin-templates'
       fullPath: '/admin-templates'
       preLoaderRoute: typeof AdminTemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-users': {
+      id: '/admin-users'
+      path: '/admin-users'
+      fullPath: '/admin-users'
+      preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin-verification': {
@@ -723,6 +743,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminBookingsRoute: AdminBookingsRoute,
   AdminDisputesRoute: AdminDisputesRoute,
   AdminTemplatesRoute: AdminTemplatesRoute,
+  AdminUsersRoute: AdminUsersRoute,
   AdminVerificationRoute: AdminVerificationRoute,
   BookPlotRoute: BookPlotRoute,
   BroadcastRoute: BroadcastRoute,

@@ -64,20 +64,47 @@ function useAdminStats(enabled: boolean) {
   return stats;
 }
 
+function AttentionPanel({ onNavigate }: { onNavigate: (p: string) => void }) {
+  const [pending, setPending] = useState<{ id: string; email: string; role: string }[]>([]);
+  const [disputes, setDisputes] = useState<{ id: string; title?: string; reason?: string }[]>([]);
+  useEffect(() => {
+    const db = getSupabase(); if (!db) return;
+    void db.from('profiles').select('id,email,role').eq('verification_status', 'pending').order('created_at', { ascending: false }).limit(5)
+      .then(({ data }) => setPending(data ?? []));
+    void db.from('disputes').select('*').eq('status', 'open').limit(5).then(({ data }) => setDisputes(data ?? []));
+  }, []);
+  return (
+    <div className="attention-grid">
+      <div className="attention-card">
+        <h3>Pending approvals</h3>
+        {pending.length === 0 ? <p className="muted small">All caught up.</p> : pending.map((p) => (
+          <div key={p.id} className="attention-row"><span>{p.email}<span className="muted small"> · {p.role}</span></span>
+            <Button size="sm" onClick={() => onNavigate('admin-verification')}>Review</Button></div>))}
+      </div>
+      <div className="attention-card">
+        <h3>Open disputes</h3>
+        {disputes.length === 0 ? <p className="muted small">No open disputes.</p> : disputes.map((d) => (
+          <div key={d.id} className="attention-row"><span>{d.title ?? d.reason ?? 'Dispute'}</span>
+            <Button size="sm" variant="outline" onClick={() => onNavigate('admin-disputes')}>Open</Button></div>))}
+      </div>
+    </div>
+  );
+}
+
 function AdminOverview({ onNavigate }: { onNavigate: (p: string) => void }) {
   const stats = useAdminStats(true);
   const tiles: { key: string; label: string; page: string }[] = [
     { key: 'pending', label: 'Pending approvals', page: 'admin-verification' },
-    { key: 'users', label: 'Total users', page: 'admin-verification' },
+    { key: 'users', label: 'Total users', page: 'admin-users' },
     { key: 'listings', label: 'Listings', page: 'marketplace' },
     { key: 'bookings', label: 'Bookings', page: 'admin-bookings' },
     { key: 'payments', label: 'Payments', page: 'admin-analytics' },
     { key: 'disputes', label: 'Open disputes', page: 'admin-disputes' },
   ];
   const areas: [string, string][] = [
-    ['admin-verification', 'Approvals'], ['admin-bookings', 'Bookings'], ['admin-disputes', 'Disputes'],
+    ['admin-users', 'Users'], ['admin-verification', 'Approvals'], ['admin-bookings', 'Bookings'], ['admin-disputes', 'Disputes'],
     ['admin-templates', 'Legal templates'], ['broadcast', 'Broadcast'], ['admin-analytics', 'Analytics'],
-    ['add-property', 'Add listing'], ['society', 'Societies'], ['dealer', 'Dealers'],
+    ['marketplace', 'Listings'], ['add-property', 'Add listing'], ['society', 'Societies'], ['dealer', 'Dealers'],
   ];
   return (
     <>
@@ -89,6 +116,7 @@ function AdminOverview({ onNavigate }: { onNavigate: (p: string) => void }) {
           </Button>
         ))}
       </div>
+      <AttentionPanel onNavigate={onNavigate} />
       <h3>Manage platform</h3>
       <div className="hub-grid">
         {areas.map(([page, label]) => (
