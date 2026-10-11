@@ -1,3 +1,5 @@
+import { assignablePlots } from '@/lib/manzil/plot-rules';
+import { fetchBookedPlotIds } from '@/lib/manzil/society';
 import { Button } from '@/components/ui/button';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
@@ -52,10 +54,10 @@ function Dealers({ onNavigate }: { onNavigate: (p: string) => void }) {
 
   useEffect(() => {
     if (!societyId) return;
-    fetchPlots(societyId).then((plots) =>
+    Promise.all([fetchPlots(societyId), fetchBookedPlotIds(societyId)]).then(([plots, booked]) =>
       setAvailablePlots(
-        plots
-          .filter((p) => p.status === 'available' && (!lotBlock || p.block === lotBlock))
+        assignablePlots(plots, booked)
+          .filter((p) => !lotBlock || p.block === lotBlock)
           .map((p) => ({ id: p.id, label: `${p.block}-${p.plot_no} (${p.size_marla}M)` })),
       ),
     );

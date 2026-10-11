@@ -137,10 +137,10 @@ function Dashboard({ onNavigate }: { onNavigate: (p: string) => void }) {
   const status = profile?.verification_status;
   const needsForm = !isAdmin && profile && (status === 'rejected' || (status === 'pending' && !details));
 
-  const statusBadge = isAdmin ? <div className="badge ok">Super admin</div> :
+  const statusBadge = !profile ? <div className="badge">Loading…</div> : isAdmin ? <div className="badge ok">Super admin</div> :
     status === 'approved' ? <div className="badge ok">Verified</div> :
     status === 'pending' ? <div className="badge warn">{details ? 'Awaiting approval' : 'Verification required'}</div> :
-    status === 'rejected' ? <div className="badge warn">Rejected</div> : <div className="badge warn">Blacklisted</div>;
+    status === 'rejected' ? <div className="badge warn">Rejected</div> : status === 'blacklisted' ? <div className="badge warn">Blacklisted</div> : <div className="badge">Loading…</div>;
 
   const form = profile?.role === 'dealer' ? DealerRegistrationForm : profile?.role === 'society_admin' ? SocietyRegistrationForm : CustomerRegistrationForm;
   const Form = form;

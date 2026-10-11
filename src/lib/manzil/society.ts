@@ -160,19 +160,7 @@ export async function decideDealerRequest(id: string, status: 'approved' | 'reje
 }
 
 export async function fetchApprovedSocieties(): Promise<{ id: string; email: string; name: string }[]> {
-  const supabase = getSupabase();
-  if (!supabase) return [];
-  const { data } = await supabase
-    .from('profiles')
-    .select('id, email')
-    .eq('role', 'society_admin')
-    .eq('verification_status', 'approved');
-  const out: { id: string; email: string; name: string }[] = [];
-  for (const p of (data as { id: string; email: string }[]) ?? []) {
-    const { data: d } = await supabase.from('society_details').select('society_name').eq('profile_id', p.id).maybeSingle();
-    out.push({ id: p.id, email: p.email, name: (d as { society_name: string } | null)?.society_name ?? p.email });
-  }
-  return out;
+  return listPublicSocieties();
 }
 
 export async function fetchSocietyDealers(societyId: string): Promise<{ id: string; email: string; firm: string }[]> {
@@ -188,6 +176,33 @@ export async function fetchSocietyDealers(societyId: string): Promise<{ id: stri
       email: (prof as { email: string } | null)?.email ?? '—',
       firm: (det as { firm_name: string } | null)?.firm_name ?? '—',
     });
+  }
+  return out;
+}
+
+/** Plot ids tied to a live booking (pending/approved/token_paid/completed). */
+export async function fetchBookedPlotIds(societyId: string): Promise<Set<string>> {
+  const supabase = getSupabase();
+  if (!supabase) return new Set();
+  const { data } = await supabase.from('bookings').select('plot_id, status').eq('society_id', societyId)
+    .in('status', ['pending', 'approved', 'token_paid', 'completed']);
+  return new Set(((data as { plot_id: string | null }[]) ?? []).map((b) => b.plot_id).filter((x): x is string => !!x));
+}
+
+/** Approved societies visible to any signed-in user (uses list_societies() when installed). */
+export async function listPublicSocieties(): Promise<{ id: string; email: string; name: string }[]> {
+  const supabase = getSupabase();
+  if (!supabase) return [];
+  const rpc = await supabase.rpc('list_societies');
+  if (!rpc.error && Array.isArray(rpc.data)) {
+    return (rpc.data as { id: string; email: string | null; society_name: string | null }[])
+      .map((r) => ({ id: r.id, email: r.email ?? '', name: r.society_name ?? r.email ?? 'Society' }));
+  }
+  const { data } = await supabase.from('profiles').select('id, email').eq('role', 'society_admin').eq('verification_status', 'approved');
+  const out: { id: string; email: string; name: string }[] = [];
+  for (const p of (data as { id: string; email: string }[]) ?? []) {
+    const { data: d } = await supabase.from('society_details').select('society_name').eq('profile_id', p.id).maybeSingle();
+    out.push({ id: p.id, email: p.email, name: (d as { society_name: string } | null)?.society_name ?? p.email });
   }
   return out;
 }

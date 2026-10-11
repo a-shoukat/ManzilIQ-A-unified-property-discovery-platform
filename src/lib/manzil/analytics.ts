@@ -121,6 +121,7 @@ export async function marketTrends(): Promise<{ byCity: MarketTrend[]; overall: 
   const { data: props } = await supabase
     .from('properties')
     .select('price, plot_size_marla, category, city, created_at')
+    .eq('purpose', 'sale')
     .gt('plot_size_marla', 0)
     .gt('price', 0)
     .limit(500);

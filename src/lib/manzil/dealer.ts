@@ -1,23 +1,18 @@
+import { listPublicSocieties } from './society';
 import { getSupabase } from './supabase';
 import type { Lead, LeadActivity, Lot, Plot, SocietySummary } from '@/lib/manzil/types';
 
 export async function fetchSocietySummaries(): Promise<SocietySummary[]> {
   const supabase = getSupabase();
   if (!supabase) return [];
-  const { data } = await supabase
-    .from('profiles')
-    .select('id, email')
-    .eq('role', 'society_admin')
-    .eq('verification_status', 'approved');
   const out: SocietySummary[] = [];
-  for (const p of (data as { id: string; email: string }[]) ?? []) {
-    const { data: d } = await supabase.from('society_details').select('society_name').eq('profile_id', p.id).maybeSingle();
+  for (const p of await listPublicSocieties()) {
     const { count: total } = await supabase.from('plots').select('id', { count: 'exact', head: true }).eq('society_id', p.id);
     const { count: avail } = await supabase.from('plots').select('id', { count: 'exact', head: true }).eq('society_id', p.id).eq('status', 'available');
     out.push({
       id: p.id,
       email: p.email,
-      name: (d as { society_name: string } | null)?.society_name ?? p.email,
+      name: p.name,
       plots_available: avail ?? 0,
       plots_total: total ?? 0,
     });
