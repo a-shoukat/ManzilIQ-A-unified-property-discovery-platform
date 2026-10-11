@@ -110,6 +110,10 @@ export async function fetchMyPayments(customerId: string): Promise<Payment[]> {
   return list;
 }
 
+/** Shown when the database silently refuses the write (missing row-level policy). */
+export const PAYMENT_SAVE_DENIED =
+  'Your payment could not be saved because your account is not allowed to update payments yet. Ask the site owner to enable customer payment updates.';
+
 export async function payInstallment(
   p: Payment,
   method: PaymentMethod,
@@ -121,7 +125,7 @@ export async function payInstallment(
   let proofUrl: string | null = null;
   if (proofFile) proofUrl = await uploadDocument(proofFile);
   const lateFee = calcLateFee(p);
-  const { error } = await supabase
+  const { error, data } = await supabase
     .from('payments')
     .update({
       method,
@@ -130,8 +134,12 @@ export async function payInstallment(
       paid_at: new Date().toISOString(),
       late_fee: lateFee,
     })
-    .eq('id', p.id);
+    .eq('id', p.id)
+    .select('id');
   if (error) throw error;
+  // A row-level policy can hide the row from the writer: the update then "succeeds"
+  // but changes nothing, so the buyer would see a fake success screen.
+  if (!data || data.length === 0) throw new Error(PAYMENT_SAVE_DENIED);
   // trigger: payment received → notify society
   if (p.society_id) {
     notify(p.society_id, 'Payment received', `${p.label ?? 'Payment'} of PKR ${p.amount.toLocaleString()} received (${p.booking_ref ?? ''})${txnRef ? ` · Txn ${txnRef}` : ''}.`, 'payment_received').catch(() => {});
@@ -148,8 +156,13 @@ export async function payInstallment(
 export async function confirmPayment(id: string): Promise<void> {
   const supabase = getSupabase();
   if (!supabase) throw new Error('Database not connected');
-  const { error } = await supabase.from('payments').update({ status: 'confirmed', paid_at: new Date().toISOString() }).eq('id', id);
+  const { error, data } = await supabase
+    .from('payments')
+    .update({ status: 'confirmed', paid_at: new Date().toISOString() })
+    .eq('id', id)
+    .select('id');
   if (error) throw error;
+  if (!data || data.length === 0) throw new Error('This payment could not be confirmed — your account is not allowed to update payments yet.');
 }
 
 export async function fetchSocietyPayments(societyId: string): Promise<Payment[]> {
