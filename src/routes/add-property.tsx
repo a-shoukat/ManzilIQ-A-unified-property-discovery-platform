@@ -1,3 +1,5 @@
+import { AMENITIES, MAX_PHOTOS } from '@/lib/manzil/listing-detail';
+import { uploadListingPhoto } from '@/lib/manzil/phase4';
 import { toMarla } from '@/lib/manzil/phase3-rules';
 import { Button } from '@/components/ui/button';
 import { createFileRoute } from '@tanstack/react-router';
@@ -24,6 +26,21 @@ function AddProperty({ onNavigate, editId }: { onNavigate: (p: string, arg?: str
   const [bedrooms, setBedrooms] = useState('');
   const [bathrooms, setBathrooms] = useState('');
   const [description, setDescription] = useState('');
+  const [amenities, setAmenities] = useState<string[]>([]);
+  const [images, setImages] = useState<string[]>([]);
+  const [phone, setPhone] = useState('');
+  const [featured, setFeatured] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const { profile } = useAuth();
+  const addPhotos = async (files: FileList | null) => {
+    if (!files?.length) return;
+    const room = MAX_PHOTOS - images.length;
+    if (room <= 0) { setError(`Up to ${MAX_PHOTOS} photos`); return; }
+    setUploading(true); setError(null);
+    try { const urls: string[] = []; for (const f of [...files].slice(0, room)) urls.push(await uploadListingPhoto(f)); setImages((p) => [...p, ...urls]); }
+    catch (err) { setError(errorText(err, 'Photo upload failed')); }
+    setUploading(false);
+  };
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [existingStatus, setExistingStatus] = useState<'available' | 'reserved' | 'sold'>('available');
@@ -36,6 +53,7 @@ function AddProperty({ onNavigate, editId }: { onNavigate: (p: string, arg?: str
       setSize(String(p.plot_size_marla)); setCategory(p.category); setPurpose(p.purpose); setPrice(String(p.price));
       setBedrooms(p.bedrooms != null ? String(p.bedrooms) : ''); setBathrooms(p.bathrooms != null ? String(p.bathrooms) : '');
       setDescription(p.description ?? ''); setExistingStatus(p.status);
+      setAmenities(p.amenities ?? []); setImages(p.images ?? (p.image_url ? [p.image_url] : [])); setPhone(p.contact_phone ?? ''); setFeatured(!!p.is_featured);
     });
   }, [editId]);
 
@@ -58,9 +76,14 @@ function AddProperty({ onNavigate, editId }: { onNavigate: (p: string, arg?: str
           bathrooms: bathrooms ? parseInt(bathrooms, 10) : null,
           description: description || null,
           status: existingStatus,
+          // Detail fields are only sent when used, so listings still save before the Phase 4 setup runs.
+          ...(images.length ? { images, image_url: images[0] } : {}),
+          ...(amenities.length ? { amenities } : {}),
+          ...(phone ? { contact_phone: phone } : {}),
+          ...(profile?.role === 'super_admin' ? { is_featured: featured } : {}),
         };
       if (editId) { await updateProperty(editId, fields); onNavigate('property', editId); }
-      else { await createProperty({ ...fields, image_url: null }, session?.user.id ?? ""); onNavigate('marketplace'); }
+      else { await createProperty({ image_url: null, ...fields }, session?.user.id ?? ""); onNavigate('marketplace'); }
     } catch (err) {
       setError(errorText(err, editId ? 'Failed to save changes' : 'Failed to add property'));
     } finally {
@@ -138,8 +161,20 @@ function AddProperty({ onNavigate, editId }: { onNavigate: (p: string, arg?: str
             Description
             <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
           </label>
+          <label>Contact phone (shown to signed-in buyers)<input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="03xx-xxxxxxx" /></label>
+          <fieldset className="amenity-picker"><legend>Amenities & features</legend>
+            {AMENITIES.map((a) => <label key={a} className="amenity-chip"><input type="checkbox" checked={amenities.includes(a)} onChange={(e) => setAmenities((p) => e.target.checked ? [...p, a] : p.filter((x) => x !== a))} />{a}</label>)}
+          </fieldset>
+          <div className="photo-picker">
+            <div className="muted small">Photos ({images.length}/{MAX_PHOTOS}) — the first photo is the cover.</div>
+            <div className="photo-thumbs">
+              {images.map((u, i) => <div key={u} className="photo-thumb"><img src={u} alt={`Photo ${i + 1}`} /><button type="button" aria-label="Remove photo" onClick={() => setImages((p) => p.filter((x) => x !== u))}>×</button></div>)}
+              {images.length < MAX_PHOTOS && <label className="photo-add">{uploading ? 'Uploading…' : '+ Add photos'}<input type="file" accept="image/*" multiple hidden disabled={uploading} onChange={(e) => void addPhotos(e.target.files)} /></label>}
+            </div>
+          </div>
+          {profile?.role === 'super_admin' && <label className="amenity-chip"><input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} />Featured listing (shown first)</label>}
           {error && <div className="error">{error}</div>}
-          <Button variant="legacy" className="btn" disabled={loading}>
+          <Button variant="legacy" className="btn" disabled={loading || uploading}>
             {loading ? 'Saving…' : editId ? 'Save changes' : 'Add property'}
           </Button>
         </form>

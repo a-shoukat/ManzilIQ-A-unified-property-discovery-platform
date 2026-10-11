@@ -22,7 +22,7 @@ export async function reportListing(propertyId: string, title: string, reason: s
   if (!u.user) throw new Error('Sign in to report a listing');
   const { error } = await s.from('listing_reports').insert({ property_id: propertyId, reporter_id: u.user.id, reason, details: details || null });
   if (error) throw error;
-  const { data: admins } = await s.rpc('list_super_admins').then((r) => r, () => ({ data: null }));
+  const { data: admins } = await s.rpc('list_super_admins');
   if (Array.isArray(admins)) notify(admins as string[], 'Listing reported', `"${title}" — ${reason}`, 'listing_report').catch(() => {});
 }
 
