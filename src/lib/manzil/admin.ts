@@ -35,11 +35,11 @@ export async function fetchDisputes(mineOnly: string | null): Promise<Dispute[]>
   const list = (data as Dispute[]) ?? [];
   for (const d of list) {
     if (d.reporter_id) {
-      const { data: p } = await supabase.from('profiles').select('email').eq('id', d.reporter_id).single();
+      const { data: p } = await supabase.from('profiles').select('email').eq('id', d.reporter_id).maybeSingle();
       d.reporter_email = (p as { email: string } | null)?.email ?? '—';
     }
     if (d.plot_id) {
-      const { data: pl } = await supabase.from('plots').select('block, plot_no').eq('id', d.plot_id).single();
+      const { data: pl } = await supabase.from('plots').select('block, plot_no').eq('id', d.plot_id).maybeSingle();
       d.plot_label = pl ? `${(pl as { block: string }).block}-${(pl as { plot_no: string }).plot_no}` : '—';
     }
   }
@@ -54,7 +54,7 @@ export async function setDisputeStatus(id: string, status: Dispute['status'], re
   const { error } = await supabase.from('disputes').update(patch).eq('id', id);
   if (error) throw error;
   // trigger: complaint status update → notify reporter
-  const { data: d } = await supabase.from('disputes').select('reporter_id, subject').eq('id', id).single();
+  const { data: d } = await supabase.from('disputes').select('reporter_id, subject').eq('id', id).maybeSingle();
   const dd = d as { reporter_id: string; subject: string } | null;
   if (dd?.reporter_id) {
     notify(dd.reporter_id, `Dispute ${status}`, `Your dispute "${dd.subject}" is now ${status}.${resolutionNote ? ' Note: ' + resolutionNote : ''}`, 'dispute_update').catch(() => {});

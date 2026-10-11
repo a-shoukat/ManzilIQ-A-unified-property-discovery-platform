@@ -11,7 +11,7 @@ export async function fetchSocietySummaries(): Promise<SocietySummary[]> {
     .eq('verification_status', 'approved');
   const out: SocietySummary[] = [];
   for (const p of (data as { id: string; email: string }[]) ?? []) {
-    const { data: d } = await supabase.from('society_details').select('society_name').eq('profile_id', p.id).single();
+    const { data: d } = await supabase.from('society_details').select('society_name').eq('profile_id', p.id).maybeSingle();
     const { count: total } = await supabase.from('plots').select('id', { count: 'exact', head: true }).eq('society_id', p.id);
     const { count: avail } = await supabase.from('plots').select('id', { count: 'exact', head: true }).eq('society_id', p.id).eq('status', 'available');
     out.push({
@@ -84,7 +84,7 @@ export async function fetchLeads(dealerId: string): Promise<Lead[]> {
   const leads = (data as Lead[]) ?? [];
   for (const l of leads) {
     if (l.plot_id) {
-      const { data: p } = await supabase.from('plots').select('block, plot_no').eq('id', l.plot_id).single();
+      const { data: p } = await supabase.from('plots').select('block, plot_no').eq('id', l.plot_id).maybeSingle();
       l.plot_label = p ? `${(p as { block: string }).block}-${(p as { plot_no: string }).plot_no}` : '—';
     }
   }

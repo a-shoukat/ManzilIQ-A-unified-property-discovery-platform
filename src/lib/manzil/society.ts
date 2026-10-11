@@ -79,7 +79,7 @@ export async function fetchLots(societyId: string): Promise<Lot[]> {
   // enrich with dealer email + plot counts
   for (const lot of lots) {
     if (lot.dealer_id) {
-      const { data: prof } = await supabase.from('profiles').select('email').eq('id', lot.dealer_id).single();
+      const { data: prof } = await supabase.from('profiles').select('email').eq('id', lot.dealer_id).maybeSingle();
       lot.dealer_email = (prof as { email: string } | null)?.email ?? '—';
     }
     const { count } = await supabase.from('plots').select('id', { count: 'exact', head: true }).eq('lot_id', lot.id);
@@ -143,9 +143,9 @@ export async function fetchDealerRequests(societyId: string): Promise<DealerRequ
     .order('created_at', { ascending: false });
   const reqs = (data as DealerRequest[]) ?? [];
   for (const r of reqs) {
-    const { data: prof } = await supabase.from('profiles').select('email').eq('id', r.dealer_id).single();
+    const { data: prof } = await supabase.from('profiles').select('email').eq('id', r.dealer_id).maybeSingle();
     r.dealer_email = (prof as { email: string } | null)?.email ?? '—';
-    const { data: det } = await supabase.from('dealer_details').select('firm_name, license_no').eq('profile_id', r.dealer_id).single();
+    const { data: det } = await supabase.from('dealer_details').select('firm_name, license_no').eq('profile_id', r.dealer_id).maybeSingle();
     r.firm_name = (det as { firm_name: string } | null)?.firm_name ?? null;
     r.license_no = (det as { license_no: string } | null)?.license_no ?? null;
   }
@@ -169,7 +169,7 @@ export async function fetchApprovedSocieties(): Promise<{ id: string; email: str
     .eq('verification_status', 'approved');
   const out: { id: string; email: string; name: string }[] = [];
   for (const p of (data as { id: string; email: string }[]) ?? []) {
-    const { data: d } = await supabase.from('society_details').select('society_name').eq('profile_id', p.id).single();
+    const { data: d } = await supabase.from('society_details').select('society_name').eq('profile_id', p.id).maybeSingle();
     out.push({ id: p.id, email: p.email, name: (d as { society_name: string } | null)?.society_name ?? p.email });
   }
   return out;
@@ -181,8 +181,8 @@ export async function fetchSocietyDealers(societyId: string): Promise<{ id: stri
   const { data } = await supabase.from('dealer_requests').select('dealer_id').eq('society_id', societyId).eq('status', 'approved');
   const out: { id: string; email: string; firm: string }[] = [];
   for (const r of (data as { dealer_id: string }[]) ?? []) {
-    const { data: prof } = await supabase.from('profiles').select('email').eq('id', r.dealer_id).single();
-    const { data: det } = await supabase.from('dealer_details').select('firm_name').eq('profile_id', r.dealer_id).single();
+    const { data: prof } = await supabase.from('profiles').select('email').eq('id', r.dealer_id).maybeSingle();
+    const { data: det } = await supabase.from('dealer_details').select('firm_name').eq('profile_id', r.dealer_id).maybeSingle();
     out.push({
       id: r.dealer_id,
       email: (prof as { email: string } | null)?.email ?? '—',
