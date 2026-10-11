@@ -6,6 +6,7 @@ import { ROLE_LABELS } from '@/lib/manzil/types';
 import { useEffect, useState } from 'react';
 import { getSupabase } from '@/lib/manzil/supabase';
 import { CustomerRegistrationForm, DealerRegistrationForm, SocietyRegistrationForm } from '@/components/manzil/RegistrationForms';
+import { RoleOverview } from '@/components/manzil/RoleOverview';
 
 const ROLE_HOME: Record<string, { text: string; links: { label: string; page: string }[] }> = {
   buyer: {
@@ -176,15 +177,8 @@ function Dashboard({ onNavigate }: { onNavigate: (p: string) => void }) {
           <div className="notice">Thanks! Your documents are under review. You'll be notified once approved.</div>
         )}
 
-        {!isAdmin && status === 'approved' && home && (
-          <>
-            <p className="muted">{home.text}</p>
-            <div className="link-row">
-              {home.links.map((l) => (
-                <Button variant="legacy" key={l.page} className="btn secondary small" onClick={() => onNavigate(l.page)}>{l.label}</Button>
-              ))}
-            </div>
-          </>
+        {!isAdmin && status === 'approved' && home && profile && (
+          <RoleOverview role={profile.role} userId={profile.id} onNavigate={onNavigate} />
         )}
 
         <div className="link-row">
