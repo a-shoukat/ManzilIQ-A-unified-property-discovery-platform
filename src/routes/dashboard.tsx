@@ -74,7 +74,7 @@ function AdminOverview({ onNavigate }: { onNavigate: (p: string) => void }) {
     { key: 'payments', label: 'Payments', page: 'admin-analytics' },
     { key: 'disputes', label: 'Open disputes', page: 'admin-disputes' },
   ];
-  const areas = [
+  const areas: [string, string][] = [
     ['admin-verification', 'Approvals'], ['admin-bookings', 'Bookings'], ['admin-disputes', 'Disputes'],
     ['admin-templates', 'Legal templates'], ['broadcast', 'Broadcast'], ['admin-analytics', 'Analytics'],
     ['add-property', 'Add listing'], ['society', 'Societies'], ['dealer', 'Dealers'],
