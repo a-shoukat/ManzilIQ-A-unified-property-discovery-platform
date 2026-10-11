@@ -7,6 +7,8 @@ export interface Profile {
   email: string;
   role: UserRole;
   verification_status: VerificationStatus;
+  rejection_reason?: string | null;
+  full_name?: string | null;
   created_at: string;
 }
 
@@ -34,6 +36,8 @@ export interface CustomerDetails {
   contact_phone: string | null;
   address: string | null;
   photo_url: string | null;
+  cnic_front_url?: string | null;
+  cnic_back_url?: string | null;
 }
 
 export const ROLE_LABELS: Record<UserRole, string> = {
