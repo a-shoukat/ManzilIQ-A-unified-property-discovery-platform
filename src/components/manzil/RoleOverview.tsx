@@ -39,7 +39,7 @@ function useAttention(role: string, userId: string) {
     }
     if (role === 'dealer') {
       jobs.push(db.from('leads').select('*').eq('dealer_id', userId).eq('status', 'new').order('created_at', { ascending: false }).limit(5)
-        .then(({ data }) => (data ?? []).forEach((l: Record<string, unknown>) => out.push({ id: `l${l.id}`, label: `New lead · ${String(l.name ?? l.full_name ?? 'Customer')}`, page: 'dealer-leads' }))));
+        .then(({ data }) => (data ?? []).forEach((l: Record<string, unknown>) => out.push({ id: `l${l['id']}`, label: `New lead · ${String(l['name'] ?? l['full_name'] ?? 'Customer')}`, page: 'dealer-leads' }))));
     }
     if (role === 'society_admin') {
       jobs.push(db.from('bookings').select('id').eq('society_id', userId).eq('status', 'pending').limit(5)
