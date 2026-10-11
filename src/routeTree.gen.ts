@@ -15,6 +15,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin-analytics'
 import { Route as AdminBookingsRouteImport } from './routes/admin-bookings'
 import { Route as AdminDisputesRouteImport } from './routes/admin-disputes'
+import { Route as AdminFraudRouteImport } from './routes/admin-fraud'
 import { Route as AdminTemplatesRouteImport } from './routes/admin-templates'
 import { Route as AdminUsersRouteImport } from './routes/admin-users'
 import { Route as AdminVerificationRouteImport } from './routes/admin-verification'
@@ -24,6 +25,7 @@ import { Route as CompareRouteImport } from './routes/compare'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as DealerRouteImport } from './routes/dealer'
 import { Route as DealerAnalyticsRouteImport } from './routes/dealer-analytics'
+import { Route as DealerCommissionsRouteImport } from './routes/dealer-commissions'
 import { Route as DealerDiscoverRouteImport } from './routes/dealer-discover'
 import { Route as DealerLeadsRouteImport } from './routes/dealer-leads'
 import { Route as DealerLotsRouteImport } from './routes/dealer-lots'
@@ -77,6 +79,11 @@ const AdminDisputesRoute = AdminDisputesRouteImport.update({
   path: '/admin-disputes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminFraudRoute = AdminFraudRouteImport.update({
+  id: '/admin-fraud',
+  path: '/admin-fraud',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminTemplatesRoute = AdminTemplatesRouteImport.update({
   id: '/admin-templates',
   path: '/admin-templates',
@@ -120,6 +127,11 @@ const DealerRoute = DealerRouteImport.update({
 const DealerAnalyticsRoute = DealerAnalyticsRouteImport.update({
   id: '/dealer-analytics',
   path: '/dealer-analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealerCommissionsRoute = DealerCommissionsRouteImport.update({
+  id: '/dealer-commissions',
+  path: '/dealer-commissions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DealerDiscoverRoute = DealerDiscoverRouteImport.update({
@@ -240,6 +252,7 @@ export interface FileRoutesByFullPath {
   '/admin-analytics': typeof AdminAnalyticsRoute
   '/admin-bookings': typeof AdminBookingsRoute
   '/admin-disputes': typeof AdminDisputesRoute
+  '/admin-fraud': typeof AdminFraudRoute
   '/admin-templates': typeof AdminTemplatesRoute
   '/admin-users': typeof AdminUsersRoute
   '/admin-verification': typeof AdminVerificationRoute
@@ -249,6 +262,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/dealer': typeof DealerRoute
   '/dealer-analytics': typeof DealerAnalyticsRoute
+  '/dealer-commissions': typeof DealerCommissionsRoute
   '/dealer-discover': typeof DealerDiscoverRoute
   '/dealer-leads': typeof DealerLeadsRoute
   '/dealer-lots': typeof DealerLotsRoute
@@ -279,6 +293,7 @@ export interface FileRoutesByTo {
   '/admin-analytics': typeof AdminAnalyticsRoute
   '/admin-bookings': typeof AdminBookingsRoute
   '/admin-disputes': typeof AdminDisputesRoute
+  '/admin-fraud': typeof AdminFraudRoute
   '/admin-templates': typeof AdminTemplatesRoute
   '/admin-users': typeof AdminUsersRoute
   '/admin-verification': typeof AdminVerificationRoute
@@ -288,6 +303,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/dealer': typeof DealerRoute
   '/dealer-analytics': typeof DealerAnalyticsRoute
+  '/dealer-commissions': typeof DealerCommissionsRoute
   '/dealer-discover': typeof DealerDiscoverRoute
   '/dealer-leads': typeof DealerLeadsRoute
   '/dealer-lots': typeof DealerLotsRoute
@@ -319,6 +335,7 @@ export interface FileRoutesById {
   '/admin-analytics': typeof AdminAnalyticsRoute
   '/admin-bookings': typeof AdminBookingsRoute
   '/admin-disputes': typeof AdminDisputesRoute
+  '/admin-fraud': typeof AdminFraudRoute
   '/admin-templates': typeof AdminTemplatesRoute
   '/admin-users': typeof AdminUsersRoute
   '/admin-verification': typeof AdminVerificationRoute
@@ -328,6 +345,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/dealer': typeof DealerRoute
   '/dealer-analytics': typeof DealerAnalyticsRoute
+  '/dealer-commissions': typeof DealerCommissionsRoute
   '/dealer-discover': typeof DealerDiscoverRoute
   '/dealer-leads': typeof DealerLeadsRoute
   '/dealer-lots': typeof DealerLotsRoute
@@ -360,6 +378,7 @@ export interface FileRouteTypes {
     | '/admin-analytics'
     | '/admin-bookings'
     | '/admin-disputes'
+    | '/admin-fraud'
     | '/admin-templates'
     | '/admin-users'
     | '/admin-verification'
@@ -369,6 +388,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dealer'
     | '/dealer-analytics'
+    | '/dealer-commissions'
     | '/dealer-discover'
     | '/dealer-leads'
     | '/dealer-lots'
@@ -399,6 +419,7 @@ export interface FileRouteTypes {
     | '/admin-analytics'
     | '/admin-bookings'
     | '/admin-disputes'
+    | '/admin-fraud'
     | '/admin-templates'
     | '/admin-users'
     | '/admin-verification'
@@ -408,6 +429,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dealer'
     | '/dealer-analytics'
+    | '/dealer-commissions'
     | '/dealer-discover'
     | '/dealer-leads'
     | '/dealer-lots'
@@ -438,6 +460,7 @@ export interface FileRouteTypes {
     | '/admin-analytics'
     | '/admin-bookings'
     | '/admin-disputes'
+    | '/admin-fraud'
     | '/admin-templates'
     | '/admin-users'
     | '/admin-verification'
@@ -447,6 +470,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dealer'
     | '/dealer-analytics'
+    | '/dealer-commissions'
     | '/dealer-discover'
     | '/dealer-leads'
     | '/dealer-lots'
@@ -478,6 +502,7 @@ export interface RootRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminBookingsRoute: typeof AdminBookingsRoute
   AdminDisputesRoute: typeof AdminDisputesRoute
+  AdminFraudRoute: typeof AdminFraudRoute
   AdminTemplatesRoute: typeof AdminTemplatesRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminVerificationRoute: typeof AdminVerificationRoute
@@ -487,6 +512,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   DealerRoute: typeof DealerRoute
   DealerAnalyticsRoute: typeof DealerAnalyticsRoute
+  DealerCommissionsRoute: typeof DealerCommissionsRoute
   DealerDiscoverRoute: typeof DealerDiscoverRoute
   DealerLeadsRoute: typeof DealerLeadsRoute
   DealerLotsRoute: typeof DealerLotsRoute
@@ -555,6 +581,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDisputesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin-fraud': {
+      id: '/admin-fraud'
+      path: '/admin-fraud'
+      fullPath: '/admin-fraud'
+      preLoaderRoute: typeof AdminFraudRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin-templates': {
       id: '/admin-templates'
       path: '/admin-templates'
@@ -616,6 +649,13 @@ declare module '@tanstack/react-router' {
       path: '/dealer-analytics'
       fullPath: '/dealer-analytics'
       preLoaderRoute: typeof DealerAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dealer-commissions': {
+      id: '/dealer-commissions'
+      path: '/dealer-commissions'
+      fullPath: '/dealer-commissions'
+      preLoaderRoute: typeof DealerCommissionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dealer-discover': {
@@ -782,6 +822,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminBookingsRoute: AdminBookingsRoute,
   AdminDisputesRoute: AdminDisputesRoute,
+  AdminFraudRoute: AdminFraudRoute,
   AdminTemplatesRoute: AdminTemplatesRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminVerificationRoute: AdminVerificationRoute,
@@ -791,6 +832,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   DealerRoute: DealerRoute,
   DealerAnalyticsRoute: DealerAnalyticsRoute,
+  DealerCommissionsRoute: DealerCommissionsRoute,
   DealerDiscoverRoute: DealerDiscoverRoute,
   DealerLeadsRoute: DealerLeadsRoute,
   DealerLotsRoute: DealerLotsRoute,

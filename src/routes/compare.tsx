@@ -1,3 +1,4 @@
+import { formatSize } from '@/lib/manzil/phase3-rules';
 import { Button } from '@/components/ui/button';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
@@ -10,7 +11,7 @@ function Compare({ onNavigate }: { onNavigate: (p: string, arg?: string) => void
 
   const rows: { label: string; get: (p: (typeof items)[number]) => string }[] = [
     { label: 'Price', get: (p) => formatPrice(p.price) },
-    { label: 'Size', get: (p) => `${p.plot_size_marla} Marla` },
+    { label: 'Size', get: (p) => formatSize(p.plot_size_marla) },
     { label: 'Location', get: (p) => `${p.city}${p.area ? ', ' + p.area : ''}` },
     { label: 'Society', get: (p) => p.society_name ?? '—' },
     { label: 'Category', get: (p) => p.category },

@@ -1,3 +1,5 @@
+import { sendInquiry } from '@/lib/manzil/phase3';
+import { formatSize } from '@/lib/manzil/phase3-rules';
 import { Button } from '@/components/ui/button';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
@@ -66,7 +68,7 @@ function PropertyDetail({
     ['Area', p.area ?? '—'],
     ['Society', p.society_name ?? '—'],
     ['Block', p.block ?? '—'],
-    ['Plot size', `${p.plot_size_marla} Marla`],
+    ['Plot size', formatSize(p.plot_size_marla)],
     ['Category', p.category],
     ['Purpose', p.purpose],
     ['Bedrooms', p.bedrooms != null ? String(p.bedrooms) : '—'],
@@ -114,6 +116,7 @@ function PropertyDetail({
         </div>
       </div>
       {p.description && <p className="desc">{p.description}</p>}
+      <InquiryBox p={p} />
       <div className="spec-table">
         {rows.map(([k, v]) => (
           <div key={k} className="spec-row">
@@ -123,6 +126,29 @@ function PropertyDetail({
         ))}
       </div>
     </div>
+  );
+}
+
+function InquiryBox({ p }: { p: Property }) {
+  const { session, profile } = useAuth();
+  const [msg, setMsg] = useState(`Is "${p.title}" still available?`);
+  const [phone, setPhone] = useState('');
+  const [sending, setSending] = useState(false);
+  if (!p.owner_id || p.owner_id === session?.user.id) return null;
+  if (!session) return <div className="card card-full" style={{ margin: '16px 0' }}><strong>Interested?</strong><p className="muted small">Sign in to send an inquiry to the seller.</p></div>;
+  const send = async (e: React.FormEvent) => {
+    e.preventDefault(); setSending(true);
+    try { await sendInquiry(p.owner_id!, p.title, { name: profile?.full_name || session.user.email || 'Buyer', phone, email: session.user.email ?? '' }, msg); toast.success('Inquiry sent to the seller'); setMsg(''); }
+    catch (err) { toast.error(errorText(err, 'Could not send inquiry')); }
+    setSending(false);
+  };
+  return (
+    <form className="card card-full" style={{ margin: '16px 0' }} onSubmit={send}>
+      <strong>Send an inquiry</strong>
+      <label>Your phone<input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="03xx-xxxxxxx" /></label>
+      <label>Message<textarea required rows={3} value={msg} onChange={(e) => setMsg(e.target.value)} /></label>
+      <Button size="sm" type="submit" disabled={sending}>{sending ? 'Sending…' : 'Send inquiry'}</Button>
+    </form>
   );
 }
 

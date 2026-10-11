@@ -1,3 +1,4 @@
+import { toMarla } from '@/lib/manzil/phase3-rules';
 import { Button } from '@/components/ui/button';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
@@ -16,6 +17,7 @@ function AddProperty({ onNavigate, editId }: { onNavigate: (p: string, arg?: str
   const [society, setSociety] = useState('');
   const [block, setBlock] = useState('');
   const [size, setSize] = useState('5');
+  const [unit, setUnit] = useState<'marla' | 'kanal'>('marla');
   const [category, setCategory] = useState<PropertyCategory>('residential');
   const [purpose, setPurpose] = useState<PropertyPurpose>('sale');
   const [price, setPrice] = useState('');
@@ -48,7 +50,7 @@ function AddProperty({ onNavigate, editId }: { onNavigate: (p: string, arg?: str
           area: area || null,
           society_name: society || null,
           block: block || null,
-          plot_size_marla: parseFloat(size) || 0,
+          plot_size_marla: toMarla(parseFloat(size) || 0, unit),
           category,
           purpose,
           price: parseFloat(price) || 0,
@@ -99,7 +101,7 @@ function AddProperty({ onNavigate, editId }: { onNavigate: (p: string, arg?: str
           <div className="form-row">
             <label>
               Size (Marla)
-              <input required type="number" min={0} step="0.5" value={size} onChange={(e) => setSize(e.target.value)} />
+              <span style={{ display: 'flex', gap: 8 }}><input required type="number" min={0} step="0.5" value={size} onChange={(e) => setSize(e.target.value)} /><select aria-label="Size unit" value={unit} onChange={(e) => setUnit(e.target.value as 'marla' | 'kanal')} style={{ width: 110 }}><option value="marla">Marla</option><option value="kanal">Kanal</option></select></span>
             </label>
             <label>
               Price (PKR)
