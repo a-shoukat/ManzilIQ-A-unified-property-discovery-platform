@@ -3,6 +3,9 @@ import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
 import { useAuth } from '@/lib/manzil/auth';
 import { ROLE_LABELS } from '@/lib/manzil/types';
+import { useEffect, useState } from 'react';
+import { getSupabase } from '@/lib/manzil/supabase';
+import { CustomerRegistrationForm, DealerRegistrationForm, SocietyRegistrationForm } from '@/components/manzil/RegistrationForms';
 
 const ROLE_HOME: Record<string, { text: string; links: { label: string; page: string }[] }> = {
   buyer: {
@@ -41,70 +44,126 @@ const ROLE_HOME: Record<string, { text: string; links: { label: string; page: st
   },
 };
 
-function Dashboard({ onNavigate }: { onNavigate: (p: string) => void }) {
-  const { profile, signOut } = useAuth();
-  const home = profile ? ROLE_HOME[profile.role] : null;
+function useAdminStats(enabled: boolean) {
+  const [stats, setStats] = useState<Record<string, number | null>>({});
+  useEffect(() => {
+    const db = getSupabase();
+    if (!enabled || !db) return;
+    const count = async (table: string, filter?: [string, string]) => {
+      let q = db.from(table).select('*', { count: 'exact', head: true });
+      if (filter) q = q.eq(filter[0], filter[1]);
+      const { count: c, error } = await q;
+      return error ? null : c ?? 0;
+    };
+    void Promise.all([
+      count('profiles'), count('profiles', ['verification_status', 'pending']), count('properties'),
+      count('bookings'), count('payments'), count('disputes', ['status', 'open']),
+    ]).then(([users, pending, listings, bookings, payments, disputes]) =>
+      setStats({ users, pending, listings, bookings, payments, disputes }));
+  }, [enabled]);
+  return stats;
+}
 
-  const statusBadge =
-    profile?.verification_status === 'approved' ? (
-      <div className="badge ok">Verified</div>
-    ) : profile?.verification_status === 'pending' ? (
-      <div className="badge warn">Pending verification</div>
-    ) : profile?.verification_status === 'rejected' ? (
-      <div className="badge warn">Rejected</div>
-    ) : (
-      <div className="badge warn">Blacklisted</div>
-    );
+function AdminOverview({ onNavigate }: { onNavigate: (p: string) => void }) {
+  const stats = useAdminStats(true);
+  const tiles: { key: string; label: string; page: string }[] = [
+    { key: 'pending', label: 'Pending approvals', page: 'admin-verification' },
+    { key: 'users', label: 'Total users', page: 'admin-verification' },
+    { key: 'listings', label: 'Listings', page: 'marketplace' },
+    { key: 'bookings', label: 'Bookings', page: 'admin-bookings' },
+    { key: 'payments', label: 'Payments', page: 'admin-analytics' },
+    { key: 'disputes', label: 'Open disputes', page: 'admin-disputes' },
+  ];
+  const areas = [
+    ['admin-verification', 'Approvals'], ['admin-bookings', 'Bookings'], ['admin-disputes', 'Disputes'],
+    ['admin-templates', 'Legal templates'], ['broadcast', 'Broadcast'], ['admin-analytics', 'Analytics'],
+    ['add-property', 'Add listing'], ['society', 'Societies'], ['dealer', 'Dealers'],
+  ];
+  return (
+    <>
+      <div className="stat-grid">
+        {tiles.map((t) => (
+          <Button variant="legacy" key={t.key} className="stat-tile" onClick={() => onNavigate(t.page)}>
+            <span className="muted small">{t.label}</span>
+            <strong>{stats[t.key] ?? '—'}</strong>
+          </Button>
+        ))}
+      </div>
+      <h3>Manage platform</h3>
+      <div className="hub-grid">
+        {areas.map(([page, label]) => (
+          <Button variant="legacy" key={page} className="hub-card" onClick={() => onNavigate(page)}>
+            <strong>{label}</strong>
+          </Button>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function Dashboard({ onNavigate }: { onNavigate: (p: string) => void }) {
+  const { profile, details, signOut, refresh } = useAuth();
+  const home = profile ? ROLE_HOME[profile.role] : null;
+  const isAdmin = profile?.role === 'super_admin';
+  const status = profile?.verification_status;
+  const needsForm = !isAdmin && profile && (status === 'rejected' || (status === 'pending' && !details));
+
+  const statusBadge = isAdmin ? <div className="badge ok">Super admin</div> :
+    status === 'approved' ? <div className="badge ok">Verified</div> :
+    status === 'pending' ? <div className="badge warn">{details ? 'Awaiting approval' : 'Verification required'}</div> :
+    status === 'rejected' ? <div className="badge warn">Rejected</div> : <div className="badge warn">Blacklisted</div>;
+
+  const form = profile?.role === 'dealer' ? DealerRegistrationForm : profile?.role === 'society_admin' ? SocietyRegistrationForm : CustomerRegistrationForm;
+  const Form = form;
 
   return (
     <div className="page">
       <div className="card wide">
         <div className="topbar">
           <div>
-            <h1>ManzilIQ</h1>
+            <h1>{isAdmin ? 'Super admin dashboard' : 'ManzilIQ'}</h1>
             <p className="muted" style={{ margin: 0 }}>
-              {profile ? ROLE_LABELS[profile.role] : ''} dashboard
+              {profile ? ROLE_LABELS[profile.role] : ''} {isAdmin ? '· full platform control' : 'dashboard'}
             </p>
           </div>
-          <Button variant="legacy"
-            className="btn secondary small"
-            onClick={async () => {
-              await signOut();
-              onNavigate('login');
-            }}
-          >
+          <Button variant="legacy" className="btn secondary small" onClick={async () => { await signOut(); onNavigate('login'); }}>
             Sign out
           </Button>
         </div>
-
         {statusBadge}
-        <p>
-          Signed in as <strong>{profile?.email}</strong>
-        </p>
-        <p className="muted">{home?.text}</p>
+        <p>Signed in as <strong>{profile?.email}</strong></p>
 
-        {home && home.links.length > 0 && (
-          <div className="link-row">
-            {home.links.map((l) => (
-              <Button variant="legacy" key={l.page} className="btn secondary small" onClick={() => onNavigate(l.page)}>
-                {l.label}
-              </Button>
-            ))}
+        {!profile && <p className="muted">Setting up your account…</p>}
+        {isAdmin && <AdminOverview onNavigate={onNavigate} />}
+
+        {needsForm && (
+          <div className="onboarding-box">
+            <h3>{status === 'rejected' ? 'Resubmit your verification' : 'Verify your identity'}</h3>
+            {status === 'rejected' && profile?.rejection_reason && <div className="error">Reason: {profile.rejection_reason}</div>}
+            <p className="muted">Submit your details below. A super admin will review and approve your account.</p>
+            <Form onDone={() => { void refresh(); }} />
           </div>
+        )}
+        {!isAdmin && status === 'pending' && details && (
+          <div className="notice">Thanks! Your documents are under review. You'll be notified once approved.</div>
+        )}
+
+        {!isAdmin && status === 'approved' && home && (
+          <>
+            <p className="muted">{home.text}</p>
+            <div className="link-row">
+              {home.links.map((l) => (
+                <Button variant="legacy" key={l.page} className="btn secondary small" onClick={() => onNavigate(l.page)}>{l.label}</Button>
+              ))}
+            </div>
+          </>
         )}
 
         <div className="link-row">
-          <Button variant="legacy" className="btn small" onClick={() => onNavigate('marketplace')}>
-            Browse marketplace
-          </Button>
-          <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('map-view')}>
-            Society map
-          </Button>
-          <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('compare')}>
-            Compare plots
-          </Button>
+          <Button variant="legacy" className="btn small" onClick={() => onNavigate('marketplace')}>Browse marketplace</Button>
+          <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('map-view')}>Society map</Button>
+          <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('compare')}>Compare plots</Button>
         </div>
-
       </div>
     </div>
   );
