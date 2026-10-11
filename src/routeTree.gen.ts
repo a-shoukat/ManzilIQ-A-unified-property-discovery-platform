@@ -25,6 +25,7 @@ import { Route as CompareRouteImport } from './routes/compare'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as DealerRouteImport } from './routes/dealer'
 import { Route as DealerAnalyticsRouteImport } from './routes/dealer-analytics'
+import { Route as DealerBookRouteImport } from './routes/dealer-book'
 import { Route as DealerCommissionsRouteImport } from './routes/dealer-commissions'
 import { Route as DealerDiscoverRouteImport } from './routes/dealer-discover'
 import { Route as DealerLeadsRouteImport } from './routes/dealer-leads'
@@ -127,6 +128,11 @@ const DealerRoute = DealerRouteImport.update({
 const DealerAnalyticsRoute = DealerAnalyticsRouteImport.update({
   id: '/dealer-analytics',
   path: '/dealer-analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealerBookRoute = DealerBookRouteImport.update({
+  id: '/dealer-book',
+  path: '/dealer-book',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DealerCommissionsRoute = DealerCommissionsRouteImport.update({
@@ -262,6 +268,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/dealer': typeof DealerRoute
   '/dealer-analytics': typeof DealerAnalyticsRoute
+  '/dealer-book': typeof DealerBookRoute
   '/dealer-commissions': typeof DealerCommissionsRoute
   '/dealer-discover': typeof DealerDiscoverRoute
   '/dealer-leads': typeof DealerLeadsRoute
@@ -303,6 +310,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/dealer': typeof DealerRoute
   '/dealer-analytics': typeof DealerAnalyticsRoute
+  '/dealer-book': typeof DealerBookRoute
   '/dealer-commissions': typeof DealerCommissionsRoute
   '/dealer-discover': typeof DealerDiscoverRoute
   '/dealer-leads': typeof DealerLeadsRoute
@@ -345,6 +353,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/dealer': typeof DealerRoute
   '/dealer-analytics': typeof DealerAnalyticsRoute
+  '/dealer-book': typeof DealerBookRoute
   '/dealer-commissions': typeof DealerCommissionsRoute
   '/dealer-discover': typeof DealerDiscoverRoute
   '/dealer-leads': typeof DealerLeadsRoute
@@ -388,6 +397,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dealer'
     | '/dealer-analytics'
+    | '/dealer-book'
     | '/dealer-commissions'
     | '/dealer-discover'
     | '/dealer-leads'
@@ -429,6 +439,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dealer'
     | '/dealer-analytics'
+    | '/dealer-book'
     | '/dealer-commissions'
     | '/dealer-discover'
     | '/dealer-leads'
@@ -470,6 +481,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dealer'
     | '/dealer-analytics'
+    | '/dealer-book'
     | '/dealer-commissions'
     | '/dealer-discover'
     | '/dealer-leads'
@@ -512,6 +524,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   DealerRoute: typeof DealerRoute
   DealerAnalyticsRoute: typeof DealerAnalyticsRoute
+  DealerBookRoute: typeof DealerBookRoute
   DealerCommissionsRoute: typeof DealerCommissionsRoute
   DealerDiscoverRoute: typeof DealerDiscoverRoute
   DealerLeadsRoute: typeof DealerLeadsRoute
@@ -649,6 +662,13 @@ declare module '@tanstack/react-router' {
       path: '/dealer-analytics'
       fullPath: '/dealer-analytics'
       preLoaderRoute: typeof DealerAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dealer-book': {
+      id: '/dealer-book'
+      path: '/dealer-book'
+      fullPath: '/dealer-book'
+      preLoaderRoute: typeof DealerBookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dealer-commissions': {
@@ -832,6 +852,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   DealerRoute: DealerRoute,
   DealerAnalyticsRoute: DealerAnalyticsRoute,
+  DealerBookRoute: DealerBookRoute,
   DealerCommissionsRoute: DealerCommissionsRoute,
   DealerDiscoverRoute: DealerDiscoverRoute,
   DealerLeadsRoute: DealerLeadsRoute,
