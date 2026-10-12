@@ -1188,3 +1188,12 @@ textarea {
 .wallet-success { text-align: center; max-width: 380px; }
 .wallet-success .spec-row { justify-content: space-between; text-align: left; }
 .wallet-tick { width: 56px; height: 56px; margin: 0 auto 8px; border-radius: 50%; display: grid; place-items: center; font-size: 28px; background: var(--success); color: var(--primary-foreground); }
+
+.detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 12px; }
+.detail-grid h4 { margin: 0 0 6px; }
+.detail-row { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; border-bottom: 1px solid var(--border); }
+.timeline { list-style: none; padding: 0; margin: 0; }
+.timeline li { padding: 4px 0 4px 18px; position: relative; color: var(--muted-foreground); text-transform: capitalize; }
+.timeline li::before { content: ''; position: absolute; left: 0; top: 10px; width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
+.timeline li.done { color: var(--foreground); }
+.timeline li.done::before { background: var(--primary); }
