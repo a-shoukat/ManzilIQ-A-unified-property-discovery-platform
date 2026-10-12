@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { useNavigate, useLocation } from '@tanstack/react-router';
-import { LayoutGrid, Map, Sparkles, ArrowLeftRight, Wallet, CalendarDays, FileText, ChartNoAxesCombined, Bell, ChevronRight, LogOut, Menu, X, Plus, ShieldCheck, Users, House, ArrowUpRight, Heart, UserRound } from 'lucide-react';
+import { Building2, LayoutGrid, Map, Sparkles, ArrowLeftRight, Wallet, CalendarDays, FileText, ChartNoAxesCombined, Bell, ChevronRight, LogOut, Menu, X, Plus, ShieldCheck, Users, House, ArrowUpRight, Heart, UserRound } from 'lucide-react';
 import logoAsset from '@/assets/manziliq-logo.jpg.asset.json';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/manzil/auth';
