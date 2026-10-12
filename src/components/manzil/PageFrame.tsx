@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { useNavigate, useLocation } from '@tanstack/react-router';
 import { Building2, LayoutGrid, Map, Sparkles, ArrowLeftRight, Wallet, CalendarDays, FileText, ChartNoAxesCombined, Bell, ChevronRight, LogOut, Menu, X, Plus, ShieldCheck, Users, House, ArrowUpRight, Heart, UserRound } from 'lucide-react';
+import logoAsset from '@/assets/manziliq-logo.jpg.asset.json';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/manzil/auth';
 import { useCompare } from '@/lib/manzil/compare';
@@ -47,7 +48,7 @@ export function PageFrame({children, publicPage=false}: {children:ReactNode; pub
   return <div className="app-shell">
    {open && <div className="mobile-scrim" onClick={()=>setOpen(false)}/>}
    <aside className={`sidebar${open?' open':''}`}>
-    <Button variant="legacy" className="brand" onClick={()=>go('marketplace')}><span className="brand-symbol"><Building2 size={24}/></span><span>Manzil<span className="brand-iq">IQ</span></span></Button>
+    <Button variant="legacy" className="brand" onClick={()=>go('marketplace')} aria-label="ManzilIQ home"><img src={logoAsset.url} alt="ManzilIQ" className="brand-logo" /></Button>
     <div className="workspace-label">YOUR PROPERTY PARTNER</div>
     <div className="nav-group"><div className="nav-section-label">DISCOVER</div>{links(mainLinks)}</div>
     {session && profile && <div className="nav-group"><div className="nav-section-label">MY WORKSPACE</div>{links(profile.role==='buyer' ? portfolioLinks : portfolioLinks.filter(({key}) => ['dashboard','documents','inbox'].includes(key)))}</div>}
