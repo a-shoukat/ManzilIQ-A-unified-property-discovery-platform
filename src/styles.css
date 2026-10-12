@@ -1070,9 +1070,9 @@ textarea {
 
 .app-shell { min-height:100vh; }
 .sidebar { width:238px; position:fixed; inset:0 auto 0 0; z-index:35; background:var(--card); border-right:1px solid var(--border); display:flex; flex-direction:column; padding:30px 18px 16px; overflow-y:auto; }
-.brand { display:flex; align-items:center; justify-content:flex-start; gap:10px; padding:0 8px; width:100%; font-size:25px; font-weight:700; color:var(--foreground); height:36px; background:none; border:0; }
-.brand-symbol { width:35px;height:37px;background:var(--primary);color:var(--primary-foreground);display:grid;place-items:center;border-radius:7px; }
-.brand-iq {color:var(--primary);}.workspace-label {font-size:9px;letter-spacing:0;margin:14px 0 30px 9px;color:var(--muted-foreground);font-weight:600;}
+.brand { display:flex; align-items:center; justify-content:flex-start; gap:10px; padding:0 8px; width:100%; color:var(--foreground); height:44px; background:none; border:0; }
+.brand-logo { height:40px; width:auto; display:block; }
+.workspace-label {font-size:9px;letter-spacing:0;margin:14px 0 30px 9px;color:var(--muted-foreground);font-weight:600;}
 .nav-group{margin-bottom:24px;}.nav-section-label{font-size:10px;font-weight:600;color:var(--muted-foreground);margin:0 12px 10px;}
 .side-link{width:100%;display:flex;justify-content:flex-start;align-items:center;gap:12px;padding:12px;margin:3px 0;font-size:12px;font-weight:500;color:var(--muted-foreground);border:0;border-radius:5px;background:none;white-space:normal;text-align:left;}
 .side-link.active{background:var(--accent);color:var(--primary);font-weight:600;}.side-link:hover{background:var(--muted);}.side-count{margin-left:auto;background:var(--primary);color:var(--primary-foreground);padding:1px 6px;border-radius:4px;font-size:10px;}
