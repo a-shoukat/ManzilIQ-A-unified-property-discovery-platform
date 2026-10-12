@@ -176,6 +176,14 @@ export interface Booking {
   created_at: string;
   plot_label?: string;
   customer_email?: string;
+  customer_name?: string | null;
+  plot_no?: string | null;
+  plot_block?: string | null;
+  plot_size_marla?: number | null;
+  plot_price?: number | null;
+  plot_status?: string | null;
+  society_name?: string | null;
+  dealer_email?: string | null;
 }
 
 export const INSTALLMENT_PLANS = [

@@ -1,3 +1,4 @@
+import { plotLabel } from './booking-rules';
 import { getSupabase } from './supabase';
 import { generateSchedule } from './payment';
 import { generateDocument } from './legal';
@@ -17,20 +18,38 @@ export function makeReferenceNo(): string {
   return `BK-${Date.now().toString(36).toUpperCase().slice(-6)}${Math.floor(Math.random() * 90 + 10)}`;
 }
 
-async function enrich(b: Booking): Promise<Booking> {
+/** Batch-loads plot, society, customer and dealer details so every row has a readable label. */
+async function enrichAll(list: Booking[]): Promise<Booking[]> {
   const supabase = getSupabase();
-  if (!supabase) return b;
-  if (b.plot_id) {
-    const { data: p } = await supabase.from('plots').select('block, plot_no').eq('id', b.plot_id).maybeSingle();
-    b.plot_label = p ? `${(p as { block: string }).block}-${(p as { plot_no: string }).plot_no}` : 'Plot details unavailable';
-  } else {
-    b.plot_label = 'No plot linked';
+  if (!supabase || list.length === 0) return list;
+  const uniq = (xs: (string | null)[]) => [...new Set(xs.filter((x): x is string => !!x))];
+  const plotIds = uniq(list.map((b) => b.plot_id));
+  const socIds = uniq(list.map((b) => b.society_id));
+  const userIds = uniq(list.flatMap((b) => [b.customer_id, b.dealer_id]));
+  const [plotsRes, socRes, usersRes] = await Promise.all([
+    plotIds.length ? supabase.from('plots').select('id, block, plot_no, size_marla, base_price, status').in('id', plotIds) : Promise.resolve({ data: [] }),
+    socIds.length ? supabase.from('society_details').select('profile_id, society_name').in('profile_id', socIds) : Promise.resolve({ data: [] }),
+    userIds.length ? supabase.from('profiles').select('id, email, full_name').in('id', userIds) : Promise.resolve({ data: [] }),
+  ]);
+  type P = { id: string; block: string | null; plot_no: string; size_marla: number; base_price: number; status: string };
+  const plots = new Map(((plotsRes.data ?? []) as P[]).map((p) => [p.id, p]));
+  const socs = new Map(((socRes.data ?? []) as { profile_id: string; society_name: string }[]).map((x) => [x.profile_id, x.society_name]));
+  const users = new Map(((usersRes.data ?? []) as { id: string; email: string; full_name: string | null }[]).map((u) => [u.id, u]));
+  for (const b of list) {
+    const p = b.plot_id ? plots.get(b.plot_id) : undefined;
+    b.society_name = b.society_id ? socs.get(b.society_id) ?? null : null;
+    if (p) {
+      b.plot_no = p.plot_no; b.plot_block = p.block; b.plot_size_marla = p.size_marla; b.plot_price = p.base_price; b.plot_status = p.status;
+      b.plot_label = plotLabel(p.plot_no, p.block, b.society_name);
+    } else {
+      b.plot_label = b.plot_id ? 'Plot details unavailable' : 'No plot linked';
+    }
+    const c = b.customer_id ? users.get(b.customer_id) : undefined;
+    b.customer_email = c?.email ?? '—';
+    b.customer_name = c?.full_name ?? null;
+    b.dealer_email = b.dealer_id ? users.get(b.dealer_id)?.email ?? null : null;
   }
-  if (b.customer_id) {
-    const { data: c } = await supabase.from('profiles').select('email').eq('id', b.customer_id).maybeSingle();
-    b.customer_email = (c as { email: string } | null)?.email ?? '—';
-  }
-  return b;
+  return list;
 }
 
 export async function createBooking(input: {
@@ -65,8 +84,7 @@ export async function fetchMyBookings(customerId: string): Promise<Booking[]> {
   if (!supabase) return [];
   const { data } = await supabase.from('bookings').select('*').eq('customer_id', customerId).order('created_at', { ascending: false });
   const list = (data as Booking[]) ?? [];
-  for (const b of list) await enrich(b);
-  return list;
+  return enrichAll(list);
 }
 
 export async function fetchSocietyBookings(societyId: string): Promise<Booking[]> {
@@ -74,8 +92,7 @@ export async function fetchSocietyBookings(societyId: string): Promise<Booking[]
   if (!supabase) return [];
   const { data } = await supabase.from('bookings').select('*').eq('society_id', societyId).order('created_at', { ascending: false });
   const list = (data as Booking[]) ?? [];
-  for (const b of list) await enrich(b);
-  return list;
+  return enrichAll(list);
 }
 
 export async function fetchAllBookings(): Promise<Booking[]> {
@@ -83,8 +100,7 @@ export async function fetchAllBookings(): Promise<Booking[]> {
   if (!supabase) return [];
   const { data } = await supabase.from('bookings').select('*').order('created_at', { ascending: false });
   const list = (data as Booking[]) ?? [];
-  for (const b of list) await enrich(b);
-  return list;
+  return enrichAll(list);
 }
 
 export async function setBookingStatus(id: string, status: Booking['status']): Promise<void> {
