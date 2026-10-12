@@ -85,6 +85,8 @@ function MapView({ onNavigate }: { onNavigate: (p: string) => void }) {
         <input type="number" placeholder="Max Marla" value={maxSize} onChange={(e) => setMaxSize(e.target.value)} style={{ marginTop: 0 }} />
       </div>
 
+      <PunjabMap />
+
       {loading ? <p className="muted">Loading…</p> : (
         <>
           <div className="map-toolbar">
@@ -153,6 +155,46 @@ function MapView({ onNavigate }: { onNavigate: (p: string) => void }) {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+const PUNJAB_PLACES: { label: string; q: string; z: number }[] = [
+  { label: 'All Punjab', q: 'Punjab, Pakistan', z: 7 },
+  { label: 'Lahore', q: 'Lahore, Pakistan', z: 11 },
+  { label: 'Rawalpindi', q: 'Rawalpindi, Pakistan', z: 11 },
+  { label: 'Faisalabad', q: 'Faisalabad, Pakistan', z: 11 },
+  { label: 'Multan', q: 'Multan, Pakistan', z: 11 },
+  { label: 'Gujranwala', q: 'Gujranwala, Pakistan', z: 11 },
+  { label: 'Sialkot', q: 'Sialkot, Pakistan', z: 12 },
+  { label: 'Bahawalpur', q: 'Bahawalpur, Pakistan', z: 11 },
+];
+
+/** Embedded Google map of Punjab, Pakistan with quick city jumps. */
+function PunjabMap() {
+  const [place, setPlace] = useState(PUNJAB_PLACES[0]!);
+  const src = `https://maps.google.com/maps?q=${encodeURIComponent(place.q)}&z=${place.z}&output=embed`;
+  return (
+    <div className="card card-full" style={{ marginBottom: 24 }}>
+      <div className="topbar">
+        <div>
+          <h3 style={{ margin: 0 }}>Punjab, Pakistan</h3>
+          <p className="muted small" style={{ margin: 0 }}>Explore cities and areas across Punjab</p>
+        </div>
+      </div>
+      <div className="block-tabs" style={{ flexWrap: 'wrap', marginBottom: 12 }}>
+        {PUNJAB_PLACES.map((p) => (
+          <Button variant="legacy" key={p.label} className={`tab${p.label === place.label ? ' active' : ''}`} onClick={() => setPlace(p)}>{p.label}</Button>
+        ))}
+      </div>
+      <iframe
+        title={`Map of ${place.label}`}
+        src={src}
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+        style={{ width: '100%', height: 'min(70vh, 520px)', border: 0, borderRadius: 12 }}
+        allowFullScreen
+      />
     </div>
   );
 }
