@@ -89,11 +89,11 @@ async function localBrain(input: string): Promise<{ text: string; action?: { lab
 
   // greeting
   if (/^(salam|assalam|hello|hi|aoa)\b/.test(q)) {
-    return { text: 'Walaikum Assalam! 👋 Main ManzilIQ AI Assistant hoon. Plot prices, bookings, installments ya documents — kis cheez mein madad karoon?' };
+    return { text: "Hello! 👋 I'm the ManzilIQ assistant. How can I help with plot prices, bookings, installments or documents?" };
   }
 
   return {
-    text: 'Main aapki madad kar sakta hoon:\n• Plot price estimate (e.g. "price of 5 marla in Narowal")\n• Listings search (e.g. "show plots in Lahore")\n• Booking & installment guide\n• Marla conversions\n• Documents & disputes help',
+    text: 'I can help with:\n• Plot price estimate (e.g. "price of 5 marla in Narowal")\n• Listings search (e.g. "show plots in Lahore")\n• Booking & installment guide\n• Marla conversions\n• Documents & disputes help',
   };
 }
 

@@ -39,10 +39,10 @@ export function PageFrame({children, publicPage=false}: {children:ReactNode; pub
  const location = useLocation();
  const current = location.pathname === '/' ? 'marketplace' : (location.pathname.split('/')[1] ?? 'marketplace');
  const [open,setOpen] = useState(false);
- const isSociety = profile?.role === 'society_admin' || profile?.role === 'super_admin';
- const isDealer = profile?.role === 'dealer' || profile?.role === 'super_admin';
+ const isSociety = !!session && profile?.role === 'society_admin';
+ const isDealer = !!session && profile?.role === 'dealer';
  const go = (key:string) => { onNavigate(key); setOpen(false); };
-  const links = (list:typeof mainLinks) => list.filter(({key}) => !session || canAccessPage(key, profile?.role)).map(({key,label,icon:Icon}) => <Button variant="legacy" key={key} className={`side-link${current===key?' active':''}`} onClick={()=>go(key)}><Icon size={18}/><span>{label}</span>{key==='compare' && items.length>0 && <span className="side-count">{items.length}</span>}</Button>);
+  const links = (list:typeof mainLinks) => list.filter(({key}) => canAccessPage(key, session ? profile?.role : undefined)).map(({key,label,icon:Icon}) => <Button variant="legacy" key={key} className={`side-link${current===key?' active':''}`} onClick={()=>go(key)}><Icon size={18}/><span>{label}</span>{key==='compare' && items.length>0 && <span className="side-count">{items.length}</span>}</Button>);
   const allowed = canAccessPage(current, profile?.role);
   return <div className="app-shell">
    {open && <div className="mobile-scrim" onClick={()=>setOpen(false)}/>}
@@ -50,11 +50,11 @@ export function PageFrame({children, publicPage=false}: {children:ReactNode; pub
     <Button variant="legacy" className="brand" onClick={()=>go('marketplace')}><span className="brand-symbol"><Building2 size={24}/></span><span>Manzil<span className="brand-iq">IQ</span></span></Button>
     <div className="workspace-label">YOUR PROPERTY PARTNER</div>
     <div className="nav-group"><div className="nav-section-label">DISCOVER</div>{links(mainLinks)}</div>
-    <div className="nav-group"><div className="nav-section-label">MY WORKSPACE</div>{links(portfolioLinks)}</div>
+    {session && profile && <div className="nav-group"><div className="nav-section-label">MY WORKSPACE</div>{links(profile.role==='buyer' ? portfolioLinks : portfolioLinks.filter(({key}) => ['dashboard','documents','inbox'].includes(key)))}</div>}
     <div className="nav-group"><div className="nav-section-label">INSIGHTS</div>{links([{key:'market-trends',label:'Market trends',icon:ChartNoAxesCombined}])}
      {isSociety && links([{key:'society',label:'Society management',icon:Building2},{key:'society-inventory',label:'Plot inventory',icon:LayoutGrid},{key:'society-bookings',label:'Booking requests',icon:CalendarDays},{key:'society-dealers',label:'Dealers',icon:Users},{key:'society-financials',label:'Financials',icon:Wallet},{key:'society-analytics',label:'Society analytics',icon:ChartNoAxesCombined}])}
      {isDealer && links([{key:'dealer',label:'Dealer workspace',icon:Users},{key:'dealer-lots',label:'My lots',icon:LayoutGrid},{key:'dealer-leads',label:'Leads',icon:Users},{key:'dealer-book',label:'Book for customer',icon:CalendarDays},{key:'dealer-commissions',label:'Commissions',icon:Wallet},{key:'dealer-analytics',label:'Performance',icon:ChartNoAxesCombined}])}
-    {profile?.role==='super_admin' && links([{key:'admin',label:'Administration',icon:ShieldCheck},{key:'admin-users',label:'Users',icon:Users},{key:'admin-verification',label:'Approvals',icon:ShieldCheck},{key:'admin-bookings',label:'All bookings',icon:CalendarDays},{key:'admin-disputes',label:'Disputes',icon:ShieldCheck},{key:'admin-fraud',label:'Fraud alerts',icon:ShieldCheck},{key:'admin-reports',label:'Reported listings',icon:ShieldCheck},{key:'admin-templates',label:'Templates',icon:FileText},{key:'admin-analytics',label:'Platform analytics',icon:ChartNoAxesCombined},{key:'broadcast',label:'Broadcast',icon:Bell}])}
+    {session && profile?.role==='super_admin' && links([{key:'admin',label:'Administration',icon:ShieldCheck},{key:'admin-users',label:'Users',icon:Users},{key:'admin-verification',label:'Approvals',icon:ShieldCheck},{key:'admin-bookings',label:'All bookings',icon:CalendarDays},{key:'admin-disputes',label:'Disputes',icon:ShieldCheck},{key:'admin-fraud',label:'Fraud alerts',icon:ShieldCheck},{key:'admin-reports',label:'Reported listings',icon:ShieldCheck},{key:'admin-templates',label:'Templates',icon:FileText},{key:'admin-analytics',label:'Platform analytics',icon:ChartNoAxesCombined},{key:'broadcast',label:'Broadcast',icon:Bell}])}
    </div>
    <div className="sidebar-bottom"><div className="advisor-note"><Sparkles size={19}/><strong>A little clarity goes a long way.</strong><span>Find your next move with ManzilIQ.</span><Button variant="legacy" className="advisor-link" onClick={()=>go('price-estimator')}>Explore price estimates <ArrowUpRight size={16}/></Button></div>
    <Button variant="legacy" className="account-button" onClick={()=> session ? go('dashboard') : go('login')}><span className="avatar">{session?.user.email?.[0]?.toUpperCase() ?? 'G'}</span><span><strong>{session?.user.email?.split('@')[0] ?? 'Guest account'}</strong><small>{profile?.role?.replace('_',' ') ?? 'Welcome to ManzilIQ'}</small></span><ChevronRight size={16}/></Button></div>

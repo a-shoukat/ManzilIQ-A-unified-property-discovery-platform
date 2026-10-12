@@ -12,7 +12,7 @@ import {
 } from '@/lib/manzil/booking';
 import { notify } from '@/lib/manzil/notify';
 import { generateDocument } from '@/lib/manzil/legal';
-import { formatPrice } from '@/lib/manzil/estimator';
+import { formatPrice } from '@/lib/manzil/properties';
 import { DOC_TITLES, type Booking } from '@/lib/manzil/types';
 import { BookingCard } from './my-bookings';
 import { useSocietyId } from './society';
