@@ -165,7 +165,8 @@ function MyPayments({ onNavigate }: { onNavigate: (p: string) => void }) {
             <div className="spec-table">
               <div className="spec-row"><span className="detail-key">Booking</span><span>{receipt.booking_ref}</span></div>
               <div className="spec-row"><span className="detail-key">Label</span><span>{receipt.label}</span></div>
-              <div className="spec-row"><span className="detail-key">Installment amount</span><span>{formatPrice(receipt.amount)}</span></div>
+              <div className="spec-row"><span className="detail-key"><strong>Amount paid</strong></span><strong>{formatPrice(receiptTotal(receipt))}</strong></div>
+              <div className="spec-row"><span className="detail-key">Installment</span><span>{formatPrice(receipt.amount)}</span></div>
               <div className="spec-row"><span className="detail-key">Late fee</span><span>{receipt.late_fee > 0 ? formatPrice(receipt.late_fee) : '—'}</span></div>
               <div className="spec-row"><span className="detail-key"><strong>Total paid</strong></span><strong>{formatPrice(receiptTotal(receipt))}</strong></div>
               <div className="spec-row"><span className="detail-key">Method</span><span>{receipt.method}</span></div>

@@ -3,6 +3,15 @@ import { generateSchedule } from './payment';
 import { generateDocument } from './legal';
 import { notify } from './notify';
 import type { Booking } from '@/lib/manzil/types';
+import { ACTIVE_BOOKING_STATUSES, PLOT_UNAVAILABLE, bookingErrorText, filterBookablePlots } from './booking-rules';
+
+/** Plot ids held by an active booking (blocks double booking even when plot status is stale). */
+export async function fetchHeldPlotIds(plotIds: string[]): Promise<string[]> {
+  const supabase = getSupabase();
+  if (!supabase || plotIds.length === 0) return [];
+  const { data } = await supabase.from('bookings').select('plot_id').in('plot_id', plotIds).in('status', [...ACTIVE_BOOKING_STATUSES]);
+  return ((data as { plot_id: string }[]) ?? []).map((r) => r.plot_id);
+}
 
 export function makeReferenceNo(): string {
   return `BK-${Date.now().toString(36).toUpperCase().slice(-6)}${Math.floor(Math.random() * 90 + 10)}`;
@@ -13,7 +22,9 @@ async function enrich(b: Booking): Promise<Booking> {
   if (!supabase) return b;
   if (b.plot_id) {
     const { data: p } = await supabase.from('plots').select('block, plot_no').eq('id', b.plot_id).maybeSingle();
-    b.plot_label = p ? `${(p as { block: string }).block}-${(p as { plot_no: string }).plot_no}` : '—';
+    b.plot_label = p ? `${(p as { block: string }).block}-${(p as { plot_no: string }).plot_no}` : 'Plot details unavailable';
+  } else {
+    b.plot_label = 'No plot linked';
   }
   if (b.customer_id) {
     const { data: c } = await supabase.from('profiles').select('email').eq('id', b.customer_id).maybeSingle();
@@ -33,12 +44,15 @@ export async function createBooking(input: {
 }): Promise<Booking> {
   const supabase = getSupabase();
   if (!supabase) throw new Error('Database not connected');
+  const held = await fetchHeldPlotIds([input.plot_id]);
+  const { data: pl } = await supabase.from('plots').select('id, status').eq('id', input.plot_id).maybeSingle();
+  if (!pl || held.length || filterBookablePlots([pl as { id: string; status: string }], []).length === 0) throw new Error(PLOT_UNAVAILABLE);
   const { data, error } = await supabase
     .from('bookings')
     .insert({ ...input, reference_no: makeReferenceNo(), status: 'pending' })
     .select()
     .single();
-  if (error) throw error;
+  if (error) throw new Error(bookingErrorText(error) ?? error.message);
   // trigger: new booking created → notify society
   if (input.society_id) {
     notify(input.society_id, 'New booking request', `Booking ${(data as Booking).reference_no} needs review.`, 'booking_created').catch(() => {});
@@ -87,7 +101,8 @@ export async function approveBooking(b: Booking): Promise<void> {
   await setBookingStatus(b.id, 'approved');
   let total = 0;
   if (b.plot_id) {
-    await supabase.from('plots').update({ status: 'reserved' }).eq('id', b.plot_id);
+    const { data: up, error: upErr } = await supabase.from('plots').update({ status: 'reserved' }).eq('id', b.plot_id).select('id');
+    if (upErr || !up?.length) throw new Error('Booking approved, but the plot could not be marked reserved — your account is not allowed to update this plot. Run reference/phase7-fixes.sql.');
     const { data: p } = await supabase.from('plots').select('base_price').eq('id', b.plot_id).maybeSingle();
     total = Number((p as { base_price: number } | null)?.base_price ?? 0);
   }
@@ -133,10 +148,11 @@ export async function fetchAvailablePlots(societyId: string) {
   if (!supabase) return [];
   const { data } = await supabase
     .from('plots')
-    .select('id, block, plot_no, size_marla, base_price')
+    .select('id, block, plot_no, size_marla, base_price, status')
     .eq('society_id', societyId)
     .eq('status', 'available')
     .order('block')
     .order('plot_no');
-  return (data as { id: string; block: string; plot_no: string; size_marla: number; base_price: number }[]) ?? [];
+  const list = (data as { id: string; block: string; plot_no: string; size_marla: number; base_price: number; status: string }[]) ?? [];
+  return filterBookablePlots(list, await fetchHeldPlotIds(list.map((p) => p.id)));
 }

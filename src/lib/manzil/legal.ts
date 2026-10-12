@@ -10,6 +10,7 @@ interface DocContext {
   amount: string;
   date: string;
   reference_no: string;
+  breakdown?: string;
 }
 
 async function buildContext(booking: Booking): Promise<DocContext> {
@@ -57,7 +58,7 @@ const FALLBACK_BODIES: Record<GeneratedDocType, string> = {
   allotment: 'ALLOTMENT LETTER\n\nDate: {{date}}\nRef: {{reference_no}}\n\nDear {{customer_name}} (CNIC: {{cnic}}),\n\nThis letter confirms the allotment of {{plot}}, {{society}} against a total consideration of {{amount}}.\n\nAuthorized signature: ____________',
   token_receipt: 'TOKEN RECEIPT\n\nDate: {{date}}\nRef: {{reference_no}}\n\nReceived from {{customer_name}} (CNIC: {{cnic}}) the token amount against {{plot}}, {{society}}.\n\nReceived by: ____________',
   sale_agreement: 'SALE & PURCHASE AGREEMENT\n\nDate: {{date}} | Ref: {{reference_no}}\n\nBetween {{society}} and {{customer_name}} (CNIC: {{cnic}}) for {{plot}} at {{amount}}.\n\nSeller: ____________   Buyer: ____________',
-  installment_receipt: 'INSTALLMENT RECEIPT\n\nDate: {{date}}\nRef: {{reference_no}}\n\nReceived from {{customer_name}} installment against {{plot}}, {{society}}.\n\nReceived by: ____________',
+  installment_receipt: 'INSTALLMENT RECEIPT\n\nDate: {{date}}\nRef: {{reference_no}}\n\nReceived from {{customer_name}} against {{plot}}, {{society}}.\n\nAmount paid: {{amount}}\n{{breakdown}}\n\nReceived by: ____________',
   transfer_deed: 'TRANSFER DEED\n\nDate: {{date}} | Ref: {{reference_no}}\n\n{{plot}}, {{society}} is hereby transferred to {{customer_name}} (CNIC: {{cnic}}) after full payment of {{amount}}.\n\nTransferor: ____________   Transferee: ____________',
   noc_letter: 'NOC ISSUANCE LETTER\n\nDate: {{date}} | Ref: {{reference_no}}\n\nThis is to certify that {{plot}}, {{society}} has no objection for transfer to {{customer_name}} (CNIC: {{cnic}}).\n\nIssued by: ____________',
   cancellation: 'CANCELLATION LETTER\n\nDate: {{date}} | Ref: {{reference_no}}\n\nThe booking of {{plot}}, {{society}} by {{customer_name}} (CNIC: {{cnic}}) stands cancelled.\n\nAuthorized signature: ____________',

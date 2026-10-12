@@ -4,7 +4,8 @@ import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageF
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/manzil/auth';
 import { fetchMyLots, fetchLotPlots } from '@/lib/manzil/dealer';
-import { createBooking } from '@/lib/manzil/booking';
+import { createBooking, fetchHeldPlotIds } from '@/lib/manzil/booking';
+import { filterBookablePlots } from '@/lib/manzil/booking-rules';
 import { findBuyerByEmail } from '@/lib/manzil/phase3';
 import { formatSize } from '@/lib/manzil/phase3-rules';
 import { notify } from '@/lib/manzil/notify';
@@ -29,7 +30,8 @@ function DealerBook({ onNavigate }: { onNavigate: (p: string) => void }) {
     fetchMyLots(session.user.id).then(async (ls) => {
       setLots(ls);
       const all = await Promise.all(ls.map(async (l) => (await fetchLotPlots(l.id)).map((p) => ({ ...p, lot: l }))));
-      setPlots(all.flat().filter((p) => p.status === 'available' || p.status === 'assigned'));
+      const flat = all.flat();
+      setPlots(filterBookablePlots(flat, await fetchHeldPlotIds(flat.map((p) => p.id))));
     });
   }, [session]);
 
