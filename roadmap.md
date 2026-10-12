@@ -15,3 +15,7 @@
 - [x] Phase 6 verified signed-in as test-buyer: wrong OTP shows "Incorrect OTP", code 123456 shows the success screen with a DEMO-JC transaction ID.
 - [x] Payment bug found and fixed: the database silently refused every buyer payment (no policy let a customer update their own row) while the app printed "Payment successful". The app now checks the write actually landed and reports the real problem; wallet payments are recorded as "awaiting confirmation" so a customer can never confirm their own payment.
 - [ ] Run reference/phase6-features.sql so buyers can actually save payments (blocked: only the owner can run SQL). Then delete the leftover test row: `delete from public.payments where receipt_no = 'RCP-DEMO-TEST';` (neither the app nor the admin can remove it).
+
+## Phase 7 fixes
+- [x] Receipt shows amount paid + fee lines; double-booking blocked (list + DB trigger); dealer names in Assign lot; CSV tip English
+- [ ] Owner runs reference/phase7-fixes.sql, then signed-in re-test
