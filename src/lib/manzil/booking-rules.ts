@@ -31,3 +31,11 @@ export function receiptLines(p: { amount: number; late_fee: number }) {
   const lateFee = Number(p.late_fee || 0);
   return { installment, lateFee, totalPaid: installment + lateFee };
 }
+
+/** Readable plot label: "Plot A-101 · Block A · Dream Gardens". Avoids repeating the block when plot_no already starts with it. */
+export function plotLabel(plotNo: string, block: string | null | undefined, society?: string | null): string {
+  const parts = [`Plot ${plotNo}`];
+  if (block) parts.push(`Block ${block}`);
+  if (society) parts.push(society);
+  return parts.join(' · ');
+}

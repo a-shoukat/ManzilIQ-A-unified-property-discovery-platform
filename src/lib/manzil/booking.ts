@@ -1,10 +1,9 @@
-import { plotLabel } from './booking-rules';
 import { getSupabase } from './supabase';
 import { generateSchedule } from './payment';
 import { generateDocument } from './legal';
 import { notify } from './notify';
 import type { Booking } from '@/lib/manzil/types';
-import { ACTIVE_BOOKING_STATUSES, PLOT_UNAVAILABLE, bookingErrorText, filterBookablePlots } from './booking-rules';
+import { ACTIVE_BOOKING_STATUSES, PLOT_UNAVAILABLE, plotLabel, bookingErrorText, filterBookablePlots } from './booking-rules';
 
 /** Plot ids held by an active booking (blocks double booking even when plot status is stale). */
 export async function fetchHeldPlotIds(plotIds: string[]): Promise<string[]> {
@@ -171,4 +170,18 @@ export async function fetchAvailablePlots(societyId: string) {
     .order('plot_no');
   const list = (data as { id: string; block: string; plot_no: string; size_marla: number; base_price: number; status: string }[]) ?? [];
   return filterBookablePlots(list, await fetchHeldPlotIds(list.map((p) => p.id)));
+}
+
+/** Everything the booking detail view needs: payments and documents linked to one booking. */
+export async function fetchBookingExtras(bookingId: string) {
+  const supabase = getSupabase();
+  if (!supabase) return { payments: [], documents: [] };
+  const [p, d] = await Promise.all([
+    supabase.from('payments').select('*').eq('booking_id', bookingId).order('due_date'),
+    supabase.from('generated_documents').select('id, doc_type, version, created_at').eq('booking_id', bookingId).order('created_at'),
+  ]);
+  return {
+    payments: (p.data ?? []) as import('./types').Payment[],
+    documents: (d.data ?? []) as { id: string; doc_type: import('./types').GeneratedDocType; version: number; created_at: string }[],
+  };
 }
