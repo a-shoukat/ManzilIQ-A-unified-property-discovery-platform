@@ -48,7 +48,7 @@ export function PageFrame({children, publicPage=false}: {children:ReactNode; pub
   return <div className="app-shell">
    {open && <div className="mobile-scrim" onClick={()=>setOpen(false)}/>}
    <aside className={`sidebar${open?' open':''}`}>
-    <Button variant="legacy" className="brand" onClick={()=>go('marketplace')}><span className="brand-symbol"><Building2 size={24}/></span><span>Manzil<span className="brand-iq">IQ</span></span></Button>
+    <Button variant="legacy" className="brand" onClick={()=>go('marketplace')} aria-label="ManzilIQ home"><img src={logoAsset.url} alt="ManzilIQ" className="brand-logo" /></Button>
     <div className="workspace-label">YOUR PROPERTY PARTNER</div>
     <div className="nav-group"><div className="nav-section-label">DISCOVER</div>{links(mainLinks)}</div>
     {session && profile && <div className="nav-group"><div className="nav-section-label">MY WORKSPACE</div>{links(profile.role==='buyer' ? portfolioLinks : portfolioLinks.filter(({key}) => ['dashboard','documents','inbox'].includes(key)))}</div>}
