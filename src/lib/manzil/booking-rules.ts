@@ -15,7 +15,8 @@ export function filterBookablePlots<T extends { id: string; status?: string }>(p
 /** Map a database refusal for a taken plot to the clear user-facing message. */
 export function bookingErrorText(err: unknown): string | null {
   const msg = err instanceof Error ? err.message : (err as { message?: string } | null)?.message ?? '';
-  return msg.toLowerCase().includes('no longer available') ? PLOT_UNAVAILABLE : null;
+  const m = msg.toLowerCase();
+  return m.includes('no longer available') || m.includes('bookings_one_active_per_plot') ? PLOT_UNAVAILABLE : null;
 }
 
 /** "Name — Firm (email)" for a dealer dropdown, skipping missing parts. */
