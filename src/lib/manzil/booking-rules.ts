@@ -15,7 +15,8 @@ export function filterBookablePlots<T extends { id: string; status?: string }>(p
 /** Map a database refusal for a taken plot to the clear user-facing message. */
 export function bookingErrorText(err: unknown): string | null {
   const msg = err instanceof Error ? err.message : (err as { message?: string } | null)?.message ?? '';
-  return msg.toLowerCase().includes('no longer available') ? PLOT_UNAVAILABLE : null;
+  const m = msg.toLowerCase();
+  return m.includes('no longer available') || m.includes('bookings_one_active_per_plot') ? PLOT_UNAVAILABLE : null;
 }
 
 /** "Name — Firm (email)" for a dealer dropdown, skipping missing parts. */
@@ -30,4 +31,12 @@ export function receiptLines(p: { amount: number; late_fee: number }) {
   const installment = Number(p.amount || 0);
   const lateFee = Number(p.late_fee || 0);
   return { installment, lateFee, totalPaid: installment + lateFee };
+}
+
+/** Readable plot label: "Plot A-101 · Block A · Dream Gardens". Avoids repeating the block when plot_no already starts with it. */
+export function plotLabel(plotNo: string, block: string | null | undefined, society?: string | null): string {
+  const parts = [`Plot ${plotNo}`];
+  if (block) parts.push(`Block ${block}`);
+  if (society) parts.push(society);
+  return parts.join(' · ');
 }

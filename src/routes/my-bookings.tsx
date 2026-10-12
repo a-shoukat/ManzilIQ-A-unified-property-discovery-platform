@@ -18,7 +18,7 @@ export function BookingCard({ b, actions }: { b: Booking; actions?: React.ReactN
         <div>
           <strong>{b.reference_no}</strong>
           <div className="muted small">
-            Plot {b.plot_label ?? '—'} · {b.channel} · Token {formatPrice(b.token_amount)}
+            {b.plot_label ?? 'Plot details unavailable'} · {b.channel} · Token {formatPrice(b.token_amount)}
             {b.installment_plan ? ` · ${b.installment_plan}` : ''}
           </div>
           <div className="muted small">{new Date(b.created_at).toLocaleString()}</div>

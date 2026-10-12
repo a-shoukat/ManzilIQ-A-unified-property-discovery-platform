@@ -17,7 +17,7 @@ export default function AiAssistant({ onNavigate }: { onNavigate: (p: string) =>
     {
       id: 0,
       role: 'assistant',
-      text: 'Assalam-o-Alaikum! 👋 Main ManzilIQ AI Assistant hoon. Plot prices, bookings, installments — kuch bhi poochein.',
+      text: "Hello! 👋 I'm the ManzilIQ assistant. Ask me about plot prices, bookings, installments or documents.",
     },
   ]);
   const idRef = useRef(1);
@@ -39,7 +39,7 @@ export default function AiAssistant({ onNavigate }: { onNavigate: (p: string) =>
       const reply = await askAssistant(history, t);
       setMsgs((p) => [...p, { id: idRef.current++, role: 'assistant', text: reply.text, ...(reply.action ? {action:reply.action} : {}) }]);
     } catch {
-      setMsgs((p) => [...p, { id: idRef.current++, role: 'assistant', text: 'Kuch ghalat ho gaya — dobara try karein.' }]);
+      setMsgs((p) => [...p, { id: idRef.current++, role: 'assistant', text: 'Something went wrong — please try again.' }]);
     } finally {
       setLoading(false);
     }
@@ -82,7 +82,7 @@ export default function AiAssistant({ onNavigate }: { onNavigate: (p: string) =>
               send(input);
             }}
           >
-            <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Apna sawal likhein…" />
+            <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type your question…" />
             <Button variant="legacy" className="btn small" type="submit" disabled={loading}>Send</Button>
           </form>
         </div>

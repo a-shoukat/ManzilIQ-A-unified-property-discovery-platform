@@ -16,6 +16,7 @@ function BookPlot({ onNavigate }: { onNavigate: (p: string) => void }) {
   const [step, setStep] = useState(1);
   const [societies, setSocieties] = useState<{ id: string; name: string }[]>([]);
   const [societyId, setSocietyId] = useState('');
+  const [plotsLoading, setPlotsLoading] = useState(false);
   const [plots, setPlots] = useState<Awaited<ReturnType<typeof fetchAvailablePlots>>>([]);
   const [plotId, setPlotId] = useState('');
   const [channel, setChannel] = useState<'direct' | 'dealer'>('direct');
@@ -36,10 +37,15 @@ function BookPlot({ onNavigate }: { onNavigate: (p: string) => void }) {
   }, []);
 
   useEffect(() => {
-    if (!societyId) return;
-    fetchAvailablePlots(societyId).then(setPlots);
-    fetchSocietyDealers(societyId).then(setDealers);
+    setPlots([]);
+    setDealers([]);
     setPlotId('');
+    if (!societyId) return;
+    let live = true;
+    setPlotsLoading(true);
+    fetchAvailablePlots(societyId).then((p) => { if (live) { setPlots(p); setPlotsLoading(false); } });
+    fetchSocietyDealers(societyId).then((d) => { if (live) setDealers(d); });
+    return () => { live = false; };
   }, [societyId]);
 
   const selectedPlot = plots.find((p) => p.id === plotId);
@@ -95,8 +101,8 @@ function BookPlot({ onNavigate }: { onNavigate: (p: string) => void }) {
               </select>
             </label>
             <label>Select plot
-              <select value={plotId} onChange={(e) => setPlotId(e.target.value)}>
-                <option value="">Choose a plot…</option>
+              <select value={plotId} disabled={plotsLoading} onChange={(e) => setPlotId(e.target.value)}>
+                <option value="">{plotsLoading ? 'Loading plots…' : 'Choose a plot…'}</option>
                 {plots.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.block}-{p.plot_no} · {p.size_marla}M · {formatPrice(p.base_price)}
@@ -104,7 +110,7 @@ function BookPlot({ onNavigate }: { onNavigate: (p: string) => void }) {
                 ))}
               </select>
             </label>
-            {plots.length === 0 && <p className="muted small">No available plots in this society.</p>}
+            {!plotsLoading && plots.length === 0 && <p className="muted small">No available plots in this society.</p>}
             <Button variant="legacy" className="btn" disabled={!canNext1} onClick={() => setStep(2)}>Continue</Button>
           </>
         )}

@@ -22,3 +22,13 @@ describe('phase 7 rules', () => {
     expect(dealerLabel({ name: null, firm: '—', email: '—' })).toBe('Dealer');
   });
 });
+
+import { plotLabel } from '@/lib/manzil/booking-rules';
+describe('plot label in bookings list', () => {
+  it('shows plot number, block and society', () => {
+    expect(plotLabel('A-101', 'A', 'Dream Gardens')).toBe('Plot A-101 · Block A · Dream Gardens');
+  });
+  it('still shows the plot number when society is unknown', () => {
+    expect(plotLabel('A-101', 'A', null)).toBe('Plot A-101 · Block A');
+  });
+});
