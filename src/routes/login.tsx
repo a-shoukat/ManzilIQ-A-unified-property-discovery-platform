@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
-import { ArrowUpRight, Building2, Eye, EyeOff, ArrowLeft, ShieldCheck } from 'lucide-react';
+import { ArrowUpRight, Eye, EyeOff, ArrowLeft, ShieldCheck } from 'lucide-react';
+import iconAsset from '@/assets/manziliq-icon.png.asset.json';
 import { Button } from '@/components/ui/button';
 import { getSupabase, isSupabaseConfigured } from '@/lib/manzil/supabase';
 import { PageFrame, pageHead, useAppNavigation } from '@/components/manzil/PageFrame';
