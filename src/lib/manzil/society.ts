@@ -163,19 +163,18 @@ export async function fetchApprovedSocieties(): Promise<{ id: string; email: str
   return listPublicSocieties();
 }
 
-export async function fetchSocietyDealers(societyId: string): Promise<{ id: string; email: string; firm: string }[]> {
+export async function fetchSocietyDealers(societyId: string): Promise<{ id: string; name: string; email: string; firm: string }[]> {
   const supabase = getSupabase();
   if (!supabase) return [];
+  const { data: rpc, error } = await supabase.rpc('list_society_dealers', { p_society: societyId });
+  if (!error && Array.isArray(rpc)) return rpc as { id: string; name: string; email: string; firm: string }[];
   const { data } = await supabase.from('dealer_requests').select('dealer_id').eq('society_id', societyId).eq('status', 'approved');
-  const out: { id: string; email: string; firm: string }[] = [];
+  const out: { id: string; name: string; email: string; firm: string }[] = [];
   for (const r of (data as { dealer_id: string }[]) ?? []) {
-    const { data: prof } = await supabase.from('profiles').select('email').eq('id', r.dealer_id).maybeSingle();
+    const { data: prof } = await supabase.from('profiles').select('email, full_name').eq('id', r.dealer_id).maybeSingle();
     const { data: det } = await supabase.from('dealer_details').select('firm_name').eq('profile_id', r.dealer_id).maybeSingle();
-    out.push({
-      id: r.dealer_id,
-      email: (prof as { email: string } | null)?.email ?? '—',
-      firm: (det as { firm_name: string } | null)?.firm_name ?? '—',
-    });
+    const pp = prof as { email?: string; full_name?: string } | null;
+    out.push({ id: r.dealer_id, name: pp?.full_name ?? '', email: pp?.email ?? '', firm: (det as { firm_name: string } | null)?.firm_name ?? '' });
   }
   return out;
 }

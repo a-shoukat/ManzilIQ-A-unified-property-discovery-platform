@@ -1,3 +1,4 @@
+import { receiptLines } from './booking-rules';
 import { firstDueDate } from './payment-rules';
 import { getSupabase } from './supabase';
 import { uploadDocument } from './storage';
@@ -149,7 +150,8 @@ export async function payInstallment(
   // auto-generate installment receipt
   try {
     const { data: b } = await supabase.from('bookings').select('*').eq('id', p.booking_id).maybeSingle();
-    if (b) await generateDocument(b as Booking, 'installment_receipt');
+    const r = receiptLines({ amount: p.amount, late_fee: lateFee });
+    if (b) await generateDocument(b as Booking, 'installment_receipt', { amount: `PKR ${r.totalPaid.toLocaleString()}`, breakdown: `Installment: PKR ${r.installment.toLocaleString()} | Late fee: PKR ${r.lateFee.toLocaleString()}` });
   } catch (e) {
     console.error('receipt gen failed:', e);
   }

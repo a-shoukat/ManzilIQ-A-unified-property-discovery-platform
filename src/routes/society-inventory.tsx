@@ -156,7 +156,7 @@ function Inventory({ onNavigate }: { onNavigate: (p: string) => void }) {
           <p className="muted small">Columns: block, plot_no, size_marla, category, base_price</p>
           <input type="file" accept=".csv" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleCsv(f); }} />
           <p className="muted small" style={{ marginTop: 12 }}>
-            Tip: Excel mein banao → "Save as CSV" → upload karo.
+            Tip: Create the sheet in Excel, choose File &gt; Save as &gt; CSV, then upload it here.
           </p>
         </div>
       </div>

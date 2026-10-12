@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { dealerLabel } from '@/lib/manzil/booking-rules';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
 import { useEffect, useState } from 'react';
@@ -123,7 +124,7 @@ function BookPlot({ onNavigate }: { onNavigate: (p: string) => void }) {
               <label>Choose dealer
                 <select value={dealerId} onChange={(e) => setDealerId(e.target.value)}>
                   <option value="">Select dealer…</option>
-                  {dealers.map((d) => <option key={d.id} value={d.id}>{d.firm} ({d.email})</option>)}
+                  {dealers.map((d) => <option key={d.id} value={d.id}>{dealerLabel(d)}</option>)}
                 </select>
               </label>
             )}

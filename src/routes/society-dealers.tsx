@@ -1,6 +1,7 @@
 import { assignablePlots } from '@/lib/manzil/plot-rules';
 import { fetchBookedPlotIds } from '@/lib/manzil/society';
 import { Button } from '@/components/ui/button';
+import { dealerLabel } from '@/lib/manzil/booking-rules';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
 import { useEffect, useState } from 'react';
@@ -135,7 +136,7 @@ function Dealers({ onNavigate }: { onNavigate: (p: string) => void }) {
                 <label>Dealer
                   <select value={lotDealer} onChange={(e) => setLotDealer(e.target.value)}>
                     <option value="">Select dealer…</option>
-                    {dealers.map((d) => <option key={d.id} value={d.id}>{d.firm} ({d.email})</option>)}
+                    {dealers.map((d) => <option key={d.id} value={d.id}>{dealerLabel(d)}</option>)}
                   </select>
                 </label>
                 <label>Commission %<input type="number" min={0} step={0.5} value={lotCommission} onChange={(e) => setLotCommission(e.target.value)} /></label>
@@ -187,7 +188,7 @@ function Dealers({ onNavigate }: { onNavigate: (p: string) => void }) {
                   return (
                     <tr key={d.id}>
                       <td>{d.email}</td>
-                      <td>{d.firm}</td>
+                      <td>{d.firm || '—'}</td>
                       <td>{dl.length}</td>
                       <td>{dl.reduce((s, l) => s + (l.plot_count ?? 0), 0)}</td>
                     </tr>
