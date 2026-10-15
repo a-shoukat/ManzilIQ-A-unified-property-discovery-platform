@@ -36,6 +36,7 @@ import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MapViewRouteImport } from './routes/map-view'
 import { Route as MarketTrendsRouteImport } from './routes/market-trends'
+import { Route as MasterPlanRouteImport } from './routes/master-plan'
 import { Route as MyActivityRouteImport } from './routes/my-activity'
 import { Route as MyBookingsRouteImport } from './routes/my-bookings'
 import { Route as MyPaymentsRouteImport } from './routes/my-payments'
@@ -187,6 +188,11 @@ const MarketTrendsRoute = MarketTrendsRouteImport.update({
   path: '/market-trends',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MasterPlanRoute = MasterPlanRouteImport.update({
+  id: '/master-plan',
+  path: '/master-plan',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MyActivityRoute = MyActivityRouteImport.update({
   id: '/my-activity',
   path: '/my-activity',
@@ -291,6 +297,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/map-view': typeof MapViewRoute
   '/market-trends': typeof MarketTrendsRoute
+  '/master-plan': typeof MasterPlanRoute
   '/my-activity': typeof MyActivityRoute
   '/my-bookings': typeof MyBookingsRoute
   '/my-payments': typeof MyPaymentsRoute
@@ -335,6 +342,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/map-view': typeof MapViewRoute
   '/market-trends': typeof MarketTrendsRoute
+  '/master-plan': typeof MasterPlanRoute
   '/my-activity': typeof MyActivityRoute
   '/my-bookings': typeof MyBookingsRoute
   '/my-payments': typeof MyPaymentsRoute
@@ -380,6 +388,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/map-view': typeof MapViewRoute
   '/market-trends': typeof MarketTrendsRoute
+  '/master-plan': typeof MasterPlanRoute
   '/my-activity': typeof MyActivityRoute
   '/my-bookings': typeof MyBookingsRoute
   '/my-payments': typeof MyPaymentsRoute
@@ -426,6 +435,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/map-view'
     | '/market-trends'
+    | '/master-plan'
     | '/my-activity'
     | '/my-bookings'
     | '/my-payments'
@@ -470,6 +480,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/map-view'
     | '/market-trends'
+    | '/master-plan'
     | '/my-activity'
     | '/my-bookings'
     | '/my-payments'
@@ -514,6 +525,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/map-view'
     | '/market-trends'
+    | '/master-plan'
     | '/my-activity'
     | '/my-bookings'
     | '/my-payments'
@@ -559,6 +571,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MapViewRoute: typeof MapViewRoute
   MarketTrendsRoute: typeof MarketTrendsRoute
+  MasterPlanRoute: typeof MasterPlanRoute
   MyActivityRoute: typeof MyActivityRoute
   MyBookingsRoute: typeof MyBookingsRoute
   MyPaymentsRoute: typeof MyPaymentsRoute
@@ -767,6 +780,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketTrendsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/master-plan': {
+      id: '/master-plan'
+      path: '/master-plan'
+      fullPath: '/master-plan'
+      preLoaderRoute: typeof MasterPlanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/my-activity': {
       id: '/my-activity'
       path: '/my-activity'
@@ -903,6 +923,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MapViewRoute: MapViewRoute,
   MarketTrendsRoute: MarketTrendsRoute,
+  MasterPlanRoute: MasterPlanRoute,
   MyActivityRoute: MyActivityRoute,
   MyBookingsRoute: MyBookingsRoute,
   MyPaymentsRoute: MyPaymentsRoute,
