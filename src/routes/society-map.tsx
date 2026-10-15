@@ -1,7 +1,4 @@
-import { fetchSocietyMapUrl, uploadSocietyMap } from '@/lib/manzil/phase3';
 import { formatSize } from '@/lib/manzil/phase3-rules';
-import { toast } from 'sonner';
-import { errorText } from '@/lib/manzil/errors';
 import { Button } from '@/components/ui/button';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
@@ -28,18 +25,7 @@ function PlotMap({ onNavigate }: { onNavigate: (p: string) => void }) {
   const [zoom, setZoom] = useState(1);
   const [selected, setSelected] = useState<Plot | null>(null);
 
-  const [mapUrl, setMapUrl] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
-  useEffect(() => {
-    if (societyId) { fetchPlots(societyId).then(setPlots); fetchSocietyMapUrl(societyId).then(setMapUrl); }
-  }, [societyId]);
-  const onUpload = async (f: File | undefined) => {
-    if (!f || !societyId) return;
-    setUploading(true);
-    try { await uploadSocietyMap(societyId, f); setMapUrl(await fetchSocietyMapUrl(societyId)); toast.success('Plot map uploaded'); }
-    catch (e) { toast.error(errorText(e, 'Upload failed')); }
-    setUploading(false);
-  };
+  useEffect(() => { if (societyId) fetchPlots(societyId).then(setPlots); }, [societyId]);
 
   const blocks = [...new Set(plots.map((p) => p.block))].sort();
   const activeBlock = block || blocks[0] || '';
