@@ -25,7 +25,7 @@ export function useAppNavigation() {
  };
 }
 const mainLinks = [
- {key:'marketplace',label:'Marketplace',icon:House}, {key:'map-view',label:'Map explorer',icon:Map},
+ {key:'marketplace',label:'Marketplace',icon:House}, {key:'map-view',label:'Map explorer',icon:Map}, {key:'master-plan',label:'Master plans',icon:LayoutGrid},
  {key:'price-estimator',label:'Price estimator',icon:Sparkles}, {key:'compare',label:'Compare properties',icon:ArrowLeftRight},
 ];
 const portfolioLinks = [

@@ -10,6 +10,7 @@ import { fetchPlots } from '@/lib/manzil/society';
 import { formatPrice } from '@/lib/manzil/properties';
 import type { Plot } from '@/lib/manzil/types';
 import { useSocietyId } from './society';
+import { MasterPlanWorkspace } from '@/components/manzil/MasterPlanWorkspace';
 
 const STATUS_COLOR: Record<Plot['status'], string> = {
   available: 'var(--success)',
@@ -21,7 +22,7 @@ const STATUS_COLOR: Record<Plot['status'], string> = {
 
 /** WBS: Society Portal — Interactive Plot Map (5 features) */
 function PlotMap({ onNavigate }: { onNavigate: (p: string) => void }) {
-  const { societyId } = useSocietyId();
+  const { societyId, societies } = useSocietyId();
   const [plots, setPlots] = useState<Plot[]>([]);
   const [block, setBlock] = useState('');
   const [zoom, setZoom] = useState(1);
@@ -54,17 +55,8 @@ function PlotMap({ onNavigate }: { onNavigate: (p: string) => void }) {
         <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('society')}>Society portal</Button>
       </div>
 
-      <div className="card card-full" style={{ marginBottom: 16 }}>
-        <div className="queue-head">
-          <div><strong>Society master plan</strong><div className="muted small">Upload your layout / plot map image (JPG or PNG, up to 10 MB).</div></div>
-          <label className="btn small" style={{ cursor: 'pointer', margin: 0 }}>
-            {uploading ? 'Uploading…' : mapUrl ? 'Replace map' : 'Upload map'}
-            <input type="file" accept="image/*" hidden disabled={uploading} onChange={(e) => void onUpload(e.target.files?.[0])} />
-          </label>
-        </div>
-        {mapUrl && <a href={mapUrl} target="_blank" rel="noreferrer"><img src={mapUrl} alt="Society master plan" style={{ marginTop: 12, width: '100%', maxHeight: 520, objectFit: 'contain', borderRadius: 12 }} /></a>}
-      </div>
-
+      {societyId && <div style={{ marginBottom: 24 }}><MasterPlanWorkspace societyId={societyId} societyName={societies.find((x) => x.id === societyId)?.name ?? 'My society'} editable /></div>}
+      <h3>Block grid view</h3>
       <div className="map-toolbar">
         <div className="block-tabs">
           {blocks.map((b) => (
