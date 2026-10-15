@@ -114,7 +114,7 @@ export function MasterPlanMap(props: MasterPlanMapProps) {
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     setTip(null);
     if (pointers.current.size === 2) {
-      const [a, b] = [...pointers.current.values()];
+      const [a, b] = [...pointers.current.values()] as { x: number; y: number }[] as [{ x: number; y: number }, { x: number; y: number }];
       gesture.current = { kind: 'pinch', sx: 0, sy: 0, vx: 0, vy: 0, dist: Math.hypot(a.x - b.x, a.y - b.y), z: viewRef.current.z };
       setDraft(null); return;
     }
@@ -126,7 +126,7 @@ export function MasterPlanMap(props: MasterPlanMapProps) {
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     const g = gesture.current; if (!g) return;
     if (g.kind === 'pinch' && pointers.current.size === 2) {
-      const [a, b] = [...pointers.current.values()]; const r = wrapRef.current!.getBoundingClientRect();
+      const [a, b] = [...pointers.current.values()] as { x: number; y: number }[] as [{ x: number; y: number }, { x: number; y: number }]; const r = wrapRef.current!.getBoundingClientRect();
       zoomAt(g.z! * (Math.hypot(a.x - b.x, a.y - b.y) / g.dist!), (a.x + b.x) / 2 - r.left, (a.y + b.y) / 2 - r.top);
     } else if (g.kind === 'pan') setView((v) => ({ ...v, x: g.vx + e.clientX - g.sx, y: g.vy + e.clientY - g.sy }));
     else if (g.kind === 'draw') { const p = local(e.clientX, e.clientY); setDraft((d) => d && { ...d, x2: clamp(p.x, 0, size.w), y2: clamp(p.y, 0, size.h) }); }
