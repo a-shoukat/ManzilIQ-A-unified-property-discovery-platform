@@ -14,7 +14,7 @@ import { buildTranscript, isUnlinked, mappingProgress, mapStatus, MAP_STATUS_LAB
 
 const STATUSES: MapStatus[] = ['available', 'reserved', 'sold', 'blocked'];
 
-export function MasterPlanWorkspace({ societyId, societyName, editable, onBook }: { societyId: string; societyName: string; editable: boolean; onBook?: (p: Plot) => void }) {
+export function MasterPlanWorkspace({ societyId, societyName, editable, onBook }: { societyId: string; societyName: string; editable: boolean; onBook?: ((p: Plot) => void) | undefined }) {
   const [pdfUrl, setPdfUrl] = useState<string | null | undefined>(undefined);
   const [plots, setPlots] = useState<Plot[]>([]);
   const [regions, setRegions] = useState<MapRegion[]>([]);
@@ -137,7 +137,7 @@ export function MasterPlanWorkspace({ societyId, societyName, editable, onBook }
 
         <MasterPlanMap pdfUrl={pdfUrl} plots={plots} regions={regions} page={page} onPageCount={setPages}
           visibleRegionIds={visible} highlightId={flash} drawMode={editable && drawMode} editable={editable}
-          selectedRegionId={selected?.id}
+          selectedRegionId={selected?.id ?? null}
           onDraw={(rect, pg) => { setPending({ rect, page: pg }); setLinkQuery(''); }}
           onSelectRegion={(r) => editable && setSelected(r)}
           onViewDetails={(p) => setDetail(p)} />

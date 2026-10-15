@@ -30,7 +30,7 @@ export async function fetchRegions(societyId: string): Promise<MapRegion[]> {
   return (data ?? []).map((r) => ({ ...r, x_pct: +r.x_pct, y_pct: +r.y_pct, w_pct: +r.w_pct, h_pct: +r.h_pct })) as MapRegion[];
 }
 
-export async function saveRegion(r: Omit<MapRegion, 'id'> & { id?: string }): Promise<MapRegion> {
+export async function saveRegion(r: Omit<MapRegion, 'id'> & { id?: string | undefined }): Promise<MapRegion> {
   const sb = getSupabase();
   if (!sb) throw new Error('Database not connected');
   const q = r.id ? sb.from('plot_map_regions').update(r).eq('id', r.id) : sb.from('plot_map_regions').insert(r);
