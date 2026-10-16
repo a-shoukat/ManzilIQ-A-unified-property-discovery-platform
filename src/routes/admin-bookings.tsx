@@ -17,6 +17,7 @@ import { DOC_TITLES, type Booking } from '@/lib/manzil/types';
 import { BookingCard } from './my-bookings';
 import { useSocietyId } from './society';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { SoldReportButtons } from '@/components/manzil/SoldReportButtons';
 
 interface Props {
   onNavigate: (p: string) => void;
@@ -99,6 +100,7 @@ function BookingDetail({ b, onClose, acting, act }: { b: Booking; onClose: () =>
         {!extras ? <p className="muted small">Loading…</p> : extras.documents.length === 0 ? <p className="muted small">No documents yet.</p> : (
           <ul className="small">{extras.documents.map((d) => <li key={d.id}>{DOC_TITLES[d.doc_type] ?? d.doc_type} · v{d.version} · {new Date(d.created_at).toLocaleDateString()}</li>)}</ul>
         )}
+        {b.status === 'completed' && (<><h4>Property sold report</h4><SoldReportButtons b={b} /></>)}
         <h4>Actions</h4>
         <BookingActions b={b} acting={acting} act={act} />
       </DialogContent>
