@@ -17,8 +17,19 @@ export function BookingCard({ b, actions }: { b: Booking; actions?: React.ReactN
       <div className="queue-head">
         <div>
           <strong>{b.reference_no}</strong>
+          <div className="booking-chips">
+            {b.plot_no ? (
+              <>
+                <span className="booking-chip booking-chip-plot">Plot {b.plot_no}</span>
+                {b.plot_block && <span className="booking-chip">Block {b.plot_block}</span>}
+                {b.society_name && <span className="booking-chip">{b.society_name}</span>}
+              </>
+            ) : (
+              <span className="booking-chip booking-chip-missing">{b.plot_label ?? 'Plot details unavailable'}</span>
+            )}
+          </div>
           <div className="muted small">
-            {b.plot_label ?? 'Plot details unavailable'} · {b.channel} · Token {formatPrice(b.token_amount)}
+            {b.channel} · Token {formatPrice(b.token_amount)}
             {b.installment_plan ? ` · ${b.installment_plan}` : ''}
           </div>
           <div className="muted small">{new Date(b.created_at).toLocaleString()}</div>

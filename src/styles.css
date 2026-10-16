@@ -1275,3 +1275,8 @@ textarea {
 .mp-pill.st-blocked { background: var(--muted); }
 .mp-swatch { border: 1.5px solid; }
 .mp-link-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; max-height: 180px; overflow: auto; }
+
+.booking-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 4px; }
+.booking-chip { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 500; background: var(--muted); color: var(--foreground); border: 1px solid var(--border); }
+.booking-chip-plot { background: color-mix(in oklab, var(--primary) 12%, transparent); color: var(--primary); border-color: color-mix(in oklab, var(--primary) 30%, transparent); font-weight: 600; }
+.booking-chip-missing { background: color-mix(in oklab, var(--destructive) 10%, transparent); color: var(--destructive); }
