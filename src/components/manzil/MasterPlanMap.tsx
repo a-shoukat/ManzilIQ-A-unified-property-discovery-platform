@@ -167,6 +167,13 @@ export function MasterPlanMap(props: MasterPlanMapProps) {
     if (pointers.current.size === 0) gesture.current = null;
   };
 
+  const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cancelHide = () => { if (hideTimer.current) { clearTimeout(hideTimer.current); hideTimer.current = null; } };
+  const scheduleHide = (regionId: string) => {
+    cancelHide();
+    hideTimer.current = setTimeout(() => setTip((t) => (t?.region.id === regionId ? null : t)), 250);
+  };
+  useEffect(() => () => cancelHide(), []);
   const showTip = (region: MapRegion, e: React.PointerEvent | React.MouseEvent) => {
     const r = wrapRef.current!.getBoundingClientRect();
     setTip({ region, x: e.clientX - r.left, y: e.clientY - r.top });
@@ -198,8 +205,8 @@ export function MasterPlanMap(props: MasterPlanMapProps) {
             return (
               <div key={r.id} data-region className={`mp-region st-${st}${unlinked ? ' unlinked' : ''}${props.highlightId === r.id ? ' flash' : ''}${props.selectedRegionId === r.id ? ' selected' : ''}`}
                 style={{ left: `${r.x_pct}%`, top: `${r.y_pct}%`, width: `${r.w_pct}%`, height: `${r.h_pct}%` }}
-                onPointerEnter={(e) => e.pointerType === 'mouse' && showTip(r, e)}
-                onPointerLeave={(e) => e.pointerType === 'mouse' && setTip((t) => (t?.region.id === r.id ? null : t))}
+                onPointerEnter={(e) => { if (e.pointerType === 'mouse') { cancelHide(); showTip(r, e); } }}
+                onPointerLeave={(e) => { if (e.pointerType === 'mouse') scheduleHide(r.id); }}
                 onClick={(e) => { showTip(r, e); props.onSelectRegion?.(r); }}
                 aria-label={plot ? `Plot ${plot.block}-${plot.plot_no}` : 'Unlinked region'}>
                 {unlinked && <span className="mp-unlinked">unlinked</span>}
@@ -210,7 +217,8 @@ export function MasterPlanMap(props: MasterPlanMapProps) {
         </div>
         {tip && (
           <div data-tip className="mp-tip" style={{ left: clamp(tip.x + 12, 4, (wrapRef.current?.clientWidth ?? 300) - 230), top: clamp(tip.y + 12, 4, (wrapRef.current?.clientHeight ?? 300) - 170) }}
-            onPointerEnter={() => {}} >
+            onPointerDown={(e) => e.stopPropagation()}
+            onPointerEnter={cancelHide} onPointerLeave={(e) => { if (e.pointerType === 'mouse') scheduleHide(tip.region.id); }}>
             {tipPlot ? (<>
               <strong>Plot {tipPlot.plot_no}</strong>
               <div className="mp-tip-row"><span>Block</span><span>{tipPlot.block}</span></div>
