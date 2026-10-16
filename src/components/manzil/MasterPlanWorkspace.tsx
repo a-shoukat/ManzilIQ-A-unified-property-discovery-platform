@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,6 +28,7 @@ export function MasterPlanWorkspace({ societyId, societyName, editable, onBook }
   const [block, setBlock] = useState(''); const [status, setStatus] = useState(''); const [size, setSize] = useState('');
   const [search, setSearch] = useState(''); const [flash, setFlash] = useState<string | null>(null);
   const [detail, setDetail] = useState<Plot | null>(null);
+  const detailRef = useRef<HTMLDivElement>(null);
 
   const reload = useCallback(() => {
     fetchPlots(societyId).then(setPlots);
@@ -76,7 +77,7 @@ export function MasterPlanWorkspace({ societyId, societyName, editable, onBook }
       const saved = await saveRegion({ id: pending.id, society_id: societyId, plot_id: plot.id, plot_label: `${plot.block}-${plot.plot_no}`, page: pending.page, ...pending.rect });
       setRegions((rs) => [...rs.filter((r) => r.id !== saved.id), { ...saved, x_pct: +saved.x_pct, y_pct: +saved.y_pct, w_pct: +saved.w_pct, h_pct: +saved.h_pct }]);
       toast.success(`Plot ${plot.block}-${plot.plot_no} mapped`);
-      setPending(null); setLinkQuery(''); setSelected(null);
+      setPending(null); setLinkQuery(''); setSelected(null); setDrawMode(false);
     } catch (e) { toast.error(errorText(e, 'Could not save region')); }
   };
   const remove = async (r: MapRegion) => {
@@ -141,7 +142,7 @@ export function MasterPlanWorkspace({ societyId, societyName, editable, onBook }
           selectedRegionId={selected?.id ?? null}
           onDraw={(rect, pg) => { setPending({ rect, page: pg }); setLinkQuery(''); }}
           onSelectRegion={(r) => editable && setSelected(r)}
-          onViewDetails={(p) => setDetail(p)} />
+          onViewDetails={(p) => { setDetail(p); setTimeout(() => detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50); }} />
 
         {editable && pending && (
           <div className="card card-full">
@@ -170,7 +171,7 @@ export function MasterPlanWorkspace({ societyId, societyName, editable, onBook }
           </div>
         )}
         {detail && (
-          <div className="card card-full">
+          <div className="card card-full" ref={detailRef}>
             <div className="topbar"><h3 style={{ margin: 0 }}>Plot {detail.block}-{detail.plot_no}</h3><Button size="sm" variant="secondary" onClick={() => setDetail(null)}>Close</Button></div>
             <div className="detail-grid">
               <div className="detail-item"><span className="detail-key">Block</span><span>{detail.block}</span></div>
