@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import PropertyCard from '@/components/manzil/PropertyCard';
 import { useAuth } from '@/lib/manzil/auth';
 import { useCompare } from '@/lib/manzil/compare';
+import { filterForViewer } from '@/lib/manzil/sold-visibility';
 import { fetchProperties } from '@/lib/manzil/properties';
 import { freshness, similarProperties, REPORT_REASONS } from '@/lib/manzil/listing-detail';
 import { reportListing } from '@/lib/manzil/phase4';
@@ -76,7 +77,8 @@ export function ReportListing({ p }: { p: Property }) {
 export function SimilarListings({ p, onNavigate }: { p: Property; onNavigate: (page: string, arg?: string) => void }) {
   const [list, setList] = useState<Property[]>([]);
   const { has, toggle } = useCompare();
-  useEffect(() => { fetchProperties().then(({ list }) => setList(similarProperties(p, list))); }, [p]);
+  const { profile } = useAuth();
+  useEffect(() => { fetchProperties().then(({ list }) => setList(similarProperties(p, filterForViewer(list, profile?.role)))); }, [p, profile?.role]);
   if (!list.length) return null;
   return <section style={{ marginTop: 32 }}><h2>Similar properties</h2>
     <div className="listings-grid">{list.map((x) => <PropertyCard key={x.id} property={x} onOpen={(id) => onNavigate('property', id)} inCompare={has(x.id)} onToggleCompare={toggle} />)}</div></section>;
