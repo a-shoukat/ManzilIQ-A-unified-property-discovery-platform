@@ -37,7 +37,7 @@ export const PAGE_FEATURES: Record<string, Partial<Record<UserRole, Feature>>> =
 };
 
 export const plansFor = (role: PaidRole) => PLANS.filter((p) => p.role === role);
-export const freePlan = (role: PaidRole) => plansFor(role)[0];
+export const freePlan = (role: PaidRole): Plan => plansFor(role)[0]!;
 export const getPlan = (id: string | undefined) => PLANS.find((p) => p.id === id);
 
 export interface SubscriptionRow { id?: string; user_id: string; role: string; plan_id: string; status: 'active' | 'trialing' | 'expired' | 'cancelled'; current_period_start: string; current_period_end: string }
