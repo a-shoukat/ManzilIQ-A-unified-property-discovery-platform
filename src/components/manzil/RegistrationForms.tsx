@@ -21,6 +21,7 @@ export function SocietyRegistrationForm({ onDone }: Props) {
     e.preventDefault();
     const supabase = getSupabase();
     if (!supabase) return;
+    if (!noc || !secp) { setError('Please upload both your NOC and SECP registration documents.'); return; }
     setLoading(true);
     setError(null);
     try {
