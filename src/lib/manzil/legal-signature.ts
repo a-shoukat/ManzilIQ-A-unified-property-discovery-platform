@@ -4,7 +4,7 @@ export interface PartySignature {
   role: string; // e.g. "Buyer", "Seller"
   mode: 'typed' | 'drawn';
   name: string;
-  dataUrl?: string; // PNG for drawn signatures
+  dataUrl?: string | undefined; // PNG for drawn signatures
   signedAt: string; // ISO
 }
 
