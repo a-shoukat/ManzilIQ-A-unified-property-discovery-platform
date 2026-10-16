@@ -43,8 +43,32 @@ export function MasterPlanMap(props: MasterPlanMapProps) {
   const gesture = useRef<{ kind: 'pan' | 'draw' | 'pinch'; sx: number; sy: number; vx: number; vy: number; dist?: number; z?: number } | null>(null);
   const plotById = useMemo(() => new Map(plots.map((p) => [p.id, p])), [plots]);
 
+  const isSvg = isSvgMapUrl(pdfUrl);
+  const [svgDims, setSvgDims] = useState<{ w: number; h: number } | null>(null);
+
+  // Load SVG-wrapped raster map
+  useEffect(() => {
+    if (!isSvg) { setSvgDims(null); return; }
+    let cancelled = false;
+    setSvgDims(null); setErr(null);
+    const img = new Image();
+    img.onload = () => { if (!cancelled) { setSvgDims({ w: img.naturalWidth || 1000, h: img.naturalHeight || 750 }); props.onPageCount?.(1); } };
+    img.onerror = () => { if (!cancelled) setErr('Could not open map image'); };
+    img.src = pdfUrl;
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pdfUrl, isSvg]);
+
+  useEffect(() => {
+    if (!svgDims || !wrapRef.current) return;
+    const fit = () => { const w = wrapRef.current!.clientWidth; setSize({ w, h: (w / svgDims.w) * svgDims.h }); };
+    fit(); window.addEventListener('resize', fit);
+    return () => window.removeEventListener('resize', fit);
+  }, [svgDims]);
+
   // Load PDF (browser-only import)
   useEffect(() => {
+    if (isSvg) { setDoc(null); return; }
     let cancelled = false;
     setDoc(null); setErr(null);
     (async () => {
@@ -58,7 +82,7 @@ export function MasterPlanMap(props: MasterPlanMapProps) {
     })();
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pdfUrl]);
+  }, [pdfUrl, isSvg]);
 
   // Debounced high-res re-render when zoom settles (never on data change)
   useEffect(() => { const t = setTimeout(() => setRenderZoom(view.z), 250); return () => clearTimeout(t); }, [view.z]);
@@ -83,6 +107,7 @@ export function MasterPlanMap(props: MasterPlanMapProps) {
     })();
     return () => { cancelled = true; task?.cancel(); };
   }, [doc, page, renderZoom]);
+  const ready = isSvg ? !!svgDims : !!doc;
 
   useEffect(() => { setView({ z: 1, x: 0, y: 0 }); }, [page, pdfUrl]);
 
