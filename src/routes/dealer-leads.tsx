@@ -173,7 +173,7 @@ function Leads({ onNavigate }: { onNavigate: (p: string) => void }) {
               <label>Label
                 <select value={fLabel} onChange={(e) => setFLabel(e.target.value as LeadLabel | '')}>
                   <option value="">— none —</option>
-                  {LEAD_LABELS.map((l) => <option key={l} value={l}>{l[0].toUpperCase() + l.slice(1)}</option>)}
+                  {LEAD_LABELS.map((l) => <option key={l} value={l}>{l.charAt(0).toUpperCase() + l.slice(1)}</option>)}
                 </select>
               </label>
             </div>
@@ -195,7 +195,7 @@ function Leads({ onNavigate }: { onNavigate: (p: string) => void }) {
         <div className="link-row" style={{ marginBottom: 12 }}>
           {(['all', ...LEAD_LABELS] as const).map((l) => (
             <Button key={l} variant="legacy" className={`btn small${labelFilter === l ? '' : ' secondary'}`} onClick={() => setLabelFilter(l)}>
-              {l === 'all' ? `All (${leads.length})` : `${l[0].toUpperCase() + l.slice(1)} (${filterByLabel(leads, l).length})`}
+              {l === 'all' ? `All (${leads.length})` : `${l.charAt(0).toUpperCase() + l.slice(1)} (${filterByLabel(leads, l).length})`}
             </Button>
           ))}
         </div>
@@ -232,7 +232,7 @@ function Leads({ onNavigate }: { onNavigate: (p: string) => void }) {
                     style={{ width: 'auto', marginTop: 0 }}
                   >
                     <option value="">No label</option>
-                    {LEAD_LABELS.map((l) => <option key={l} value={l}>{l[0].toUpperCase() + l.slice(1)}</option>)}
+                    {LEAD_LABELS.map((l) => <option key={l} value={l}>{l.charAt(0).toUpperCase() + l.slice(1)}</option>)}
                   </select>
                   {leadLabelOf(lead) && <span className={`badge${leadLabelOf(lead) === 'hot' ? ' warn' : leadLabelOf(lead) === 'warm' ? ' ok' : ''}`}>{leadLabelOf(lead)}</span>}
                   <span className="muted small">

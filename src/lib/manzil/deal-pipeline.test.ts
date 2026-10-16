@@ -32,6 +32,6 @@ describe('deal pipeline', () => {
 describe('lead labels', () => {
   const leads = [{ label: 'hot' }, { label: null, status: 'warm' }, { label: 'cold' }, { label: null, status: 'new' }];
   it('filters by Hot', () => expect(filterByLabel(leads, 'hot')).toHaveLength(1));
-  it('legacy warm status counts as Warm label', () => expect(leadLabelOf(leads[1])).toBe('warm'));
+  it('legacy warm status counts as Warm label', () => expect(leadLabelOf(leads[1]!)).toBe('warm'));
   it('all returns every lead', () => expect(filterByLabel(leads, 'all')).toHaveLength(4));
 });

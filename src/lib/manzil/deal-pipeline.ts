@@ -48,5 +48,5 @@ export function dealStage(s: BookingSignals): number {
 }
 
 export function stageName(stage: number): string {
-  return PIPELINE_STAGES[Math.min(6, Math.max(1, stage)) - 1];
+  return PIPELINE_STAGES[Math.min(6, Math.max(1, stage)) - 1] ?? '';
 }

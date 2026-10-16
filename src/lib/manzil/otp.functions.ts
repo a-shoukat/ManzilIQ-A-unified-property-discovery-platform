@@ -42,7 +42,7 @@ export const sendSignupOtp = createServerFn({ method: 'POST' })
     const key = signingKey();
     if ((!resend && !smsReady) || !key) return { mode: 'mock' as const, token: '', channels: [] as string[] };
 
-    const code = String(crypto.getRandomValues(new Uint32Array(1))[0] % 1000000).padStart(6, '0');
+    const code = String(crypto.getRandomValues(new Uint32Array(1))[0]! % 1000000).padStart(6, '0');
     const exp = Date.now() + TTL_MS;
     const phone = normPhone(data.phone);
     const sig = await hmac(key, `${data.email}|${phone}|${code}|${exp}`);
