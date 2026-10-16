@@ -16,6 +16,7 @@ import {
   fetchMyLots,
   updateLead,
 } from '@/lib/manzil/dealer';
+import { LEAD_LABELS, filterByLabel, leadLabelOf, type LeadLabel } from '@/lib/manzil/deal-pipeline';
 import { PIPELINE_STAGES, type Lead, type LeadActivity, type LeadStatus, type Plot } from '@/lib/manzil/types';
 
 const STATUSES: LeadStatus[] = ['new', 'hot', 'warm', 'cold', 'converted', 'lost'];
@@ -28,6 +29,7 @@ function Leads({ onNavigate }: { onNavigate: (p: string) => void }) {
   const [loading, setLoading] = useState(true);
   const [openLead, setOpenLead] = useState<string | null>(null);
   const [activities, setActivities] = useState<LeadActivity[]>([]);
+  const [labelFilter, setLabelFilter] = useState<LeadLabel | 'all'>('all');
   const [msg, setMsg] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
   const removeLead = async (lead: Lead) => {
@@ -50,6 +52,7 @@ function Leads({ onNavigate }: { onNavigate: (p: string) => void }) {
   const [fPhone, setFPhone] = useState('');
   const [fEmail, setFEmail] = useState('');
   const [fStatus, setFStatus] = useState<LeadStatus>('new');
+  const [fLabel, setFLabel] = useState<LeadLabel | ''>('');
   const [fPlot, setFPlot] = useState('');
   const [fFollowUp, setFFollowUp] = useState('');
 
@@ -91,6 +94,7 @@ function Leads({ onNavigate }: { onNavigate: (p: string) => void }) {
         phone: fPhone,
         email: fEmail,
         status: fStatus,
+        label: fLabel || null,
         plot_id: fPlot || null,
         follow_up_date: fFollowUp || null,
       });
@@ -111,11 +115,20 @@ function Leads({ onNavigate }: { onNavigate: (p: string) => void }) {
   };
 
   const moveStage = async (lead: Lead, dir: 1 | -1) => {
-    const next = Math.min(6, Math.max(1, lead.pipeline_stage + dir));
+    const floor = lead.booking_stage ?? 1;
+    const next = Math.min(6, Math.max(floor, stageOf(lead) + dir));
     await updateLead(lead.id, { pipeline_stage: next });
     setLeads((prev) => prev.map((l) => (l.id === lead.id ? { ...l, pipeline_stage: next } : l)));
   };
 
+  const stageOf = (l: Lead) => Math.max(l.pipeline_stage, l.booking_stage ?? 1);
+  const setLabel = async (lead: Lead, label: LeadLabel | null) => {
+    try {
+      await updateLead(lead.id, { label });
+      setLeads((prev) => prev.map((l) => (l.id === lead.id ? { ...l, label } : l)));
+    } catch (err) { toast.error(errorText(err, 'Could not save label')); }
+  };
+  const visible = filterByLabel(leads, labelFilter);
   const today = new Date().toISOString().slice(0, 10);
   const dueFollowUps = leads.filter((l) => l.follow_up_date && l.follow_up_date <= today && !['converted', 'lost'].includes(l.status));
 
@@ -157,6 +170,14 @@ function Leads({ onNavigate }: { onNavigate: (p: string) => void }) {
               </label>
             </div>
             <div className="form-row">
+              <label>Label
+                <select value={fLabel} onChange={(e) => setFLabel(e.target.value as LeadLabel | '')}>
+                  <option value="">— none —</option>
+                  {LEAD_LABELS.map((l) => <option key={l} value={l}>{l.charAt(0).toUpperCase() + l.slice(1)}</option>)}
+                </select>
+              </label>
+            </div>
+            <div className="form-row">
               <label>Assign plot
                 <select value={fPlot} onChange={(e) => setFPlot(e.target.value)}>
                   <option value="">— none —</option>
@@ -170,10 +191,20 @@ function Leads({ onNavigate }: { onNavigate: (p: string) => void }) {
         </div>
       )}
 
+      {leads.length > 0 && (
+        <div className="link-row" style={{ marginBottom: 12 }}>
+          {(['all', ...LEAD_LABELS] as const).map((l) => (
+            <Button key={l} variant="legacy" className={`btn small${labelFilter === l ? '' : ' secondary'}`} onClick={() => setLabelFilter(l)}>
+              {l === 'all' ? `All (${leads.length})` : `${l.charAt(0).toUpperCase() + l.slice(1)} (${filterByLabel(leads, l).length})`}
+            </Button>
+          ))}
+        </div>
+      )}
+
       {loading ? <p className="muted">Loading…</p> : leads.length === 0 ? (
         <p className="muted">No leads yet — add your first customer lead.</p>
       ) : (
-        leads.map((lead) => (
+        visible.length === 0 ? <p className="muted">No {labelFilter} leads.</p> : visible.map((lead) => (
           <div key={lead.id} className="card wide" style={{ marginBottom: 12 }}>
             <div className="queue-head">
               <div>
@@ -194,14 +225,24 @@ function Leads({ onNavigate }: { onNavigate: (p: string) => void }) {
                   >
                     {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
                   </select>
+                  <select
+                    aria-label="Lead label"
+                    value={leadLabelOf(lead) ?? ''}
+                    onChange={(e) => setLabel(lead, (e.target.value || null) as LeadLabel | null)}
+                    style={{ width: 'auto', marginTop: 0 }}
+                  >
+                    <option value="">No label</option>
+                    {LEAD_LABELS.map((l) => <option key={l} value={l}>{l.charAt(0).toUpperCase() + l.slice(1)}</option>)}
+                  </select>
+                  {leadLabelOf(lead) && <span className={`badge${leadLabelOf(lead) === 'hot' ? ' warn' : leadLabelOf(lead) === 'warm' ? ' ok' : ''}`}>{leadLabelOf(lead)}</span>}
                   <span className="muted small">
-                    Stage {lead.pipeline_stage}/6: {PIPELINE_STAGES[lead.pipeline_stage - 1]}
+                    Stage {stageOf(lead)}/6: {PIPELINE_STAGES[stageOf(lead) - 1]}
                   </span>
                 </div>
               </div>
               <div className="link-row" style={{ margin: 0 }}>
-                <Button variant="legacy" className="btn secondary small" disabled={lead.pipeline_stage <= 1} onClick={() => moveStage(lead, -1)}>←</Button>
-                <Button variant="legacy" className="btn secondary small" disabled={lead.pipeline_stage >= 6} onClick={() => moveStage(lead, 1)}>→</Button>
+                <Button variant="legacy" className="btn secondary small" disabled={stageOf(lead) <= (lead.booking_stage ?? 1)} onClick={() => moveStage(lead, -1)}>←</Button>
+                <Button variant="legacy" className="btn secondary small" disabled={stageOf(lead) >= 6} onClick={() => moveStage(lead, 1)}>→</Button>
                 <Button variant="legacy" className="btn secondary small" onClick={() => openDetail(lead.id)}>
                   {openLead === lead.id ? 'Hide' : 'History'}
                 </Button>
@@ -226,7 +267,7 @@ function Leads({ onNavigate }: { onNavigate: (p: string) => void }) {
             {/* pipeline progress */}
             <div className="pipeline">
               {PIPELINE_STAGES.map((s, i) => (
-                <div key={s} className={`pipe-stage${i + 1 <= lead.pipeline_stage ? ' done' : ''}`} title={s}>
+                <div key={s} className={`pipe-stage${i + 1 <= stageOf(lead) ? ' done' : ''}`} title={s}>
                   {i + 1}
                 </div>
               ))}

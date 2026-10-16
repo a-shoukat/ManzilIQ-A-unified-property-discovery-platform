@@ -129,10 +129,12 @@ export interface Lead {
   email: string | null;
   status: LeadStatus;
   pipeline_stage: number;
+  label?: 'hot' | 'warm' | 'cold' | null;
   plot_id: string | null;
   follow_up_date: string | null;
   created_at: string;
   plot_label?: string;
+  booking_stage?: number;
 }
 
 export interface LeadActivity {
@@ -185,6 +187,7 @@ export interface Booking {
   plot_status?: string | null;
   society_name?: string | null;
   dealer_email?: string | null;
+  pipeline_stage?: number | null;
 }
 
 export const INSTALLMENT_PLANS = [

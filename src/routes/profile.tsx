@@ -17,6 +17,9 @@ function ProfilePage() {
   const [address, setAddress] = useState('');
   const [photo, setPhoto] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+  const [cnicFront, setCnicFront] = useState<File | null>(null);
+  const [cnicBack, setCnicBack] = useState<File | null>(null);
+  const [cnicBusy, setCnicBusy] = useState(false);
   const [current, setCurrent] = useState('');
   const [pw, setPw] = useState('');
   const [pw2, setPw2] = useState('');
@@ -49,6 +52,36 @@ function ProfilePage() {
     finally { setSaving(false); }
   };
 
+  const canCnic = profile?.role === 'buyer' || profile?.role === 'dealer';
+  const dd = (details ?? {}) as { cnic_front_url?: string | null; cnic_doc_url?: string | null };
+  const hasCnic = !!(dd.cnic_front_url || dd.cnic_doc_url);
+  const status = profile?.verification_status ?? 'pending';
+  const statusLabel = status === 'approved' ? 'Verified' : status === 'pending' ? 'Pending' : 'Rejected';
+
+  const submitCnic = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const db = getSupabase(); if (!db || !profile) return;
+    if (!cnicFront || (isBuyer && !cnicBack)) { toast.error(isBuyer ? 'Please upload both sides of your CNIC.' : 'Please upload your CNIC image.'); return; }
+    setCnicBusy(true);
+    try {
+      const front = await uploadDocument(cnicFront);
+      if (isBuyer) {
+        const back = await uploadDocument(cnicBack!);
+        const { error } = await db.from('customer_details').upsert({ profile_id: profile.id, cnic_front_url: front, cnic_back_url: back }, { onConflict: 'profile_id' });
+        if (error) throw error;
+      } else {
+        const { error } = await db.from('dealer_details').update({ cnic_doc_url: front }).eq('profile_id', profile.id);
+        if (error) throw error;
+      }
+      const { error: sErr } = await db.from('profiles').update({ verification_status: 'pending' }).eq('id', profile.id);
+      if (sErr) throw sErr;
+      setCnicFront(null); setCnicBack(null);
+      await refresh();
+      toast.success('CNIC submitted for review');
+    } catch (err) { toast.error(errorText(err, 'Could not upload CNIC')); }
+    finally { setCnicBusy(false); }
+  };
+
   const changePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     const db = getSupabase(); if (!db || !profile) return;
@@ -79,6 +112,21 @@ function ProfilePage() {
           {!isBuyer && <p className="muted small">Business details (firm, society, licence) are managed through your verification record.</p>}
           <Button disabled={saving}>{saving ? 'Saving…' : 'Save profile'}</Button>
         </form>
+        <h3>CNIC verification</h3>
+        <p className="small">
+          Status: <span className={`badge ${status === 'approved' ? 'ok' : 'warn'}`}>{statusLabel}</span>
+          {canCnic && !hasCnic && <span className="muted"> · No CNIC uploaded yet</span>}
+        </p>
+        {status !== 'approved' && status !== 'pending' && profile.rejection_reason && <div className="error">Reason: {profile.rejection_reason}</div>}
+        {canCnic && status !== 'approved' && (
+          <form onSubmit={submitCnic}>
+            <div className="form-row">
+              <label>{isBuyer ? 'CNIC front image' : 'CNIC image'}<input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" onChange={(e) => setCnicFront(e.target.files?.[0] ?? null)} /></label>
+              {isBuyer && <label>CNIC back image<input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" onChange={(e) => setCnicBack(e.target.files?.[0] ?? null)} /></label>}
+            </div>
+            <Button variant="outline" disabled={cnicBusy}>{cnicBusy ? 'Uploading…' : hasCnic ? 'Re-upload CNIC' : 'Upload CNIC'}</Button>
+          </form>
+        )}
         <h3>Change password</h3>
         <form onSubmit={changePassword}>
           <label>Current password<input type="password" required value={current} onChange={(e) => setCurrent(e.target.value)} /></label>

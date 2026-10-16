@@ -1,6 +1,6 @@
 import { listPublicSocieties } from './society';
 import { getSupabase } from './supabase';
-import type { Lead, LeadActivity, Lot, Plot, SocietySummary } from '@/lib/manzil/types';
+import type { Booking, Lead, LeadActivity, Lot, Plot, SocietySummary } from '@/lib/manzil/types';
 
 export async function fetchSocietySummaries(): Promise<SocietySummary[]> {
   const supabase = getSupabase();
@@ -81,6 +81,12 @@ export async function fetchLeads(dealerId: string): Promise<Lead[]> {
     if (l.plot_id) {
       const { data: p } = await supabase.from('plots').select('block, plot_no').eq('id', l.plot_id).maybeSingle();
       l.plot_label = p ? `${(p as { block: string }).block}-${(p as { plot_no: string }).plot_no}` : '—';
+      const { data: bk } = await supabase.from('bookings').select('id, status, pipeline_stage').eq('plot_id', l.plot_id)
+        .not('status', 'in', '(cancelled,rejected)').order('created_at', { ascending: false }).limit(1).maybeSingle();
+      if (bk) {
+        const { fetchBookingDealStage } = await import('./booking');
+        l.booking_stage = await fetchBookingDealStage(bk as Pick<Booking, 'id' | 'status' | 'pipeline_stage'>);
+      }
     }
   }
   return leads;
@@ -95,6 +101,7 @@ export async function createLead(dealerId: string, input: Partial<Lead>): Promis
     phone: input.phone || null,
     email: input.email || null,
     status: input.status || 'new',
+    ...(input.label ? { label: input.label } : {}),
     pipeline_stage: 1,
     plot_id: input.plot_id || null,
     follow_up_date: input.follow_up_date || null,
