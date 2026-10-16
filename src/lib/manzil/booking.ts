@@ -185,3 +185,23 @@ export async function fetchBookingExtras(bookingId: string) {
     documents: (d.data ?? []) as { id: string; doc_type: import('./types').GeneratedDocType; version: number; created_at: string }[],
   };
 }
+
+/** Manually set a booking's deal-pipeline stage (1–6). */
+export async function setBookingPipelineStage(bookingId: string, stage: number): Promise<void> {
+  const supabase = getSupabase();
+  if (!supabase) throw new Error('Database not connected');
+  const { error } = await supabase.from('bookings').update({ pipeline_stage: stage }).eq('id', bookingId);
+  if (error) throw error;
+}
+
+/** Deal stage for a booking, combining booking events with any manual override. */
+export async function fetchBookingDealStage(b: Pick<Booking, 'id' | 'status' | 'pipeline_stage'>): Promise<number> {
+  const { dealStage } = await import('./deal-pipeline');
+  const x = await fetchBookingExtras(b.id);
+  return dealStage({
+    status: b.status,
+    docTypes: x.documents.map((d) => d.doc_type),
+    allPaid: x.payments.length > 0 && x.payments.every((p) => !!p.paid_at),
+    manualStage: b.pipeline_stage ?? null,
+  });
+}
