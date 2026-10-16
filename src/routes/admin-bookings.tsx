@@ -107,7 +107,7 @@ function BookingDetail({ b, onClose, acting, act }: { b: Booking; onClose: () =>
 }
 
 /** WBS: Booking & Transfer Approval (admin, 5) + Society booking management (5) */
-function BookingsAdmin({ onNavigate, admin }: Props) {
+export function BookingsAdmin({ onNavigate, admin }: Props) {
   const { societyId, societies, setSocietyId } = useSocietyId();
   const [list, setList] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
