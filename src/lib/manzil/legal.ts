@@ -1,6 +1,7 @@
 import { getSupabase } from './supabase';
 import { notify } from './notify';
 import type { Booking, GeneratedDocType, GeneratedDocument } from '@/lib/manzil/types';
+import { attachSignatures, type PartySignature } from './legal-signature';
 
 interface DocContext {
   customer_name: string;
@@ -74,6 +75,7 @@ export async function generateDocument(
   booking: Booking,
   docType: GeneratedDocType,
   extra?: Partial<DocContext>,
+  signatures?: PartySignature[],
 ): Promise<GeneratedDocument> {
   const supabase = getSupabase();
   if (!supabase) throw new Error('Database not connected');
@@ -86,7 +88,7 @@ export async function generateDocument(
     const { data: tpl } = await supabase.from('legal_templates').select('body').eq('key', tplKey).eq('published', true).order('version', { ascending: false }).limit(1).maybeSingle();
     if ((tpl as { body: string } | null)?.body) body = (tpl as { body: string }).body;
   }
-  const rendered = fill(body, ctx);
+  const rendered = attachSignatures(fill(body, ctx), signatures ?? []);
 
   const { data: prev } = await supabase
     .from('generated_documents')
