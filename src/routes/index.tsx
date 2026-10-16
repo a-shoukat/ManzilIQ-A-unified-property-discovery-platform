@@ -10,6 +10,7 @@ import { Search, MapPin, ChevronDown, SlidersHorizontal, LayoutGrid, List, Arrow
 import { Button } from '@/components/ui/button';
 import { PageFrame, pageHead, useAppNavigation } from '@/components/manzil/PageFrame';
 import PropertyCard from '@/components/manzil/PropertyCard';
+import { filterForViewer } from '@/lib/manzil/sold-visibility';
 import { fetchProperties, readCachedProperties } from '@/lib/manzil/properties';
 import { useCompare } from '@/lib/manzil/compare';
 import type { Property } from '@/lib/manzil/types';
@@ -22,8 +23,9 @@ function Index() {
  const [q,setQ]=useState(''); const [city,setCity]=useState(''); const [category,setCategory]=useState(''); const [purpose,setPurpose]=useState(''); const [status,setStatus]=useState(''); const [maxPrice,setMaxPrice]=useState(''); const [sort,setSort]=useState('newest'); const [advanced,setAdvanced]=useState(false); const [view,setView]=useState('grid');
  const {items,toggle,has,clear}=useCompare();
  useEffect(()=>{const c=readCachedProperties(); if(c){setAll(c.list);setDemo(c.demo);setLoading(false)} fetchProperties().then(({list,demo})=>{setAll(list);setDemo(demo)}).finally(()=>setLoading(false))},[]);
- const cities=[...new Set(all.map(p=>p.city))];
- const filtered=featuredFirst(all.filter(p=>(!q||`${p.title} ${p.area??''} ${p.society_name??''}`.toLowerCase().includes(q.toLowerCase()))&&(!city||p.city===city)&&(!category||p.category===category)&&(!purpose||p.purpose===purpose)&&(!status||p.status===status)&&(!maxPrice||p.price<=Number(maxPrice))).sort((a,b)=>sort==='price-asc'?a.price-b.price:sort==='price-desc'?b.price-a.price:sort==='size-desc'?b.plot_size_marla-a.plot_size_marla:new Date(b.created_at).getTime()-new Date(a.created_at).getTime()));
+ const { profile:viewer }=useAuth(); const shown=filterForViewer(all,viewer?.role);
+ const cities=[...new Set(shown.map(p=>p.city))];
+ const filtered=featuredFirst(shown.filter(p=>(!q||`${p.title} ${p.area??''} ${p.society_name??''}`.toLowerCase().includes(q.toLowerCase()))&&(!city||p.city===city)&&(!category||p.category===category)&&(!purpose||p.purpose===purpose)&&(!status||p.status===status)&&(!maxPrice||p.price<=Number(maxPrice))).sort((a,b)=>sort==='price-asc'?a.price-b.price:sort==='price-desc'?b.price-a.price:sort==='size-desc'?b.plot_size_marla-a.plot_size_marla:new Date(b.created_at).getTime()-new Date(a.created_at).getTime()));
  const reset=()=>{setQ('');setCity('');setCategory('');setPurpose('');setStatus('');setMaxPrice('')};
  return <PageFrame publicPage><div className="marketplace-page"><div className="page-heading"><div><span className="eyebrow">A PLACE TO BEGIN</span><h1>Discover your next property</h1><p>Great spaces. Real possibilities. Find a place that feels right.</p></div><Button variant="legacy" className="quiet-link" onClick={()=>onNavigate('map-view')}>Explore on map <ArrowUpRight size={17}/></Button></div>
  <section className="property-banner"><img src={residence} alt="Contemporary residence with landscaped garden" width={1920} height={768} fetchPriority="high" decoding="async"/><div className="banner-shade"/><div className="banner-content"><span className="banner-eyebrow">PROPERTY, WITH PERSPECTIVE</span><h2>A new address.<br/>A new beginning.</h2><p>Your next chapter starts with the right place.</p><Button variant="legacy" className="banner-button" onClick={()=>document.getElementById('listings')?.scrollIntoView({behavior:'smooth'})}>Find your place <ArrowUpRight size={17}/></Button></div><span className="banner-caption"><MapPin size={13}/> Spaces worth imagining</span></section>

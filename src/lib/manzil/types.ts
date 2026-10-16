@@ -67,6 +67,7 @@ export interface Property {
   description: string | null;
   image_url: string | null;
   status: PropertyStatus;
+  sold_at?: string | null;
   owner_id: string | null;
   created_at: string;
   images?: string[] | null;
