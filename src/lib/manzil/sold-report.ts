@@ -65,7 +65,7 @@ export async function loadSoldReport(b: Booking): Promise<SoldReport> {
     b.dealer_id ? one(sb.from('profiles').select('*').eq('id', b.dealer_id).maybeSingle()) : null,
     b.customer_id ? one(sb.from('profiles').select('*').eq('id', b.customer_id).maybeSingle()) : null,
     sb.from('payments').select('*').eq('booking_id', b.id).then((r) => r.data ?? [], () => []),
-    sb.from('legal_documents').select('doc_type').eq('booking_id', b.id).then((r) => r.data ?? [], () => []),
+    sb.from('generated_documents').select('doc_type').eq('booking_id', b.id).then((r) => r.data ?? [], () => []),
   ]);
   let pct = 0;
   const lotId = plot?.lot_id as string | undefined;
