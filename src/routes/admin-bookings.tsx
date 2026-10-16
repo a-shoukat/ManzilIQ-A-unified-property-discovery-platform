@@ -18,6 +18,7 @@ import { BookingCard } from './my-bookings';
 import { useSocietyId } from './society';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { SoldReportButtons } from '@/components/manzil/SoldReportButtons';
+import { BookingDealPipeline } from '@/components/manzil/DealPipeline';
 
 interface Props {
   onNavigate: (p: string) => void;
@@ -90,6 +91,8 @@ function BookingDetail({ b, onClose, acting, act }: { b: Booking; onClose: () =>
             </ol>
           </section>
         </div>
+        <h4>Deal pipeline</h4>
+        <BookingDealPipeline b={b} editable={b.status !== 'cancelled' && b.status !== 'rejected'} />
         <h4>Payment history</h4>
         {!extras ? <p className="muted small">Loading…</p> : extras.payments.length === 0 ? <p className="muted small">No payments yet.</p> : (
           <div className="table-wrap"><table className="data-table"><thead><tr><th>Item</th><th>Due</th><th>Amount</th><th>Status</th><th>Receipt</th></tr></thead><tbody>

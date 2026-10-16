@@ -134,6 +134,7 @@ export interface Lead {
   follow_up_date: string | null;
   created_at: string;
   plot_label?: string;
+  booking_stage?: number;
 }
 
 export interface LeadActivity {
