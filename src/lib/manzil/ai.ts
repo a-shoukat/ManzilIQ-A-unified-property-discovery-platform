@@ -104,10 +104,16 @@ export async function askAssistant(
   return localBrain(input);
 }
 
-export const QUICK_PROMPTS = [
-  'Price of 5 marla in Narowal',
-  'How do I book a plot?',
-  'Show commercial plots',
-  'Convert 10 marla to sq ft',
-  'How do installments work?',
-];
+export type AssistantLang = 'en' | 'ur';
+
+export const GREETINGS: Record<AssistantLang, string> = {
+  en: "Hello! 👋 I'm the ManzilIQ assistant. Ask me about plot prices, bookings, installments or documents.",
+  ur: 'Assalam o Alaikum! 👋 Main ManzilIQ assistant hoon. Plot ki qimat, booking, qist ya documents ke baare mein poochein.',
+};
+
+export const QUICK_PROMPTS_BY_LANG: Record<AssistantLang, string[]> = {
+  en: ['Price of 5 marla in Narowal', 'How do I book a plot?', 'Show commercial plots', 'Convert 10 marla to sq ft', 'How do installments work?'],
+  ur: ['Narowal mein 5 marla price', 'Plot book kaise karein?', 'Commercial plots dikhao', '10 marla convert sq ft', 'Qist kaise kaam karti hai?'],
+};
+
+export const QUICK_PROMPTS = QUICK_PROMPTS_BY_LANG.en;
