@@ -28,7 +28,7 @@ export function buildSoldReport(b: Booking, x: {
   docTypes?: string[];
 }, now = new Date()): SoldReport {
   const str = (o: Record<string, unknown> | null | undefined, k: string) => (o && o[k] != null ? String(o[k]) : '');
-  const price = Number(x.plot?.base_price ?? b.plot_price ?? 0);
+  const price = Number(x.plot?.['base_price'] ?? b.plot_price ?? 0);
   const pct = Number(x.commissionPct ?? 0);
   const isDealer = b.channel === 'dealer' && !!b.dealer_id;
   const dealerName = str(x.dealer, 'full_name') || b.dealer_email || '';
@@ -42,7 +42,7 @@ export function buildSoldReport(b: Booking, x: {
     preparedBy: isDealer ? dealerName || 'Dealer' : `${society} admin`, office: society,
     saleDate: d(b.created_at), closingDate: d(str(x.plot, 'sold_at') || str(b as unknown as Record<string, unknown>, 'updated_at') || b.created_at),
     society, city: str(x.society, 'city') || '—', block: b.plot_block || str(x.plot, 'block') || '—', plotNo: b.plot_no || str(x.plot, 'plot_no') || '—',
-    sizeMarla: (b.plot_size_marla ?? Number(x.plot?.size_marla)) || null,
+    sizeMarla: (b.plot_size_marla ?? Number(x.plot?.['size_marla'])) || null,
     category: (str(x.plot, 'category') || str(x.plot, 'plot_type') || 'residential').replace(/^\w/, (c) => c.toUpperCase()),
     salePrice: price, tokenPaid: Number(b.token_amount || 0), installmentPlan: b.installment_plan || '—', channel: isDealer ? 'dealer' : 'direct',
     dealerName: isDealer ? dealerName || '—' : '—', dealerPhone: isDealer ? str(x.dealer, 'phone') || '—' : '—', dealerEmail: isDealer ? b.dealer_email || str(x.dealer, 'email') || '—' : '—',
@@ -68,8 +68,8 @@ export async function loadSoldReport(b: Booking): Promise<SoldReport> {
     sb.from('generated_documents').select('doc_type').eq('booking_id', b.id).then((r) => r.data ?? [], () => []),
   ]);
   let pct = 0;
-  const lotId = plot?.lot_id as string | undefined;
-  if (lotId) { const lot = await one(sb.from('lots').select('commission_pct').eq('id', lotId).maybeSingle()); pct = Number(lot?.commission_pct ?? 0); }
+  const lotId = plot?.['lot_id'] as string | undefined;
+  if (lotId) { const lot = await one(sb.from('lots').select('commission_pct').eq('id', lotId).maybeSingle()); pct = Number(lot?.['commission_pct'] ?? 0); }
   return buildSoldReport(b, { plot, society, dealer, buyer, commissionPct: pct, payments: pays as never, docTypes: (docs as { doc_type: string }[]).map((x) => x.doc_type) });
 }
 
