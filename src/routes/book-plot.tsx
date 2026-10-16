@@ -96,14 +96,14 @@ function BookPlot({ onNavigate }: { onNavigate: (p: string) => void }) {
         {step === 1 && (
           <>
             <label>Society
-              <select value={societyId} onChange={(e) => setSocietyId(e.target.value)}>
+              <select value={societyId} onChange={(e) => { setPlots([]); setPlotId(''); setPlotsLoading(true); setSocietyId(e.target.value); }}>
                 {societies.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
               </select>
             </label>
             <label>Select plot
               <select value={plotId} disabled={plotsLoading} onChange={(e) => setPlotId(e.target.value)}>
                 <option value="">{plotsLoading ? 'Loading plots…' : 'Choose a plot…'}</option>
-                {plots.map((p) => (
+                {!plotsLoading && plots.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.block}-{p.plot_no} · {p.size_marla}M · {formatPrice(p.base_price)}
                   </option>
