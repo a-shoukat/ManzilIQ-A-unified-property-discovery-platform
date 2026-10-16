@@ -5,6 +5,7 @@ import type { Plot } from '@/lib/manzil/types';
 import { formatPrice } from '@/lib/manzil/properties';
 import { formatSize } from '@/lib/manzil/phase3-rules';
 import { mapStatus, MAP_STATUS_LABEL, rectToPct, isUnlinked, type MapRegion } from '@/lib/manzil/master-plan-rules';
+import { isSvgMapUrl } from '@/lib/manzil/master-plan';
 
 type PdfDoc = { numPages: number; getPage: (n: number) => Promise<any> };
 const MIN = 0.5, MAX = 6;
@@ -126,7 +127,7 @@ export function MasterPlanMap(props: MasterPlanMapProps) {
     };
     el.addEventListener('wheel', onWheel, { passive: false });
     return () => el.removeEventListener('wheel', onWheel);
-  }, [zoomAt, doc]);
+  }, [zoomAt, doc, svgDims]);
 
   const local = (cx: number, cy: number) => {
     const r = wrapRef.current!.getBoundingClientRect(); const v = viewRef.current;
@@ -174,7 +175,7 @@ export function MasterPlanMap(props: MasterPlanMapProps) {
   const pageRegions = regions.filter((r) => r.page === page);
   const tipPlot = tip?.region.plot_id ? plotById.get(tip.region.plot_id) : undefined;
 
-  if (err) return <p className="muted">Could not open the master plan PDF: {err}</p>;
+  if (err) return <p className="muted">Could not open the master plan: {err}</p>;
   return (
     <div className="mp-wrap">
       <div className="mp-zoom">
@@ -185,9 +186,9 @@ export function MasterPlanMap(props: MasterPlanMapProps) {
       </div>
       <div ref={wrapRef} className={`mp-viewport${drawMode ? ' drawing' : ''}`} style={{ height: Math.min(Math.max(size.h, 320), 720) }}
         onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp}>
-        {!doc && <div className="mp-loading">Loading master plan…</div>}
+        {!ready && <div className="mp-loading">Loading master plan…</div>}
         <div ref={innerRef} className="mp-inner" style={{ width: size.w, height: size.h, transform: `translate(${view.x}px, ${view.y}px) scale(${view.z})` }}>
-          <canvas ref={canvasRef} style={{ width: size.w, height: size.h }} />
+          {isSvg ? (svgDims && <img src={pdfUrl} alt="Master plan" draggable={false} style={{ width: size.w, height: size.h, display: 'block', userSelect: 'none', pointerEvents: 'none' }} />) : <canvas ref={canvasRef} style={{ width: size.w, height: size.h }} />}
           {pageRegions.map((r) => {
             const plot = r.plot_id ? plotById.get(r.plot_id) : undefined;
             const unlinked = isUnlinked(r, plots);
