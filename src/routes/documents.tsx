@@ -7,6 +7,8 @@ import { fetchDocuments, generateDocument } from '@/lib/manzil/legal';
 import { fetchAllBookings, fetchSocietyBookings } from '@/lib/manzil/booking';
 import { DOC_TITLES, type Booking, type GeneratedDocType, type GeneratedDocument } from '@/lib/manzil/types';
 import { useSocietyId } from './society';
+import { SignatureCapture } from '@/components/manzil/SignatureCapture';
+import { SIGNABLE_DOCS, SIGN_PARTIES, buildLegalPdfHtml, splitSignatures, watermarkText, type PartySignature } from '@/lib/manzil/legal-signature';
 
 const docTypeOptions = Object.keys(DOC_TITLES) as GeneratedDocType[];
 
@@ -22,6 +24,14 @@ function Documents({ onNavigate }: { onNavigate: (p: string) => void }) {
   const [genType, setGenType] = useState<GeneratedDocType>('sale_agreement');
   const [msg, setMsg] = useState<string | null>(null);
   const [bulk, setBulk] = useState<string[]>([]);
+  const [sigs, setSigs] = useState<PartySignature[]>([]);
+
+  const openPdf = (d: GeneratedDocument) => {
+    const html = buildLegalPdfHtml({ title: DOC_TITLES[d.doc_type], body: d.body, reference: d.booking_ref ?? d.id.slice(0, 8), generatedAt: d.created_at, version: d.version });
+    const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+    if (!window.open(url, '_blank')) setMsg('Allow pop-ups to save the PDF.');
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  };
 
   const isSociety = profile?.role === 'society_admin' || profile?.role === 'super_admin';
 
@@ -51,8 +61,12 @@ function Documents({ onNavigate }: { onNavigate: (p: string) => void }) {
       setMsg('Select a booking first.');
       return;
     }
+    if (SIGNABLE_DOCS.includes(genType) && sigs.length < 2) {
+      setMsg('Both parties must sign (type or draw) before generating.');
+      return;
+    }
     try {
-      await generateDocument(b, genType);
+      await generateDocument(b, genType, undefined, SIGNABLE_DOCS.includes(genType) ? sigs : undefined);
       setMsg(`${DOC_TITLES[genType]} generated.`);
       load();
     } catch (err) {
@@ -103,6 +117,9 @@ function Documents({ onNavigate }: { onNavigate: (p: string) => void }) {
               </select>
             </label>
           </div>
+          {SIGNABLE_DOCS.includes(genType) && (
+            <SignatureCapture key={genType} parties={SIGN_PARTIES[genType]!} onChange={setSigs} />
+          )}
           <Button variant="legacy" className="btn small" onClick={doGenerate}>Generate</Button>
         </div>
       )}
@@ -154,9 +171,21 @@ function Documents({ onNavigate }: { onNavigate: (p: string) => void }) {
             <p style={{ textAlign: 'center' }} className="muted small">
               v{viewing.version} · {new Date(viewing.created_at).toLocaleDateString()}
             </p>
-            <pre className="doc-body">{viewing.body}</pre>
+            <pre className="doc-body">{splitSignatures(viewing.body).text}</pre>
+            {splitSignatures(viewing.body).sigs.length > 0 && (
+              <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+                {splitSignatures(viewing.body).sigs.map((s) => (
+                  <div key={s.role} style={{ flex: 1, minWidth: 200 }}>
+                    <div style={{ height: 60, borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'flex-end' }}>
+                      {s.dataUrl ? <img src={s.dataUrl} alt={`${s.role} signature`} style={{ maxHeight: 56 }} /> : <i style={{ fontSize: 22 }}>{s.name}</i>}
+                    </div>
+                    <p className="small muted" style={{ margin: '4px 0 0' }}>{s.role}: {s.name}</p>
+                  </div>
+                ))}
+              </div>
+            )}
             <div className="link-row no-print">
-              <Button variant="legacy" className="btn small" onClick={() => window.print()}>Print / PDF</Button>
+              <Button variant="legacy" className="btn small" onClick={() => openPdf(viewing)}>Print / PDF</Button>
               <Button variant="legacy" className="btn secondary small" onClick={() => setViewing(null)}>Close</Button>
             </div>
           </div>
@@ -169,7 +198,8 @@ function Documents({ onNavigate }: { onNavigate: (p: string) => void }) {
           {bulkDocs.map((d) => (
             <div key={d.id} className="bulk-doc">
               <h2>{DOC_TITLES[d.doc_type]}</h2>
-              <pre className="doc-body">{d.body}</pre>
+              <div className="doc-watermark">{watermarkText(d.booking_ref ?? d.id.slice(0, 8), d.created_at)}</div>
+              <pre className="doc-body">{splitSignatures(d.body).text}</pre>
             </div>
           ))}
         </div>
