@@ -5,6 +5,7 @@ import type { Plot } from '@/lib/manzil/types';
 import { formatPrice } from '@/lib/manzil/properties';
 import { formatSize } from '@/lib/manzil/phase3-rules';
 import { mapStatus, MAP_STATUS_LABEL, rectToPct, isUnlinked, type MapRegion } from '@/lib/manzil/master-plan-rules';
+import { isSvgMapUrl } from '@/lib/manzil/master-plan';
 
 type PdfDoc = { numPages: number; getPage: (n: number) => Promise<any> };
 const MIN = 0.5, MAX = 6;
@@ -43,8 +44,32 @@ export function MasterPlanMap(props: MasterPlanMapProps) {
   const gesture = useRef<{ kind: 'pan' | 'draw' | 'pinch'; sx: number; sy: number; vx: number; vy: number; dist?: number; z?: number } | null>(null);
   const plotById = useMemo(() => new Map(plots.map((p) => [p.id, p])), [plots]);
 
+  const isSvg = isSvgMapUrl(pdfUrl);
+  const [svgDims, setSvgDims] = useState<{ w: number; h: number } | null>(null);
+
+  // Load SVG-wrapped raster map
+  useEffect(() => {
+    if (!isSvg) { setSvgDims(null); return; }
+    let cancelled = false;
+    setSvgDims(null); setErr(null);
+    const img = new Image();
+    img.onload = () => { if (!cancelled) { setSvgDims({ w: img.naturalWidth || 1000, h: img.naturalHeight || 750 }); props.onPageCount?.(1); } };
+    img.onerror = () => { if (!cancelled) setErr('Could not open map image'); };
+    img.src = pdfUrl;
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pdfUrl, isSvg]);
+
+  useEffect(() => {
+    if (!svgDims || !wrapRef.current) return;
+    const fit = () => { const w = wrapRef.current!.clientWidth; setSize({ w, h: (w / svgDims.w) * svgDims.h }); };
+    fit(); window.addEventListener('resize', fit);
+    return () => window.removeEventListener('resize', fit);
+  }, [svgDims]);
+
   // Load PDF (browser-only import)
   useEffect(() => {
+    if (isSvg) { setDoc(null); return; }
     let cancelled = false;
     setDoc(null); setErr(null);
     (async () => {
@@ -58,7 +83,7 @@ export function MasterPlanMap(props: MasterPlanMapProps) {
     })();
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pdfUrl]);
+  }, [pdfUrl, isSvg]);
 
   // Debounced high-res re-render when zoom settles (never on data change)
   useEffect(() => { const t = setTimeout(() => setRenderZoom(view.z), 250); return () => clearTimeout(t); }, [view.z]);
@@ -83,6 +108,7 @@ export function MasterPlanMap(props: MasterPlanMapProps) {
     })();
     return () => { cancelled = true; task?.cancel(); };
   }, [doc, page, renderZoom]);
+  const ready = isSvg ? !!svgDims : !!doc;
 
   useEffect(() => { setView({ z: 1, x: 0, y: 0 }); }, [page, pdfUrl]);
 
@@ -101,7 +127,7 @@ export function MasterPlanMap(props: MasterPlanMapProps) {
     };
     el.addEventListener('wheel', onWheel, { passive: false });
     return () => el.removeEventListener('wheel', onWheel);
-  }, [zoomAt, doc]);
+  }, [zoomAt, doc, svgDims]);
 
   const local = (cx: number, cy: number) => {
     const r = wrapRef.current!.getBoundingClientRect(); const v = viewRef.current;
@@ -149,7 +175,7 @@ export function MasterPlanMap(props: MasterPlanMapProps) {
   const pageRegions = regions.filter((r) => r.page === page);
   const tipPlot = tip?.region.plot_id ? plotById.get(tip.region.plot_id) : undefined;
 
-  if (err) return <p className="muted">Could not open the master plan PDF: {err}</p>;
+  if (err) return <p className="muted">Could not open the master plan: {err}</p>;
   return (
     <div className="mp-wrap">
       <div className="mp-zoom">
@@ -160,9 +186,9 @@ export function MasterPlanMap(props: MasterPlanMapProps) {
       </div>
       <div ref={wrapRef} className={`mp-viewport${drawMode ? ' drawing' : ''}`} style={{ height: Math.min(Math.max(size.h, 320), 720) }}
         onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp}>
-        {!doc && <div className="mp-loading">Loading master plan…</div>}
+        {!ready && <div className="mp-loading">Loading master plan…</div>}
         <div ref={innerRef} className="mp-inner" style={{ width: size.w, height: size.h, transform: `translate(${view.x}px, ${view.y}px) scale(${view.z})` }}>
-          <canvas ref={canvasRef} style={{ width: size.w, height: size.h }} />
+          {isSvg ? (svgDims && <img src={pdfUrl} alt="Master plan" draggable={false} style={{ width: size.w, height: size.h, display: 'block', userSelect: 'none', pointerEvents: 'none' }} />) : <canvas ref={canvasRef} style={{ width: size.w, height: size.h }} />}
           {pageRegions.map((r) => {
             const plot = r.plot_id ? plotById.get(r.plot_id) : undefined;
             const unlinked = isUnlinked(r, plots);
