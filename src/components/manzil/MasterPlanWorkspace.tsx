@@ -9,7 +9,7 @@ import { fetchPlots } from '@/lib/manzil/society';
 import { errorText } from '@/lib/manzil/errors';
 import { formatSize } from '@/lib/manzil/phase3-rules';
 import { formatPrice } from '@/lib/manzil/properties';
-import { deleteRegion, fetchMasterPlanUrl, fetchRegions, saveRegion, subscribeSocietyMap, uploadMasterPlan } from '@/lib/manzil/master-plan';
+import { deleteRegion, fetchMasterPlanUrl, fetchRegions, MAP_ACCEPT, saveRegion, subscribeSocietyMap, uploadMasterPlan } from '@/lib/manzil/master-plan';
 import { buildTranscript, isUnlinked, mappingProgress, mapStatus, MAP_STATUS_LABEL, statusSummary, type MapRegion, type MapStatus, rectToPct } from '@/lib/manzil/master-plan-rules';
 
 const STATUSES: MapStatus[] = ['available', 'reserved', 'sold', 'blocked'];
@@ -107,10 +107,11 @@ export function MasterPlanWorkspace({ societyId, societyName, editable, onBook }
         <div className="link-row" style={{ margin: 0 }}>
           {pdfUrl && <Button variant="secondary" size="sm" onClick={download}><FileDown size={15} />Generate transcript</Button>}
           {editable && pdfUrl && <Button size="sm" variant={drawMode ? 'default' : 'secondary'} onClick={() => setDrawMode((d) => !d)}><PencilRuler size={15} />{drawMode ? 'Drawing — drag on map' : 'Draw plot region'}</Button>}
-          {editable && (
-            <Button asChild size="sm" variant="secondary"><label style={{ cursor: 'pointer' }}><Upload size={15} />{uploading ? 'Uploading…' : pdfUrl ? 'Replace PDF' : 'Upload PDF'}
-              <input type="file" accept="application/pdf" hidden disabled={uploading} onChange={(e) => void onUpload(e.target.files?.[0])} /></label></Button>
-          )}
+          {editable && (<>
+            <Button asChild size="sm" variant="secondary"><label style={{ cursor: 'pointer' }}><Upload size={15} />{uploading ? 'Uploading…' : 'Upload map'}
+              <input type="file" accept={MAP_ACCEPT} hidden disabled={uploading} onChange={(e) => { void onUpload(e.target.files?.[0]); e.target.value = ''; }} /></label></Button>
+            <span className="muted small">PDF (25MB) · PNG, JPG, WEBP (10MB)</span>
+          </>)}
         </div>
       </div>
 

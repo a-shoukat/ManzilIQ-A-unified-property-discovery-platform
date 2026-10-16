@@ -2,24 +2,53 @@ import { getSupabase } from './supabase';
 import type { MapRegion } from './master-plan-rules';
 
 const BUCKET = 'society-maps';
-const PATH = (societyId: string) => `${societyId}/master-plan.pdf`;
+const PDF_NAME = 'master-plan.pdf';
+const SVG_NAME = 'master-plan.svg';
+export const IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
+export const MAP_ACCEPT = ['application/pdf', ...IMAGE_TYPES].join(',');
+
+/** True when a master-plan URL points at the SVG-wrapped raster map. */
+export const isSvgMapUrl = (url: string) => url.split('?')[0]!.toLowerCase().endsWith('.svg');
 
 export async function fetchMasterPlanUrl(societyId: string): Promise<string | null> {
   const sb = getSupabase();
   if (!sb) return null;
-  const { data } = await sb.storage.from(BUCKET).list(societyId, { limit: 5, search: 'master-plan.pdf' });
-  const f = data?.find((x) => x.name === 'master-plan.pdf');
+  const { data } = await sb.storage.from(BUCKET).list(societyId, { limit: 10, search: 'master-plan' });
+  const files = (data ?? []).filter((x) => x.name === PDF_NAME || x.name === SVG_NAME)
+    .sort((a, b) => String(b.updated_at ?? '').localeCompare(String(a.updated_at ?? '')));
+  const f = files[0];
   if (!f) return null;
-  return `${sb.storage.from(BUCKET).getPublicUrl(PATH(societyId)).data.publicUrl}?v=${encodeURIComponent(f.updated_at ?? '')}`;
+  return `${sb.storage.from(BUCKET).getPublicUrl(`${societyId}/${f.name}`).data.publicUrl}?v=${encodeURIComponent(f.updated_at ?? '')}`;
+}
+
+const readDataUrl = (file: File) => new Promise<string>((res, rej) => {
+  const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(new Error('Could not read image')); r.readAsDataURL(file);
+});
+const imageSize = (src: string) => new Promise<{ w: number; h: number }>((res, rej) => {
+  const img = new Image(); img.onload = () => res({ w: img.naturalWidth, h: img.naturalHeight }); img.onerror = () => rej(new Error('Could not open image')); img.src = src;
+});
+
+/** Wrap a raster image inside an SVG document so it renders on the same stage as PDFs. */
+export async function rasterToSvg(file: File): Promise<Blob> {
+  const dataUrl = await readDataUrl(file);
+  const { w, h } = await imageSize(dataUrl);
+  const svg = `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><image width="${w}" height="${h}" href="${dataUrl}" xlink:href="${dataUrl}"/></svg>`;
+  return new Blob([svg], { type: 'image/svg+xml' });
 }
 
 export async function uploadMasterPlan(societyId: string, file: File): Promise<void> {
   const sb = getSupabase();
   if (!sb) throw new Error('Database not connected');
-  if (file.type !== 'application/pdf') throw new Error('Please choose a PDF file');
-  if (file.size > 25 * 1024 * 1024) throw new Error('PDF must be under 25 MB');
-  const { error } = await sb.storage.from(BUCKET).upload(PATH(societyId), file, { upsert: true, contentType: 'application/pdf' });
+  const isPdf = file.type === 'application/pdf';
+  const isImage = IMAGE_TYPES.includes(file.type);
+  if (!isPdf && !isImage) throw new Error('Please choose a PDF, PNG, JPG or WEBP file');
+  if (isPdf && file.size > 25 * 1024 * 1024) throw new Error('PDF must be under 25 MB');
+  if (isImage && file.size > 10 * 1024 * 1024) throw new Error('Image must be under 10 MB');
+  const name = isPdf ? PDF_NAME : SVG_NAME;
+  const body = isPdf ? file : await rasterToSvg(file);
+  const { error } = await sb.storage.from(BUCKET).upload(`${societyId}/${name}`, body, { upsert: true, contentType: isPdf ? 'application/pdf' : 'image/svg+xml' });
   if (error) throw error;
+  await sb.storage.from(BUCKET).remove([`${societyId}/${isPdf ? SVG_NAME : PDF_NAME}`]).catch(() => {});
 }
 
 export async function fetchRegions(societyId: string): Promise<MapRegion[]> {
