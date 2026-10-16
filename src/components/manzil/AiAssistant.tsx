@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Sparkles, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { askAssistant, GREETINGS, QUICK_PROMPTS_BY_LANG, type AssistantLang, type ChatMessage } from '@/lib/manzil/ai';
 
