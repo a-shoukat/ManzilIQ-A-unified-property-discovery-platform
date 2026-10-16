@@ -11,7 +11,10 @@ function Pad({ role, onChange }: { role: string; onChange: (s: PartySignature | 
 
   useEffect(() => {
     if (!name.trim() || (mode === 'drawn' && !drawn)) return onChange(null);
-    onChange({ role, mode, name: name.trim(), dataUrl: mode === 'drawn' ? ref.current?.toDataURL('image/png') : undefined, signedAt: new Date().toISOString() });
+    const sig: PartySignature = { role, mode, name: name.trim(), signedAt: new Date().toISOString() };
+    const url = mode === 'drawn' ? ref.current?.toDataURL('image/png') : null;
+    if (url) sig.dataUrl = url;
+    onChange(sig);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, mode, drawn]);
 
