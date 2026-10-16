@@ -17,6 +17,7 @@ import { Route as AdminBookingsRouteImport } from './routes/admin-bookings'
 import { Route as AdminDisputesRouteImport } from './routes/admin-disputes'
 import { Route as AdminFraudRouteImport } from './routes/admin-fraud'
 import { Route as AdminReportsRouteImport } from './routes/admin-reports'
+import { Route as AdminSubscriptionsRouteImport } from './routes/admin-subscriptions'
 import { Route as AdminTemplatesRouteImport } from './routes/admin-templates'
 import { Route as AdminUsersRouteImport } from './routes/admin-users'
 import { Route as AdminVerificationRouteImport } from './routes/admin-verification'
@@ -41,6 +42,7 @@ import { Route as MyActivityRouteImport } from './routes/my-activity'
 import { Route as MyBookingsRouteImport } from './routes/my-bookings'
 import { Route as MyPaymentsRouteImport } from './routes/my-payments'
 import { Route as PriceEstimatorRouteImport } from './routes/price-estimator'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as SavedSearchesRouteImport } from './routes/saved-searches'
 import { Route as SocietyRouteImport } from './routes/society'
@@ -91,6 +93,11 @@ const AdminFraudRoute = AdminFraudRouteImport.update({
 const AdminReportsRoute = AdminReportsRouteImport.update({
   id: '/admin-reports',
   path: '/admin-reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSubscriptionsRoute = AdminSubscriptionsRouteImport.update({
+  id: '/admin-subscriptions',
+  path: '/admin-subscriptions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminTemplatesRoute = AdminTemplatesRouteImport.update({
@@ -213,6 +220,11 @@ const PriceEstimatorRoute = PriceEstimatorRouteImport.update({
   path: '/price-estimator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -278,6 +290,7 @@ export interface FileRoutesByFullPath {
   '/admin-disputes': typeof AdminDisputesRoute
   '/admin-fraud': typeof AdminFraudRoute
   '/admin-reports': typeof AdminReportsRoute
+  '/admin-subscriptions': typeof AdminSubscriptionsRoute
   '/admin-templates': typeof AdminTemplatesRoute
   '/admin-users': typeof AdminUsersRoute
   '/admin-verification': typeof AdminVerificationRoute
@@ -302,6 +315,7 @@ export interface FileRoutesByFullPath {
   '/my-bookings': typeof MyBookingsRoute
   '/my-payments': typeof MyPaymentsRoute
   '/price-estimator': typeof PriceEstimatorRoute
+  '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/saved-searches': typeof SavedSearchesRoute
   '/society': typeof SocietyRoute
@@ -323,6 +337,7 @@ export interface FileRoutesByTo {
   '/admin-disputes': typeof AdminDisputesRoute
   '/admin-fraud': typeof AdminFraudRoute
   '/admin-reports': typeof AdminReportsRoute
+  '/admin-subscriptions': typeof AdminSubscriptionsRoute
   '/admin-templates': typeof AdminTemplatesRoute
   '/admin-users': typeof AdminUsersRoute
   '/admin-verification': typeof AdminVerificationRoute
@@ -347,6 +362,7 @@ export interface FileRoutesByTo {
   '/my-bookings': typeof MyBookingsRoute
   '/my-payments': typeof MyPaymentsRoute
   '/price-estimator': typeof PriceEstimatorRoute
+  '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/saved-searches': typeof SavedSearchesRoute
   '/society': typeof SocietyRoute
@@ -369,6 +385,7 @@ export interface FileRoutesById {
   '/admin-disputes': typeof AdminDisputesRoute
   '/admin-fraud': typeof AdminFraudRoute
   '/admin-reports': typeof AdminReportsRoute
+  '/admin-subscriptions': typeof AdminSubscriptionsRoute
   '/admin-templates': typeof AdminTemplatesRoute
   '/admin-users': typeof AdminUsersRoute
   '/admin-verification': typeof AdminVerificationRoute
@@ -393,6 +410,7 @@ export interface FileRoutesById {
   '/my-bookings': typeof MyBookingsRoute
   '/my-payments': typeof MyPaymentsRoute
   '/price-estimator': typeof PriceEstimatorRoute
+  '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/saved-searches': typeof SavedSearchesRoute
   '/society': typeof SocietyRoute
@@ -416,6 +434,7 @@ export interface FileRouteTypes {
     | '/admin-disputes'
     | '/admin-fraud'
     | '/admin-reports'
+    | '/admin-subscriptions'
     | '/admin-templates'
     | '/admin-users'
     | '/admin-verification'
@@ -440,6 +459,7 @@ export interface FileRouteTypes {
     | '/my-bookings'
     | '/my-payments'
     | '/price-estimator'
+    | '/pricing'
     | '/profile'
     | '/saved-searches'
     | '/society'
@@ -461,6 +481,7 @@ export interface FileRouteTypes {
     | '/admin-disputes'
     | '/admin-fraud'
     | '/admin-reports'
+    | '/admin-subscriptions'
     | '/admin-templates'
     | '/admin-users'
     | '/admin-verification'
@@ -485,6 +506,7 @@ export interface FileRouteTypes {
     | '/my-bookings'
     | '/my-payments'
     | '/price-estimator'
+    | '/pricing'
     | '/profile'
     | '/saved-searches'
     | '/society'
@@ -506,6 +528,7 @@ export interface FileRouteTypes {
     | '/admin-disputes'
     | '/admin-fraud'
     | '/admin-reports'
+    | '/admin-subscriptions'
     | '/admin-templates'
     | '/admin-users'
     | '/admin-verification'
@@ -530,6 +553,7 @@ export interface FileRouteTypes {
     | '/my-bookings'
     | '/my-payments'
     | '/price-estimator'
+    | '/pricing'
     | '/profile'
     | '/saved-searches'
     | '/society'
@@ -552,6 +576,7 @@ export interface RootRouteChildren {
   AdminDisputesRoute: typeof AdminDisputesRoute
   AdminFraudRoute: typeof AdminFraudRoute
   AdminReportsRoute: typeof AdminReportsRoute
+  AdminSubscriptionsRoute: typeof AdminSubscriptionsRoute
   AdminTemplatesRoute: typeof AdminTemplatesRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminVerificationRoute: typeof AdminVerificationRoute
@@ -576,6 +601,7 @@ export interface RootRouteChildren {
   MyBookingsRoute: typeof MyBookingsRoute
   MyPaymentsRoute: typeof MyPaymentsRoute
   PriceEstimatorRoute: typeof PriceEstimatorRoute
+  PricingRoute: typeof PricingRoute
   ProfileRoute: typeof ProfileRoute
   SavedSearchesRoute: typeof SavedSearchesRoute
   SocietyRoute: typeof SocietyRoute
@@ -645,6 +671,13 @@ declare module '@tanstack/react-router' {
       path: '/admin-reports'
       fullPath: '/admin-reports'
       preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-subscriptions': {
+      id: '/admin-subscriptions'
+      path: '/admin-subscriptions'
+      fullPath: '/admin-subscriptions'
+      preLoaderRoute: typeof AdminSubscriptionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin-templates': {
@@ -815,6 +848,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PriceEstimatorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profile': {
       id: '/profile'
       path: '/profile'
@@ -904,6 +944,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminDisputesRoute: AdminDisputesRoute,
   AdminFraudRoute: AdminFraudRoute,
   AdminReportsRoute: AdminReportsRoute,
+  AdminSubscriptionsRoute: AdminSubscriptionsRoute,
   AdminTemplatesRoute: AdminTemplatesRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminVerificationRoute: AdminVerificationRoute,
@@ -928,6 +969,7 @@ const rootRouteChildren: RootRouteChildren = {
   MyBookingsRoute: MyBookingsRoute,
   MyPaymentsRoute: MyPaymentsRoute,
   PriceEstimatorRoute: PriceEstimatorRoute,
+  PricingRoute: PricingRoute,
   ProfileRoute: ProfileRoute,
   SavedSearchesRoute: SavedSearchesRoute,
   SocietyRoute: SocietyRoute,
