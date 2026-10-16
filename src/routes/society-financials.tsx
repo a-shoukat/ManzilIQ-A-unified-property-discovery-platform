@@ -14,6 +14,9 @@ import {
 import { formatPrice } from '@/lib/manzil/properties';
 import type { Payment } from '@/lib/manzil/types';
 import { useSocietyId } from './society';
+import { fetchSocietyBookings } from '@/lib/manzil/booking';
+import type { Booking } from '@/lib/manzil/types';
+import { SoldReportButtons } from '@/components/manzil/SoldReportButtons';
 
 /** WBS: Payment & Financial System — society side (plans, tracking, reporting) */
 function SocietyFinancials({ onNavigate }: { onNavigate: (p: string) => void }) {
@@ -22,6 +25,7 @@ function SocietyFinancials({ onNavigate }: { onNavigate: (p: string) => void }) 
   const [payments, setPayments] = useState<Payment[]>([]);
   const [plans, setPlans] = useState<Awaited<ReturnType<typeof fetchPlans>>>([]);
   const [loading, setLoading] = useState(true);
+  const [sold, setSold] = useState<Booking[]>([]);
 
   const [pName, setPName] = useState('');
   const [pMonths, setPMonths] = useState('12');
@@ -37,6 +41,7 @@ function SocietyFinancials({ onNavigate }: { onNavigate: (p: string) => void }) 
     setSummary(s);
     setPayments(p);
     setPlans(pl);
+    fetchSocietyBookings(sid).then((bs) => setSold(bs.filter((b) => b.status === 'completed'))).catch(() => setSold([]));
     setLoading(false);
   };
 
@@ -131,6 +136,16 @@ function SocietyFinancials({ onNavigate }: { onNavigate: (p: string) => void }) 
               </div>
             ))}
             {plans.length === 0 && <p className="muted small">No custom plans — defaults apply (20% down).</p>}
+          </div>
+
+          <h3>Property sold reports</h3>
+          <div className="card" style={{ marginBottom: 12 }}>
+            {sold.length === 0 ? <p className="muted small">No completed sales yet.</p> : sold.map((b) => (
+              <div key={b.id} className="queue-head" style={{ borderBottom: '1px solid var(--border)', padding: '8px 0' }}>
+                <span>{b.reference_no} · Plot {b.plot_no ?? '—'} · Block {b.plot_block ?? '—'} · {b.customer_name ?? b.customer_email}</span>
+                <SoldReportButtons b={b} />
+              </div>
+            ))}
           </div>
 
           <h3>Payment history</h3>
