@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { PasswordInput, PASSWORD_MISMATCH } from '@/components/manzil/PasswordInput';
 import { Button } from '@/components/ui/button';
 import { PageFrame, pageHead } from '@/components/manzil/PageFrame';
 import { getSupabase } from '@/lib/manzil/supabase';
@@ -86,7 +87,7 @@ function ProfilePage() {
     e.preventDefault();
     const db = getSupabase(); if (!db || !profile) return;
     if (pw.length < 8) { toast.error('New password must be at least 8 characters.'); return; }
-    if (pw !== pw2) { toast.error('Passwords do not match.'); return; }
+    if (pw !== pw2) { toast.error(PASSWORD_MISMATCH); return; }
     const check = await db.auth.signInWithPassword({ email: profile.email, password: current });
     if (check.error) { toast.error('Current password is incorrect.'); return; }
     const { error } = await db.auth.updateUser({ password: pw });
@@ -129,11 +130,12 @@ function ProfilePage() {
         )}
         <h3>Change password</h3>
         <form onSubmit={changePassword}>
-          <label>Current password<input type="password" required value={current} onChange={(e) => setCurrent(e.target.value)} /></label>
+          <label>Current password<PasswordInput required autoComplete="current-password" value={current} onChange={(e) => setCurrent(e.target.value)} /></label>
           <div className="form-row">
-            <label>New password<input type="password" required value={pw} onChange={(e) => setPw(e.target.value)} /></label>
-            <label>Confirm new password<input type="password" required value={pw2} onChange={(e) => setPw2(e.target.value)} /></label>
+            <label>New password<PasswordInput required autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} /></label>
+            <label>Confirm new password<PasswordInput required autoComplete="new-password" value={pw2} onChange={(e) => setPw2(e.target.value)} /></label>
           </div>
+          {pw2 && pw2 !== pw && <div className="error" role="alert">{PASSWORD_MISMATCH}</div>}
           <Button variant="outline">Change password</Button>
         </form>
       </div>
