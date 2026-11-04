@@ -1295,3 +1295,17 @@ textarea {
 .pricing-price small { font-size: .85rem; font-weight: 400; color: var(--muted-foreground); }
 .pricing-card ul { list-style: none; padding: 0; margin: 0; display: grid; gap: .4rem; flex: 1; }
 .pricing-card li { display: flex; gap: .4rem; align-items: center; font-size: .9rem; }
+.search-bar{position:relative;display:flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--background);border-radius:10px;padding:0 6px 0 12px;height:36px;min-width:0;}
+.search-bar input{flex:1;min-width:0;border:0;background:transparent;outline:none;font-size:12px;color:var(--foreground);}
+.search-bar:focus-within{border-color:var(--primary);}
+.search-bar-icon,.search-bar-spin{color:var(--muted-foreground);flex-shrink:0;}.search-bar-spin{animation:spin 1s linear infinite;}
+.search-bar-clear{height:24px;width:24px;}
+.search-bar-lg{height:48px;margin-bottom:24px;}.search-bar-lg input{font-size:14px;}
+.search-results{margin-top:8px;}.search-hint-text{margin-top:8px;}
+.global-search{position:relative;flex:1;max-width:340px;margin:0 12px;}
+.global-search-menu{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:50;background:var(--popover);color:var(--popover-foreground);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-lg,0 10px 30px rgb(0 0 0/.12));max-height:420px;overflow:auto;padding:6px;}
+.gs-heading{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-foreground);padding:8px 10px 4px;}
+.gs-item{display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;padding:8px 10px;border-radius:8px;background:transparent;border:0;cursor:pointer;}
+.gs-item:hover{background:var(--accent);}.gs-item strong{font-size:12px;font-weight:600;}.gs-item span{font-size:11px;color:var(--muted-foreground);}
+.gs-empty{padding:14px 10px;font-size:12px;color:var(--muted-foreground);}
+@media(max-width:760px){.global-search{margin:0 6px;max-width:none;}.global-search-menu{position:fixed;top:64px;left:8px;right:8px;}}
