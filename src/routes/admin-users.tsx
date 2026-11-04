@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/manzil/auth';
 import { toast } from 'sonner';
 import { createUserAsAdmin } from '@/lib/manzil/admin-users';
 import { errorText } from '@/lib/manzil/errors';
+import { PasswordInput, PASSWORD_MISMATCH } from '@/components/manzil/PasswordInput';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { ROLE_LABELS, type UserRole, type VerificationStatus } from '@/lib/manzil/types';
 
@@ -25,11 +26,13 @@ function AdminUsers() {
   const [adding, setAdding] = useState(false);
   const [nu, setNu] = useState({ name: '', email: '', role: 'buyer' as UserRole, password: '' });
   const [creating, setCreating] = useState(false);
+  const [pw2, setPw2] = useState('');
   const createUser = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (nu.password !== pw2) { toast.error(PASSWORD_MISMATCH); return; }
     if (nu.password.length < 8) { toast.error('Temporary password must be at least 8 characters.'); return; }
     setCreating(true);
-    try { await createUserAsAdmin(nu); toast.success(`${nu.email} created`); setAdding(false); setNu({ name: '', email: '', role: 'buyer', password: '' }); void load(); }
+    try { await createUserAsAdmin(nu); toast.success(`${nu.email} created`); setAdding(false); setNu({ name: '', email: '', role: 'buyer', password: '' }); setPw2(''); void load(); }
     catch (err) { toast.error(errorText(err, 'Could not create user')); }
     finally { setCreating(false); }
   };
@@ -75,7 +78,9 @@ function AdminUsers() {
               <label>Email<input required type="email" value={nu.email} onChange={(e) => setNu({ ...nu, email: e.target.value })} /></label>
               <label>Role<select value={nu.role} onChange={(e) => setNu({ ...nu, role: e.target.value as UserRole })}>
                 {EDITABLE_ROLES.map((x) => <option key={x} value={x}>{ROLE_LABELS[x]}</option>)}</select></label>
-              <label>Temporary password<input required minLength={8} value={nu.password} onChange={(e) => setNu({ ...nu, password: e.target.value })} /></label>
+              <label>Temporary password<PasswordInput required minLength={8} autoComplete="new-password" value={nu.password} onChange={(e) => setNu({ ...nu, password: e.target.value })} /></label>
+              <label>Confirm password<PasswordInput required autoComplete="new-password" value={pw2} onChange={(e) => setPw2(e.target.value)} /></label>
+              {pw2 && pw2 !== nu.password && <div className="error" role="alert">{PASSWORD_MISMATCH}</div>}
               <p className="muted small">The account is created approved. Share the temporary password; they can change it in Profile & settings.</p>
               <DialogFooter><Button type="button" variant="outline" onClick={() => setAdding(false)}>Cancel</Button><Button disabled={creating}>{creating ? 'Creating…' : 'Create user'}</Button></DialogFooter>
             </form>
