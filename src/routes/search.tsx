@@ -12,7 +12,7 @@ import { errorText } from '@/lib/manzil/errors';
 import type { Property } from '@/lib/manzil/types';
 
 export const Route = createFileRoute('/search')({
-  validateSearch: (s: Record<string, unknown>) => ({ q: typeof s.q === 'string' ? s.q : '' }),
+  validateSearch: (s: Record<string, unknown>) => ({ q: typeof s['q'] === 'string' ? s['q'] : '' }),
   head: () => ({ meta: [
     { title: 'Search available properties | ManzilIQ' },
     { name: 'description', content: 'Search available plots, houses and commercial properties across Pakistan on ManzilIQ.' },
