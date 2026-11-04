@@ -46,6 +46,7 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SavedSearchesRouteImport } from './routes/saved-searches'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as SocietyRouteImport } from './routes/society'
 import { Route as SocietyAnalyticsRouteImport } from './routes/society-analytics'
 import { Route as SocietyBookingsRouteImport } from './routes/society-bookings'
@@ -241,6 +242,11 @@ const SavedSearchesRoute = SavedSearchesRouteImport.update({
   path: '/saved-searches',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SocietyRoute = SocietyRouteImport.update({
   id: '/society',
   path: '/society',
@@ -325,6 +331,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/saved-searches': typeof SavedSearchesRoute
+  '/search': typeof SearchRoute
   '/society': typeof SocietyRoute
   '/society-analytics': typeof SocietyAnalyticsRoute
   '/society-bookings': typeof SocietyBookingsRoute
@@ -373,6 +380,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/saved-searches': typeof SavedSearchesRoute
+  '/search': typeof SearchRoute
   '/society': typeof SocietyRoute
   '/society-analytics': typeof SocietyAnalyticsRoute
   '/society-bookings': typeof SocietyBookingsRoute
@@ -422,6 +430,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/saved-searches': typeof SavedSearchesRoute
+  '/search': typeof SearchRoute
   '/society': typeof SocietyRoute
   '/society-analytics': typeof SocietyAnalyticsRoute
   '/society-bookings': typeof SocietyBookingsRoute
@@ -472,6 +481,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/reset-password'
     | '/saved-searches'
+    | '/search'
     | '/society'
     | '/society-analytics'
     | '/society-bookings'
@@ -520,6 +530,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/reset-password'
     | '/saved-searches'
+    | '/search'
     | '/society'
     | '/society-analytics'
     | '/society-bookings'
@@ -568,6 +579,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/reset-password'
     | '/saved-searches'
+    | '/search'
     | '/society'
     | '/society-analytics'
     | '/society-bookings'
@@ -617,6 +629,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SavedSearchesRoute: typeof SavedSearchesRoute
+  SearchRoute: typeof SearchRoute
   SocietyRoute: typeof SocietyRoute
   SocietyAnalyticsRoute: typeof SocietyAnalyticsRoute
   SocietyBookingsRoute: typeof SocietyBookingsRoute
@@ -889,6 +902,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SavedSearchesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/society': {
       id: '/society'
       path: '/society'
@@ -993,6 +1013,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SavedSearchesRoute: SavedSearchesRoute,
+  SearchRoute: SearchRoute,
   SocietyRoute: SocietyRoute,
   SocietyAnalyticsRoute: SocietyAnalyticsRoute,
   SocietyBookingsRoute: SocietyBookingsRoute,
