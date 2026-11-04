@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { PasswordInput, PASSWORD_MISMATCH } from '@/components/manzil/PasswordInput';
 import { Button } from '@/components/ui/button';
 import { PageFrame, pageHead } from '@/components/manzil/PageFrame';
 import { getSupabase } from '@/lib/manzil/supabase';
