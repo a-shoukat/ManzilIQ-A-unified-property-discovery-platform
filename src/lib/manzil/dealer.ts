@@ -84,6 +84,7 @@ export async function fetchLeads(dealerId: string): Promise<Lead[]> {
       const { data: bk } = await supabase.from('bookings').select('id, status, pipeline_stage').eq('plot_id', l.plot_id)
         .not('status', 'in', '(cancelled,rejected)').order('created_at', { ascending: false }).limit(1).maybeSingle();
       if (bk) {
+        l.booking_id = (bk as { id: string }).id;
         const { fetchBookingDealStage } = await import('./booking');
         l.booking_stage = await fetchBookingDealStage(bk as Pick<Booking, 'id' | 'status' | 'pipeline_stage'>);
       }
