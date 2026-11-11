@@ -13,5 +13,20 @@
   "inApp": "In-app",
   "broadcast": "Broadcast",
   "sendBroadcast": "Send broadcast",
-  "saved": "Preferences saved"
+  "saved": "Preferences saved",
+  "prefsTitle": "Notification preferences",
+  "prefsSubtitle": "Channels and event types",
+  "profileLink": "Profile & settings",
+  "inboxLink": "Inbox",
+  "loading": "Loading…",
+  "channels": "Channels",
+  "events": "Events",
+  "savePrefs": "Save preferences",
+  "saving": "Saving…",
+  "loadError": "Could not load preferences",
+  "saveError": "Could not save. Run reference/migrations/10_phase10_ui_support.sql if the table is missing.",
+  "channelInApp": "In-app",
+  "channelEmail": "Email",
+  "channelSms": "SMS",
+  "channelPush": "Push"
 }

@@ -97,7 +97,9 @@ describe("moderation / cms / prefs schemas", () => {
 });
 
 describe("phase 10 copy isolation", () => {
-  it("exposes isolatable strings per screen for Phase 12", () => {
+  it("exposes isolatable strings per screen via i18n keys", async () => {
+    const { initI18n } = await import("@/lib/i18n");
+    initI18n("en");
     expect(INQUIRY_COPY.myTitle.length).toBeGreaterThan(0);
     expect(NOTIF_PREFS_COPY.title.length).toBeGreaterThan(0);
     expect(MODERATION_COPY.title).toContain("moderation");

@@ -1,25 +1,71 @@
-/** Phase 10 Screen 4 — isolatable copy for Phase 12 Urdu. */
+/** Phase 10 Screen 4 — UI copy via i18n (admin namespace). */
+import i18n from '@/lib/i18n';
+
+const t = (key: string, opts?: Record<string, unknown>) =>
+  i18n.t(key, { ns: 'admin', ...(opts ?? {}) });
+
 export const AUDIT_COPY = {
-  title: "Audit log",
-  subtitle: (filtered: number, loaded: number) => `${filtered} events (loaded ${loaded})`,
-  exportCsv: "Export CSV",
-  adminHub: "Admin hub",
-  table: "Table / entity",
-  user: "User / actor id",
-  action: "Action",
-  from: "From",
-  to: "To",
-  loading: "Loading…",
-  empty: "No audit events match these filters.",
-  when: "When",
-  actor: "Actor",
-  entity: "Entity",
-  expand: "Expand",
-  hide: "Hide",
-  old: "Old",
-  new: "New",
-  previous: "Previous",
-  next: "Next",
-  page: (p: number, pages: number) => `Page ${p} / ${pages}`,
-  loadError: "Could not load audit logs",
+  get title() {
+    return t('auditTitle');
+  },
+  subtitle: (filtered: number, loaded: number) =>
+    t('auditSubtitle', { filtered, loaded }),
+  get exportCsv() {
+    return t('exportCsv');
+  },
+  get adminHub() {
+    return t('adminHub');
+  },
+  get table() {
+    return t('tableEntity');
+  },
+  get user() {
+    return t('userActorId');
+  },
+  get action() {
+    return t('action');
+  },
+  get from() {
+    return t('from');
+  },
+  get to() {
+    return t('to');
+  },
+  get loading() {
+    return t('loading');
+  },
+  get empty() {
+    return t('auditEmpty');
+  },
+  get when() {
+    return t('when');
+  },
+  get actor() {
+    return t('actor');
+  },
+  get entity() {
+    return t('entity');
+  },
+  get expand() {
+    return t('expand');
+  },
+  get hide() {
+    return t('hide');
+  },
+  get old() {
+    return t('old');
+  },
+  get new() {
+    return t('new');
+  },
+  get previous() {
+    return t('previous');
+  },
+  get next() {
+    return t('next');
+  },
+  page: (p: number, pages: number) => t('pageOf', { page: p, pages }),
+  get loadError() {
+    return t('auditLoadError');
+  },
 } as const;

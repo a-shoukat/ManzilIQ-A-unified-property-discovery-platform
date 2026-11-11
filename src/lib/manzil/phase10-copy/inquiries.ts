@@ -1,36 +1,100 @@
-/** Phase 10 Screen 1 — isolatable copy for Phase 12 Urdu. */
+/** Phase 10 Screen 1 — UI copy via i18n (inquiries namespace). */
+import i18n from '@/lib/i18n';
+
+const t = (key: string, opts?: Record<string, unknown>) =>
+  i18n.t(key, { ns: 'inquiries', ...(opts ?? {}) });
+
 export const INQUIRY_COPY = {
-  myTitle: "My inquiries",
-  mySubtitle: "Messages you sent about listings",
-  ownerTitle: "Inquiries",
-  ownerSubtitle: (n: number) => `${n} inquiries`,
-  inbox: "Inbox",
-  dashboard: "Dashboard",
-  leadsPipeline: "Leads pipeline",
-  loading: "Loading…",
-  emptyMine: "No inquiries yet. Contact a listing owner from a property page.",
-  emptyFilter: "No inquiries in this filter.",
-  openThread: "Open thread",
-  hideThread: "Hide thread",
-  thread: "Thread",
-  noReplies: "No replies yet.",
-  yourReply: "Your reply",
-  reply: "Reply",
-  sendReply: "Send reply",
-  sending: "Sending…",
-  status: "Status",
-  convertToLead: "Convert to lead",
-  linkedToLead: "Linked to lead",
-  all: "All",
-  newBadge: "new",
-  filterHint:
-    "Status filters: new / contacted / viewing / negotiating / qualified / converted / closed.",
-  loadError: "Could not load inquiries",
-  replyError: "Could not send reply",
-  statusError: "Could not update status",
-  convertError: "Could not convert to lead",
-  convertDealerOnly: "Convert to lead is available for dealer accounts (dealer leads pipeline).",
-  convertedMsg: "Converted to lead",
-  replySent: "Reply sent",
-  statusSet: (s: string) => `Status set to ${s}`,
+  get myTitle() {
+    return t('myTitle');
+  },
+  get mySubtitle() {
+    return t('mySubtitle');
+  },
+  get ownerTitle() {
+    return t('ownerTitle');
+  },
+  ownerSubtitle: (n: number) => t('ownerSubtitle', { count: n }),
+  get inbox() {
+    return t('inbox');
+  },
+  get dashboard() {
+    return t('dashboard');
+  },
+  get leadsPipeline() {
+    return t('leadsPipeline');
+  },
+  get loading() {
+    return t('loading');
+  },
+  get emptyMine() {
+    return t('emptyMine');
+  },
+  get emptyFilter() {
+    return t('emptyFilter');
+  },
+  get openThread() {
+    return t('openThread');
+  },
+  get hideThread() {
+    return t('hideThread');
+  },
+  get thread() {
+    return t('thread');
+  },
+  get noReplies() {
+    return t('noReplies');
+  },
+  get yourReply() {
+    return t('yourReply');
+  },
+  get reply() {
+    return t('reply');
+  },
+  get sendReply() {
+    return t('sendReply');
+  },
+  get sending() {
+    return t('sending');
+  },
+  get status() {
+    return t('status');
+  },
+  get convertToLead() {
+    return t('convertToLead');
+  },
+  get linkedToLead() {
+    return t('linkedToLead');
+  },
+  get all() {
+    return t('all');
+  },
+  get newBadge() {
+    return t('newBadge');
+  },
+  get filterHint() {
+    return t('filterHint');
+  },
+  get loadError() {
+    return t('loadError');
+  },
+  get replyError() {
+    return t('replyError');
+  },
+  get statusError() {
+    return t('statusError');
+  },
+  get convertError() {
+    return t('convertError');
+  },
+  get convertDealerOnly() {
+    return t('convertDealerOnly');
+  },
+  get convertedMsg() {
+    return t('convertedMsg');
+  },
+  get replySent() {
+    return t('replySent');
+  },
+  statusSet: (s: string) => t('statusSet', { status: s }),
 } as const;

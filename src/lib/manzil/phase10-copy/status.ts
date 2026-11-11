@@ -1,24 +1,70 @@
-/** Phase 10 Screen 7 — isolatable copy for Phase 12 Urdu. */
+/** Phase 10 Screen 7 — UI copy via i18n (admin namespace). */
+import i18n from '@/lib/i18n';
+
+const t = (key: string) => i18n.t(key, { ns: 'admin' });
+
 export const STATUS_COPY = {
-  title: "System status",
-  subtitle: "Integrations, reminders, failed notifications",
-  adminHub: "Admin hub",
-  loading: "Loading…",
-  mode: "Mode",
-  integrations: "Integrations",
-  integration: "Integration",
-  status: "Status",
-  active: "active",
-  inactive: "inactive",
-  lastReminder: "Last reminder job run",
-  noReminder: "No reminder_runs rows yet.",
-  kind: "Kind",
-  when: "When",
-  failedTitle: "Recent failed notifications",
-  failedHint: "From notification_deliveries (Phase 1 delivery log).",
-  noFailed: "No failed deliveries.",
-  channel: "Channel",
-  user: "User",
-  detail: "Detail",
-  loadError: "Could not load system status",
+  get title() {
+    return t('statusTitle');
+  },
+  get subtitle() {
+    return t('statusSubtitle');
+  },
+  get adminHub() {
+    return t('adminHub');
+  },
+  get loading() {
+    return t('loading');
+  },
+  get mode() {
+    return t('mode');
+  },
+  get integrations() {
+    return t('integrations');
+  },
+  get integration() {
+    return t('integration');
+  },
+  get status() {
+    return t('statusCol');
+  },
+  get active() {
+    return t('activeLower');
+  },
+  get inactive() {
+    return t('inactiveLower');
+  },
+  get lastReminder() {
+    return t('lastReminder');
+  },
+  get noReminder() {
+    return t('noReminder');
+  },
+  get kind() {
+    return t('kind');
+  },
+  get when() {
+    return t('when');
+  },
+  get failedTitle() {
+    return t('failedTitle');
+  },
+  get failedHint() {
+    return t('failedHint');
+  },
+  get noFailed() {
+    return t('noFailed');
+  },
+  get channel() {
+    return t('channel');
+  },
+  get user() {
+    return t('user');
+  },
+  get detail() {
+    return t('detail');
+  },
+  get loadError() {
+    return t('statusLoadError');
+  },
 } as const;

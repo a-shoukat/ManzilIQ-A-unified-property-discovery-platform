@@ -10,6 +10,7 @@ import enBooking from '@/locales/en/booking.json';
 import enPayments from '@/locales/en/payments.json';
 import enLegal from '@/locales/en/legal.json';
 import enAdmin from '@/locales/en/admin.json';
+import enInquiries from '@/locales/en/inquiries.json';
 import enNotifications from '@/locales/en/notifications.json';
 import enErrors from '@/locales/en/errors.json';
 import enValidation from '@/locales/en/validation.json';
@@ -23,6 +24,7 @@ import urBooking from '@/locales/ur/booking.json';
 import urPayments from '@/locales/ur/payments.json';
 import urLegal from '@/locales/ur/legal.json';
 import urAdmin from '@/locales/ur/admin.json';
+import urInquiries from '@/locales/ur/inquiries.json';
 import urNotifications from '@/locales/ur/notifications.json';
 import urErrors from '@/locales/ur/errors.json';
 import urValidation from '@/locales/ur/validation.json';
@@ -42,6 +44,7 @@ export const NAMESPACES = [
   'payments',
   'legal',
   'admin',
+  'inquiries',
   'notifications',
   'errors',
   'validation',
@@ -60,6 +63,7 @@ const resources = {
     payments: enPayments,
     legal: enLegal,
     admin: enAdmin,
+    inquiries: enInquiries,
     notifications: enNotifications,
     errors: enErrors,
     validation: enValidation,
@@ -74,6 +78,7 @@ const resources = {
     payments: urPayments,
     legal: urLegal,
     admin: urAdmin,
+    inquiries: urInquiries,
     notifications: urNotifications,
     errors: urErrors,
     validation: urValidation,

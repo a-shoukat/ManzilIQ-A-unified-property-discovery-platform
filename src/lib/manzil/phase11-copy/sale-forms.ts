@@ -1,59 +1,173 @@
-/** Phase 11 dealer sale forms — isolatable app chrome for Phase 12 Urdu.
+/** Phase 11 dealer sale forms — app chrome via i18n (dealer namespace).
  * Printed form field labels stay hard-coded Urdu in DealerSaleFormSheet. */
+import i18n from '@/lib/i18n';
+
+const t = (key: string) => i18n.t(key, { ns: 'dealer' });
+
 export const SALE_FORMS_COPY = {
-  settingsTitle: "Sale form settings",
-  settingsSubtitle: "Header branding for Urdu sale receipts",
-  formsTitle: "Sale forms",
-  formsSubtitle: "Draft, issue, share, and print booking receipts",
-  newForm: "New form",
-  formSettings: "Form settings",
-  dealerHub: "Dealer workspace",
-  leads: "Leads",
-  save: "Save",
-  saving: "Saving…",
-  saved: "Saved",
-  reset: "Reset to default",
-  uploadLogo: "Upload logo",
-  removeLogo: "Remove logo",
-  livePreview: "Live preview",
-  loading: "Loading…",
-  empty: "No sale forms yet.",
-  emptyFilter: "No forms match this filter.",
-  search: "Search buyer or serial",
-  statusAll: "All",
-  statusDraft: "Draft",
-  statusIssued: "Issued",
-  statusCancelled: "Cancelled",
-  create: "Create draft",
-  open: "Open",
-  duplicate: "Duplicate",
-  cancel: "Cancel form",
-  issue: "Issue form",
-  issuing: "Issuing…",
-  issued: "Form issued",
-  locked: "Issued forms are locked — duplicate to edit.",
-  editedFlag: "edited",
-  downloadPdf: "Download PDF",
-  downloadPng: "Download PNG",
-  printA5: "Print A5",
-  printA4: "Print A4",
-  share: "Share",
-  copyLink: "Copy link",
-  linkCopied: "Link copied",
-  whatsapp: "WhatsApp",
-  revokeLink: "Revoke link",
-  regenerateLink: "Regenerate link",
-  revoked: "Share link revoked",
-  loadError: "Could not load sale forms",
-  saveError: "Could not save",
-  issueError: "Could not issue form",
-  cancelError: "Could not cancel form",
-  logoError: "Could not upload logo",
-  publicUnavailableTitle: "Link unavailable",
-  publicUnavailableBody: "This share link is not available.",
-  publicLoading: "Loading…",
-  publicReadOnly: "Public sale receipt · read-only",
-  verifiedNote: "تصدیق شدہ از ڈیلر — Verified by dealer",
-  generateForm: "Generate Form",
-  nextSerialHint: "Next serial must be greater than the highest issued serial.",
+  get settingsTitle() {
+    return t('saleFormsSettingsTitle');
+  },
+  get settingsSubtitle() {
+    return t('saleFormsSettingsSubtitle');
+  },
+  get formsTitle() {
+    return t('saleFormsTitle');
+  },
+  get formsSubtitle() {
+    return t('saleFormsSubtitle');
+  },
+  get newForm() {
+    return t('saleFormsNew');
+  },
+  get formSettings() {
+    return t('saleFormsFormSettings');
+  },
+  get dealerHub() {
+    return t('saleFormsDealerHub');
+  },
+  get leads() {
+    return t('saleFormsLeads');
+  },
+  get save() {
+    return t('saleFormsSave');
+  },
+  get saving() {
+    return t('saleFormsSaving');
+  },
+  get saved() {
+    return t('saleFormsSaved');
+  },
+  get reset() {
+    return t('saleFormsReset');
+  },
+  get uploadLogo() {
+    return t('saleFormsUploadLogo');
+  },
+  get removeLogo() {
+    return t('saleFormsRemoveLogo');
+  },
+  get livePreview() {
+    return t('saleFormsLivePreview');
+  },
+  get loading() {
+    return t('saleFormsLoading');
+  },
+  get empty() {
+    return t('saleFormsEmpty');
+  },
+  get emptyFilter() {
+    return t('saleFormsEmptyFilter');
+  },
+  get search() {
+    return t('saleFormsSearch');
+  },
+  get statusAll() {
+    return t('saleFormsStatusAll');
+  },
+  get statusDraft() {
+    return t('saleFormsStatusDraft');
+  },
+  get statusIssued() {
+    return t('saleFormsStatusIssued');
+  },
+  get statusCancelled() {
+    return t('saleFormsStatusCancelled');
+  },
+  get create() {
+    return t('saleFormsCreate');
+  },
+  get open() {
+    return t('saleFormsOpen');
+  },
+  get duplicate() {
+    return t('saleFormsDuplicate');
+  },
+  get cancel() {
+    return t('saleFormsCancel');
+  },
+  get issue() {
+    return t('saleFormsIssue');
+  },
+  get issuing() {
+    return t('saleFormsIssuing');
+  },
+  get issued() {
+    return t('saleFormsIssued');
+  },
+  get locked() {
+    return t('saleFormsLocked');
+  },
+  get editedFlag() {
+    return t('saleFormsEditedFlag');
+  },
+  get downloadPdf() {
+    return t('saleFormsDownloadPdf');
+  },
+  get downloadPng() {
+    return t('saleFormsDownloadPng');
+  },
+  get printA5() {
+    return t('saleFormsPrintA5');
+  },
+  get printA4() {
+    return t('saleFormsPrintA4');
+  },
+  get share() {
+    return t('saleFormsShare');
+  },
+  get copyLink() {
+    return t('saleFormsCopyLink');
+  },
+  get linkCopied() {
+    return t('saleFormsLinkCopied');
+  },
+  get whatsapp() {
+    return t('saleFormsWhatsapp');
+  },
+  get revokeLink() {
+    return t('saleFormsRevokeLink');
+  },
+  get regenerateLink() {
+    return t('saleFormsRegenerateLink');
+  },
+  get revoked() {
+    return t('saleFormsRevoked');
+  },
+  get loadError() {
+    return t('saleFormsLoadError');
+  },
+  get saveError() {
+    return t('saleFormsSaveError');
+  },
+  get issueError() {
+    return t('saleFormsIssueError');
+  },
+  get cancelError() {
+    return t('saleFormsCancelError');
+  },
+  get logoError() {
+    return t('saleFormsLogoError');
+  },
+  get publicUnavailableTitle() {
+    return t('saleFormsPublicUnavailableTitle');
+  },
+  get publicUnavailableBody() {
+    return t('saleFormsPublicUnavailableBody');
+  },
+  get publicLoading() {
+    return t('saleFormsPublicLoading');
+  },
+  get publicReadOnly() {
+    return t('saleFormsPublicReadOnly');
+  },
+  get verifiedNote() {
+    return t('saleFormsVerifiedNote');
+  },
+  get generateForm() {
+    return t('saleFormsGenerateForm');
+  },
+  get nextSerialHint() {
+    return t('saleFormsNextSerialHint');
+  },
 } as const;

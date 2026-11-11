@@ -1,27 +1,77 @@
-/** Phase 10 Screen 6 — isolatable copy for Phase 12 Urdu. */
+/** Phase 10 Screen 6 — UI copy via i18n (payments namespace). */
+import i18n from '@/lib/i18n';
+
+const t = (key: string, opts?: Record<string, unknown>) =>
+  i18n.t(key, { ns: 'payments', ...(opts ?? {}) });
+
 export const PAYMENTS_COPY = {
-  buyerTitle: "Payment history & receipts",
-  societyTitle: "Society payment history",
-  subtitle: "Gateway references, receipts, verification",
-  myPayments: "My payments",
-  financials: "Financials",
-  dashboard: "Dashboard",
-  skipNote:
-    "Existing /my-payments and society financials screens were not modified. Receipts use generatePaymentReceiptPdf (HTML print-to-PDF, Vercel-safe).",
-  loading: "Loading…",
-  empty: "No payment transactions yet.",
-  booking: "Booking",
-  installment: "Installment",
-  amount: "Amount",
-  status: "Status",
-  gatewayRef: "Gateway ref",
-  downloadPdf: "Download PDF receipt",
-  downloading: "Preparing…",
-  verifyReceipt: "Verify receipt",
-  verificationHash: "Verification hash",
-  checkHash: "Check hash",
-  verifiedOk: "Receipt verified — hash matches.",
-  verifiedFail: "Verification failed — hash does not match this payment.",
-  loadError: "Could not load payment history",
-  pdfError: "Could not generate receipt",
+  get buyerTitle() {
+    return t('historyBuyerTitle');
+  },
+  get societyTitle() {
+    return t('historySocietyTitle');
+  },
+  get subtitle() {
+    return t('historySubtitle');
+  },
+  get myPayments() {
+    return t('myPayments');
+  },
+  get financials() {
+    return t('financials');
+  },
+  get dashboard() {
+    return t('dashboard');
+  },
+  get skipNote() {
+    return t('skipNote');
+  },
+  get loading() {
+    return t('loading');
+  },
+  get empty() {
+    return t('emptyHistory');
+  },
+  get booking() {
+    return t('booking');
+  },
+  get installment() {
+    return t('installment');
+  },
+  get amount() {
+    return t('amount');
+  },
+  get status() {
+    return t('status');
+  },
+  get gatewayRef() {
+    return t('gatewayRef');
+  },
+  get downloadPdf() {
+    return t('downloadPdf');
+  },
+  get downloading() {
+    return t('downloading');
+  },
+  get verifyReceipt() {
+    return t('verifyReceipt');
+  },
+  get verificationHash() {
+    return t('verificationHash');
+  },
+  get checkHash() {
+    return t('checkHash');
+  },
+  get verifiedOk() {
+    return t('verifiedOk');
+  },
+  get verifiedFail() {
+    return t('verifiedFail');
+  },
+  get loadError() {
+    return t('loadError');
+  },
+  get pdfError() {
+    return t('pdfError');
+  },
 } as const;
