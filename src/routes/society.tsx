@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { createFileRoute } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/manzil/auth';
@@ -25,20 +26,21 @@ export function useSocietyId(): { societyId: string | null; societies: { id: str
 }
 
 function SocietyHub({ onNavigate }: { onNavigate: (p: string) => void }) {
+  const { t } = useTranslation('society');
   const cards = [
-    { page: 'society-inventory', title: 'Plot Inventory', desc: 'CSV upload, manual entry, block grouping, edit / delete' },
-    { page: 'society-map', title: 'Interactive Plot Map', desc: 'Color-coded availability, block switcher, zoom' },
-    { page: 'society-dealers', title: 'Dealer Management', desc: 'Join requests, lot assignment, commission, revoke' },
+    { page: 'society-inventory', titleKey: 'inventoryCard', descKey: 'inventoryDesc' },
+    { page: 'society-map', titleKey: 'mapTitle', descKey: 'mapDesc' },
+    { page: 'society-dealers', titleKey: 'dealersTitle', descKey: 'dealersDesc' },
   ];
   return (
     <div className="container">
-      <h1>Society portal</h1>
-      <p className="muted">Manage inventory, map and dealers</p>
+      <h1>{t('hubTitle')}</h1>
+      <p className="muted">{t('hubSubtitle')}</p>
       <div className="hub-grid">
         {cards.map((c) => (
           <Button variant="legacy" key={c.page} className="hub-card" onClick={() => onNavigate(c.page)}>
-            <strong>{c.title}</strong>
-            <span className="muted small">{c.desc}</span>
+            <strong>{t(c.titleKey)}</strong>
+            <span className="muted small">{t(c.descKey)}</span>
           </Button>
         ))}
       </div>

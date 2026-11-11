@@ -10,6 +10,7 @@ import {
   type ReminderRunSummary,
 } from '@/lib/manzil/system-status';
 import type { BackendHealth } from '@/lib/manzil/features';
+import { STATUS_COPY as C } from '@/lib/manzil/phase10-copy/status';
 
 /** Screen 7 — Admin system status (Phase 0 health + recent failures). */
 function AdminStatus({ onNavigate }: { onNavigate: (p: string) => void }) {
@@ -27,7 +28,7 @@ function AdminStatus({ onNavigate }: { onNavigate: (p: string) => void }) {
         setLastReminder(s.lastReminder);
         setFailed(s.failedNotifications);
       })
-      .catch((e) => setError(errorText(e, 'Could not load system status')))
+      .catch((e) => setError(errorText(e, C.loadError)))
       .finally(() => setLoading(false));
   }, []);
 
@@ -35,21 +36,21 @@ function AdminStatus({ onNavigate }: { onNavigate: (p: string) => void }) {
     <div className="container">
       <div className="topbar">
         <div>
-          <h1>System status</h1>
-          <p className="muted" style={{ margin: 0 }}>Integrations, reminders, failed notifications</p>
+          <h1>{C.title}</h1>
+          <p className="muted" style={{ margin: 0 }}>{C.subtitle}</p>
         </div>
         <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('admin')}>
-          Admin hub
+          {C.adminHub}
         </Button>
       </div>
 
       {error && <div className="error" role="alert">{error}</div>}
       {loading || !health ? (
-        <p className="muted">Loading…</p>
+        <p className="muted">{C.loading}</p>
       ) : (
         <>
           <div className="notice" style={{ marginBottom: 12 }}>
-            Mode: <strong>{health.mode}</strong>
+            {C.mode}: <strong>{health.mode}</strong>
             {health.notes.length > 0 && (
               <ul style={{ margin: '8px 0 0', paddingLeft: 18 }}>
                 {health.notes.map((n) => (
@@ -60,13 +61,13 @@ function AdminStatus({ onNavigate }: { onNavigate: (p: string) => void }) {
           </div>
 
           <div className="card" style={{ marginBottom: 16 }}>
-            <h3>Integrations</h3>
+            <h3>{C.integrations}</h3>
             <div className="table-wrap">
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>Integration</th>
-                    <th>Status</th>
+                    <th>{C.integration}</th>
+                    <th>{C.status}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -74,7 +75,7 @@ function AdminStatus({ onNavigate }: { onNavigate: (p: string) => void }) {
                     <tr key={r.key}>
                       <td>{r.label}</td>
                       <td>
-                        <span className={`badge ${r.on ? 'ok' : 'warn'}`}>{r.on ? 'active' : 'inactive'}</span>
+                        <span className={`badge ${r.on ? 'ok' : 'warn'}`}>{r.on ? C.active : C.inactive}</span>
                       </td>
                     </tr>
                   ))}
@@ -84,21 +85,21 @@ function AdminStatus({ onNavigate }: { onNavigate: (p: string) => void }) {
           </div>
 
           <div className="card" style={{ marginBottom: 16 }}>
-            <h3>Last reminder job run</h3>
+            <h3>{C.lastReminder}</h3>
             {!lastReminder ? (
-              <p className="muted">No reminder_runs rows yet.</p>
+              <p className="muted">{C.noReminder}</p>
             ) : (
               <div className="detail-grid">
                 <div className="detail-item">
-                  <span className="detail-key">Kind</span>
+                  <span className="detail-key">{C.kind}</span>
                   <span>{lastReminder.kind}</span>
                 </div>
                 <div className="detail-item">
-                  <span className="detail-key">Status</span>
+                  <span className="detail-key">{C.status}</span>
                   <span>{lastReminder.status}</span>
                 </div>
                 <div className="detail-item">
-                  <span className="detail-key">When</span>
+                  <span className="detail-key">{C.when}</span>
                   <span>{new Date(lastReminder.created_at).toLocaleString()}</span>
                 </div>
               </div>
@@ -106,19 +107,19 @@ function AdminStatus({ onNavigate }: { onNavigate: (p: string) => void }) {
           </div>
 
           <div className="card">
-            <h3>Recent failed notifications</h3>
-            <p className="muted small">From notification_deliveries (Phase 1 delivery log).</p>
+            <h3>{C.failedTitle}</h3>
+            <p className="muted small">{C.failedHint}</p>
             {failed.length === 0 ? (
-              <p className="muted">No failed deliveries.</p>
+              <p className="muted">{C.noFailed}</p>
             ) : (
               <div className="table-wrap">
                 <table className="data-table">
                   <thead>
                     <tr>
-                      <th>When</th>
-                      <th>Channel</th>
-                      <th>User</th>
-                      <th>Detail</th>
+                      <th>{C.when}</th>
+                      <th>{C.channel}</th>
+                      <th>{C.user}</th>
+                      <th>{C.detail}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -142,7 +143,7 @@ function AdminStatus({ onNavigate }: { onNavigate: (p: string) => void }) {
 }
 
 export const Route = createFileRoute('/admin-status')({
-  head: () => pageHead('System status'),
+  head: () => pageHead(C.title),
   component: RoutePage,
 });
 function RoutePage() {

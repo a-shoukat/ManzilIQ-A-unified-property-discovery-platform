@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 import { dealerLabel } from '@/lib/manzil/booking-rules';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
@@ -12,6 +13,7 @@ import { INSTALLMENT_PLANS, type Booking } from '@/lib/manzil/types';
 
 /** WBS: Customer Portal — Booking Flow (6 features) */
 function BookPlot({ onNavigate }: { onNavigate: (p: string) => void }) {
+  const { t } = useTranslation(['booking', 'common']);
   const { session } = useAuth();
   const [step, setStep] = useState(1);
   const [societies, setSocieties] = useState<{ id: string; name: string }[]>([]);
@@ -81,7 +83,7 @@ function BookPlot({ onNavigate }: { onNavigate: (p: string) => void }) {
     <div className="container">
       <div className="card wide">
         <div className="topbar">
-          <h1 style={{ margin: 0 }}>Book a plot</h1>
+          <h1 style={{ margin: 0 }}>{t('booking:title')}</h1>
           <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('dashboard')}>Dashboard</Button>
         </div>
 

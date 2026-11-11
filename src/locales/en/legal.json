@@ -1,0 +1,21 @@
+{
+  "title": "Documents",
+  "subtitle": "Legal locker, generation and signatures",
+  "generate": "Generate document",
+  "saleAgreement": "Sale agreement",
+  "allotmentLetter": "Allotment letter",
+  "transferDeed": "Transfer deed",
+  "noc": "NOC",
+  "cancellation": "Cancellation",
+  "receipt": "Receipt",
+  "view": "View",
+  "downloadPdf": "Download PDF",
+  "sign": "Sign",
+  "signatures": "Signatures",
+  "noDocuments": "No documents yet.",
+  "allowPopups": "Allow pop-ups to save the PDF.",
+  "selectBooking": "Select booking",
+  "docType": "Document type",
+  "generated": "Document generated",
+  "watermarkDraft": "DRAFT"
+}

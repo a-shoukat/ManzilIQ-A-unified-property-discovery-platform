@@ -7,6 +7,13 @@ import { DEFAULT_SITE_CONTENT, contentMap } from "@/lib/manzil/cms";
 import { prefsSchema, DEFAULT_PREFS } from "@/lib/manzil/notification-prefs";
 import { integrationRows } from "@/lib/manzil/system-status";
 import type { BackendHealth } from "@/lib/manzil/features";
+import { INQUIRY_COPY } from "@/lib/manzil/phase10-copy/inquiries";
+import { NOTIF_PREFS_COPY } from "@/lib/manzil/phase10-copy/notifications";
+import { MODERATION_COPY } from "@/lib/manzil/phase10-copy/moderation";
+import { CMS_COPY } from "@/lib/manzil/phase10-copy/cms";
+import { AUDIT_COPY } from "@/lib/manzil/phase10-copy/audit";
+import { PAYMENTS_COPY } from "@/lib/manzil/phase10-copy/payments";
+import { STATUS_COPY } from "@/lib/manzil/phase10-copy/status";
 
 describe("phase 10 access", () => {
   it("guards admin moderation/cms/audit/status to super_admin", () => {
@@ -86,6 +93,20 @@ describe("moderation / cms / prefs schemas", () => {
   });
   it("validates notification prefs", () => {
     expect(prefsSchema.safeParse(DEFAULT_PREFS).success).toBe(true);
+  });
+});
+
+describe("phase 10 copy isolation", () => {
+  it("exposes isolatable strings per screen via i18n keys", async () => {
+    const { initI18n } = await import("@/lib/i18n");
+    initI18n("en");
+    expect(INQUIRY_COPY.myTitle.length).toBeGreaterThan(0);
+    expect(NOTIF_PREFS_COPY.title.length).toBeGreaterThan(0);
+    expect(MODERATION_COPY.title).toContain("moderation");
+    expect(CMS_COPY.title).toContain("CMS");
+    expect(AUDIT_COPY.title).toContain("Audit");
+    expect(PAYMENTS_COPY.skipNote).toMatch(/PDF/);
+    expect(STATUS_COPY.title).toContain("status");
   });
 });
 

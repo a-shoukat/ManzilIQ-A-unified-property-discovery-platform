@@ -1,21 +1,20 @@
 import { describe, expect, it } from "vitest";
-
-/** Status machine allowed transitions for inquiry CRM (backend contract). */
-const ALLOWED: Record<string, string[]> = {
-  new: ["contacted", "qualified", "closed"],
-  contacted: ["qualified", "converted", "closed"],
-  qualified: ["converted", "closed"],
-  converted: ["closed"],
-  closed: [],
-};
-
-function canTransition(from: string, to: string): boolean {
-  return (ALLOWED[from] ?? []).includes(to);
-}
+import { canTransitionInquiryStatus, INQUIRY_STATUS_VALUES } from "@/lib/manzil/inquiry-status";
 
 describe("inquiry status machine", () => {
-  it("new → contacted", () => expect(canTransition("new", "contacted")).toBe(true));
-  it("new → converted blocked", () => expect(canTransition("new", "converted")).toBe(false));
-  it("qualified → converted", () => expect(canTransition("qualified", "converted")).toBe(true));
-  it("closed is terminal", () => expect(canTransition("closed", "new")).toBe(false));
+  it("includes viewing and negotiating", () => {
+    expect(INQUIRY_STATUS_VALUES).toContain("viewing");
+    expect(INQUIRY_STATUS_VALUES).toContain("negotiating");
+  });
+  it("new → contacted", () => expect(canTransitionInquiryStatus("new", "contacted")).toBe(true));
+  it("new → viewing", () => expect(canTransitionInquiryStatus("new", "viewing")).toBe(true));
+  it("new → converted blocked", () =>
+    expect(canTransitionInquiryStatus("new", "converted")).toBe(false));
+  it("contacted → negotiating", () =>
+    expect(canTransitionInquiryStatus("contacted", "negotiating")).toBe(true));
+  it("viewing → negotiating", () =>
+    expect(canTransitionInquiryStatus("viewing", "negotiating")).toBe(true));
+  it("qualified → converted", () =>
+    expect(canTransitionInquiryStatus("qualified", "converted")).toBe(true));
+  it("closed is terminal", () => expect(canTransitionInquiryStatus("closed", "new")).toBe(false));
 });

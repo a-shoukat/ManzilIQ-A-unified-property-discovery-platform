@@ -1,28 +1,30 @@
 import { Button } from '@/components/ui/button';
 import { createFileRoute } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
 function AdminHub({ onNavigate }: { onNavigate: (p: string) => void }) {
+  const { t } = useTranslation('admin');
   const cards = [
-    { page: 'admin-verification', title: 'Verification Queue', desc: 'Societies & dealers (v2)' },
-    { page: 'admin-moderation', title: 'Listing moderation', desc: 'Approve / reject pending listings' },
-    { page: 'admin-cms', title: 'Homepage CMS', desc: 'Banners & site content' },
-    { page: 'admin-audit', title: 'Audit log', desc: 'Filterable platform audit trail' },
-    { page: 'admin-status', title: 'System status', desc: 'Integrations & failed notifications' },
-    { page: 'admin-bookings', title: 'Bookings', desc: 'All booking requests (v7)' },
-    { page: 'admin-disputes', title: 'Dispute Management', desc: 'Flagged transactions, mediation, freeze plots' },
-    { page: 'admin-templates', title: 'Legal Templates', desc: 'Allotment, sale agreement, transfer deed' },
-    { page: 'admin-analytics', title: 'Platform Analytics', desc: 'GMV, users, plots, growth' },
-    { page: 'broadcast', title: 'Broadcast', desc: 'Announcements (v10)' },
+    { page: 'admin-verification', titleKey: 'verificationQueue', descKey: 'verificationDesc' },
+    { page: 'admin-moderation', titleKey: 'moderation', descKey: 'moderationDesc' },
+    { page: 'admin-cms', titleKey: 'cms', descKey: 'cmsDesc' },
+    { page: 'admin-audit', titleKey: 'audit', descKey: 'auditDesc' },
+    { page: 'admin-status', titleKey: 'status', descKey: 'statusDesc' },
+    { page: 'admin-bookings', titleKey: 'bookings', descKey: 'bookingsDesc' },
+    { page: 'admin-disputes', titleKey: 'disputes', descKey: 'disputesDesc' },
+    { page: 'admin-templates', titleKey: 'templates', descKey: 'templatesDesc' },
+    { page: 'admin-analytics', titleKey: 'analytics', descKey: 'analyticsDesc' },
+    { page: 'broadcast', titleKey: 'broadcastTitle', descKey: 'broadcastDesc' },
   ];
   return (
     <div className="container">
-      <h1>Admin panel</h1>
-      <p className="muted">Platform control center</p>
+      <h1>{t('panelTitle')}</h1>
+      <p className="muted">{t('panelSubtitle')}</p>
       <div className="hub-grid">
         {cards.map((c) => (
           <Button variant="legacy" key={c.page} className="hub-card" onClick={() => onNavigate(c.page)}>
-            <strong>{c.title}</strong>
-            <span className="muted small">{c.desc}</span>
+            <strong>{t(c.titleKey)}</strong>
+            <span className="muted small">{t(c.descKey)}</span>
           </Button>
         ))}
       </div>

@@ -9,6 +9,8 @@ export interface Profile {
   verification_status: VerificationStatus;
   rejection_reason?: string | null;
   full_name?: string | null;
+  /** 'en' | 'ur' — optional until migration applied */
+  preferred_language?: 'en' | 'ur' | null;
   created_at: string;
 }
 
@@ -135,6 +137,7 @@ export interface Lead {
   created_at: string;
   plot_label?: string;
   booking_stage?: number;
+  booking_id?: string | null;
 }
 
 export interface LeadActivity {

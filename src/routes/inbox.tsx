@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { createFileRoute } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/manzil/auth';
@@ -7,9 +8,13 @@ import { calcLateFee, fetchMyPayments } from '@/lib/manzil/payment';
 import { fetchInbox, markAllRead, markRead } from '@/lib/manzil/notify';
 import { formatPrice } from '@/lib/manzil/properties';
 import type { Notification } from '@/lib/manzil/types';
+import { formatAppDate } from '@/lib/i18n';
+import { useLanguage } from '@/lib/i18n/LanguageProvider';
 
 /** Module 9 — Notification inbox + due reminders */
 function Inbox({ onNavigate }: { onNavigate: (p: string) => void }) {
+  const { t } = useTranslation(['notifications', 'common', 'auth']);
+  const { language } = useLanguage();
   const { session } = useAuth();
   const [items, setItems] = useState<Notification[]>([]);
   const [reminders, setReminders] = useState<string[]>([]);
@@ -23,7 +28,6 @@ function Inbox({ onNavigate }: { onNavigate: (p: string) => void }) {
       fetchMyPayments(session.user.id),
     ]);
     setItems(inbox);
-    // trigger: payment due reminders (3 days) + late alerts — computed live
     const now = new Date();
     const soon = new Date();
     soon.setDate(soon.getDate() + 3);
@@ -32,9 +36,9 @@ function Inbox({ onNavigate }: { onNavigate: (p: string) => void }) {
       if (p.status !== 'pending' || !p.due_date) continue;
       const due = new Date(p.due_date);
       if (due < now) {
-        r.push(`⚠️ Late: ${p.label} — ${formatPrice(p.amount + calcLateFee(p))} (incl. late fee)`);
+        r.push(t('notifications:lateAlert', { label: p.label, amount: formatPrice(p.amount + calcLateFee(p)) }));
       } else if (due <= soon) {
-        r.push(`⏰ Due in 3 days: ${p.label} — ${formatPrice(p.amount)} (due ${p.due_date})`);
+        r.push(t('notifications:dueSoon', { label: p.label, amount: formatPrice(p.amount), date: p.due_date }));
       }
     }
     setReminders(r);
@@ -44,7 +48,7 @@ function Inbox({ onNavigate }: { onNavigate: (p: string) => void }) {
   useEffect(() => {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [language]);
 
   const read = async (id: string) => {
     await markRead(id);
@@ -55,8 +59,8 @@ function Inbox({ onNavigate }: { onNavigate: (p: string) => void }) {
     <div className="container">
       <div className="topbar">
         <div>
-          <h1>Inbox</h1>
-          <p className="muted" style={{ margin: 0 }}>Notifications & reminders</p>
+          <h1>{t('notifications:inboxTitle')}</h1>
+          <p className="muted" style={{ margin: 0 }}>{t('notifications:reminders')}</p>
         </div>
         <div className="link-row" style={{ margin: 0 }}>
           {items.some((n) => !n.read) && (
@@ -69,10 +73,10 @@ function Inbox({ onNavigate }: { onNavigate: (p: string) => void }) {
                 }
               }}
             >
-              Mark all read
+              {t('notifications:markAllRead')}
             </Button>
           )}
-          <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('dashboard')}>Dashboard</Button>
+          <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('dashboard')}>{t('common:dashboard')}</Button>
         </div>
       </div>
 
@@ -82,20 +86,20 @@ function Inbox({ onNavigate }: { onNavigate: (p: string) => void }) {
         </div>
       )}
 
-      {loading ? <p className="muted">Loading…</p> : items.length === 0 && reminders.length === 0 ? (
-        <p className="muted">No notifications yet.</p>
+      {loading ? <p className="muted">{t('auth:loadingEllipsis')}</p> : items.length === 0 && reminders.length === 0 ? (
+        <p className="muted">{t('notifications:empty')}</p>
       ) : (
         items.map((n) => (
           <div key={n.id} className={`queue-card${n.read ? ' read-dim' : ''}`}>
             <div className="queue-head">
               <div>
                 <strong>{n.title}</strong>
-                <div className="muted small">{new Date(n.created_at).toLocaleString()}</div>
+                <div className="muted small">{formatAppDate(n.created_at, language, { dateStyle: 'medium', timeStyle: 'short' })}</div>
                 {n.body && <p style={{ margin: '8px 0 0' }}>{n.body}</p>}
               </div>
               {!n.read && (
                 <Button variant="legacy" className="btn secondary small" onClick={() => read(n.id)}>
-                  Mark read
+                  {t('notifications:markRead')}
                 </Button>
               )}
             </div>

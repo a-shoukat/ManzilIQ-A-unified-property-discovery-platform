@@ -3,6 +3,7 @@ import { requestCancellation } from '@/lib/manzil/phase3';
 import { toast } from 'sonner';
 import { errorText } from '@/lib/manzil/errors';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
 import { useEffect, useState } from 'react';
@@ -12,6 +13,7 @@ import { formatPrice } from '@/lib/manzil/properties';
 import type { Booking } from '@/lib/manzil/types';
 
 export function BookingCard({ b, actions }: { b: Booking; actions?: React.ReactNode }) {
+  const { t } = useTranslation(['booking', 'common']);
   return (
     <div className="queue-card">
       <div className="queue-head">
@@ -20,7 +22,7 @@ export function BookingCard({ b, actions }: { b: Booking; actions?: React.ReactN
           <div className="booking-chips">
             {b.plot_no ? (
               <>
-                <span className="booking-chip booking-chip-plot">Plot {b.plot_no}</span>
+                <span className="booking-chip booking-chip-plot">{t('common:plot')} {b.plot_no}</span>
                 {b.plot_block && <span className="booking-chip">Block {b.plot_block}</span>}
                 {b.society_name && <span className="booking-chip">{b.society_name}</span>}
               </>
@@ -63,6 +65,7 @@ function CancelControls({ b, onNavigate }: { b: Booking; onNavigate: (p: string)
 }
 
 function MyBookings({ onNavigate }: { onNavigate: (p: string) => void }) {
+  const { t } = useTranslation(['booking', 'common']);
   const { session } = useAuth();
   const [list, setList] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
@@ -75,7 +78,7 @@ function MyBookings({ onNavigate }: { onNavigate: (p: string) => void }) {
     <div className="container">
       <div className="topbar">
         <div>
-          <h1>My bookings</h1>
+          <h1>{t('booking:myBookings')}</h1>
           <p className="muted" style={{ margin: 0 }}>{list.length} bookings</p>
         </div>
         <div className="link-row" style={{ margin: 0 }}>

@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { getSupabase } from "./supabase";
 import { uploadDocument, getDocumentUrl } from "./storage";
+import {
+  BUILTIN_RESIDENCE_PATH,
+  DEFAULT_BANNER_ID,
+  HARDCODED_HOMEPAGE_CONTENT,
+} from "./homepage-cms";
 
 export const bannerSchema = z.object({
   title: z.string().trim().min(1, "Title required").max(120),
@@ -108,10 +113,24 @@ export async function upsertSiteContent(key: string, value: string): Promise<voi
   if (error) throw error;
 }
 
+/** Restore seeded homepage defaults (content keys + default hero banner). */
 export async function resetSiteContentToDefault(): Promise<void> {
   for (const [key, value] of Object.entries(DEFAULT_SITE_CONTENT)) {
     await upsertSiteContent(key, value);
   }
+  const sb = getSupabase();
+  if (!sb) return;
+  const { error } = await sb.from("site_banners").upsert({
+    id: DEFAULT_BANNER_ID,
+    title: HARDCODED_HOMEPAGE_CONTENT["hero_title"],
+    subtitle: HARDCODED_HOMEPAGE_CONTENT["hero_subtitle"],
+    image_path: BUILTIN_RESIDENCE_PATH,
+    href: null,
+    sort_order: 0,
+    active: true,
+    updated_at: new Date().toISOString(),
+  });
+  if (error) throw error;
 }
 
 export async function bannerImageUrl(path: string | null): Promise<string | null> {

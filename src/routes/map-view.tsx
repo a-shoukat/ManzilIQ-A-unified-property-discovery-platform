@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { PageFrame, useAppNavigation, pageHead } from "@/components/manzil/PageFrame";
 import { useEffect, useState } from "react";
 import { fetchPlots } from "@/lib/manzil/society";
@@ -18,6 +19,7 @@ const STATUS_COLOR: Record<Plot["status"], string> = {
 
 /** WBS: Customer Portal — Interactive Map View (5 features) */
 function MapView({ onNavigate }: { onNavigate: (p: string) => void }) {
+  const { t } = useTranslation(["marketplace", "common"]);
   const [societies, setSocieties] = useState<{ id: string; name: string }[]>([]);
   const [societyId, setSocietyId] = useState("");
   const [plots, setPlots] = useState<Plot[]>([]);
@@ -66,9 +68,9 @@ function MapView({ onNavigate }: { onNavigate: (p: string) => void }) {
     <div className="container">
       <div className="topbar">
         <div>
-          <h1>Society map</h1>
+          <h1>{t("marketplace:mapTitle")}</h1>
           <p className="muted" style={{ margin: 0 }}>
-            Explore plots visually
+            {t("marketplace:mapSubtitle")}
           </p>
         </div>
         <Button
@@ -76,12 +78,12 @@ function MapView({ onNavigate }: { onNavigate: (p: string) => void }) {
           className="btn secondary small"
           onClick={() => onNavigate("marketplace")}
         >
-          Marketplace
+          {t("common:marketplace")}
         </Button>
       </div>
 
       <div className="filters" style={{ gridTemplateColumns: "2fr 1fr 1fr 1fr" }}>
-        <select value={societyId} onChange={(e) => setSocietyId(e.target.value)}>
+        <select value={societyId} onChange={(e) => setSocietyId(e.target.value)} aria-label={t("marketplace:selectSociety")}>
           {societies.map((s) => (
             <option key={s.id} value={s.id}>
               {s.name}
@@ -89,31 +91,35 @@ function MapView({ onNavigate }: { onNavigate: (p: string) => void }) {
           ))}
         </select>
         <select value={status} onChange={(e) => setStatus(e.target.value)}>
-          <option value="">All statuses</option>
-          <option value="available">Available</option>
-          <option value="reserved">Reserved</option>
-          <option value="sold">Sold</option>
+          <option value="">{t("marketplace:allStatuses")}</option>
+          <option value="available">{t("marketplace:available")}</option>
+          <option value="reserved">{t("marketplace:reserved")}</option>
+          <option value="sold">{t("marketplace:sold")}</option>
         </select>
         <input
           type="number"
-          placeholder="Min Marla"
+          placeholder={t("marketplace:minSize")}
           value={minSize}
           onChange={(e) => setMinSize(e.target.value)}
           style={{ marginTop: 0 }}
+          dir="ltr"
+          className="ltr-isolate"
         />
         <input
           type="number"
-          placeholder="Max Marla"
+          placeholder={t("marketplace:maxSizeMarla")}
           value={maxSize}
           onChange={(e) => setMaxSize(e.target.value)}
           style={{ marginTop: 0 }}
+          dir="ltr"
+          className="ltr-isolate"
         />
       </div>
 
       <PunjabMap />
 
       {loading ? (
-        <p className="muted">Loading…</p>
+        <p className="muted">{t("marketplace:loadingPlots")}</p>
       ) : (
         <>
           <div className="map-toolbar">
@@ -161,7 +167,7 @@ function MapView({ onNavigate }: { onNavigate: (p: string) => void }) {
           </div>
 
           {shown.length === 0 ? (
-            <p className="muted">No plots match your filters.</p>
+            <p className="muted">{t("marketplace:noPlots")}</p>
           ) : (
             <div className="map-grid" style={{ transform: `scale(${zoom})` }}>
               {shown.map((p) => (
