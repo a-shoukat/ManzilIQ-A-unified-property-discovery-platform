@@ -10,6 +10,7 @@ import {
   type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -17,22 +18,28 @@ import { AuthProvider } from "@/lib/manzil/auth";
 import { CompareProvider } from "@/lib/manzil/compare";
 import { SubscriptionProvider } from "@/lib/manzil/subscription";
 import { WishlistProvider } from "@/lib/manzil/wishlist";
+import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
+import { initI18n, readStoredLanguage } from "@/lib/i18n";
+
+// Ensure i18n is ready before first render (client + SSR).
+initI18n(typeof window !== "undefined" ? readStoredLanguage() : "en");
 
 function NotFoundComponent() {
+  const { t } = useTranslation("common");
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">{t("pageNotFound")}</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+          {t("pageNotFoundBody")}
         </p>
         <div className="mt-6">
           <Link
             to="/"
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Go home
+            {t("goHome")}
           </Link>
         </div>
       </div>
@@ -43,6 +50,7 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
+  const { t } = useTranslation("common");
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
@@ -51,10 +59,10 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
+          {t("pageDidntLoad")}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+          {t("somethingWentWrong")}
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -64,13 +72,13 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
             }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Try again
+            {t("tryAgainBtn")}
           </button>
           <a
             href="/"
             className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
           >
-            Go home
+            {t("goHome")}
           </a>
         </div>
       </div>
@@ -94,6 +102,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;500;600;700&display=swap" },
       {
         rel: "stylesheet",
         href: appCss,
@@ -109,7 +118,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" dir="ltr" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
@@ -127,7 +136,18 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <AuthProvider><SubscriptionProvider><CompareProvider><WishlistProvider><Outlet /><Toaster richColors position="top-center" /></WishlistProvider></CompareProvider></SubscriptionProvider></AuthProvider>
+      <AuthProvider>
+        <LanguageProvider>
+          <SubscriptionProvider>
+            <CompareProvider>
+              <WishlistProvider>
+                <Outlet />
+                <Toaster richColors position="top-center" />
+              </WishlistProvider>
+            </CompareProvider>
+          </SubscriptionProvider>
+        </LanguageProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
