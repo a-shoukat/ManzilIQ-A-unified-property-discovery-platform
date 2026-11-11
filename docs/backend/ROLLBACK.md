@@ -12,5 +12,9 @@
 | 7 | Unset Maps key | lat/lng unused |
 | 8 | Revert rate-limit patches | n/a |
 | 9 | Disable CI workflow | n/a |
+| 10 / 10.5 | Revert Phase 10 routes/CMS/receipt wiring | Leave additive tables/columns |
+| 11 | Delete dealer-forms routes/nav/CTA/access; leave tables | Never DROP `dealer_form_settings` / `dealer_sale_forms` / `dealer-logos` |
 
 Feature flags: missing env always prefers mock/demo paths.
+
+Phase 11 detail: `docs/backend/PHASE_11_DEALER_SALE_FORMS.md`.
