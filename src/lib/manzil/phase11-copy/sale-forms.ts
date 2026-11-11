@@ -2,7 +2,8 @@
  * Printed form field labels stay hard-coded Urdu in DealerSaleFormSheet. */
 import i18n from '@/lib/i18n';
 
-const t = (key: string) => i18n.t(key, { ns: 'dealer' });
+const t = (key: string, opts?: Record<string, unknown>) =>
+  i18n.t(key, { ns: 'dealer', ...(opts ?? {}) });
 
 export const SALE_FORMS_COPY = {
   get settingsTitle() {
@@ -17,14 +18,24 @@ export const SALE_FORMS_COPY = {
   get formsSubtitle() {
     return t('saleFormsSubtitle');
   },
+  listSubtitle: (count: number) => t('saleFormsListSubtitle', { count }),
   get newForm() {
     return t('saleFormsNew');
   },
   get formSettings() {
     return t('saleFormsFormSettings');
   },
+  get headerSettings() {
+    return t('saleFormsHeaderSettings');
+  },
   get dealerHub() {
     return t('saleFormsDealerHub');
+  },
+  get portal() {
+    return t('saleFormsPortal');
+  },
+  get formsLink() {
+    return t('saleFormsFormsLink');
   },
   get leads() {
     return t('saleFormsLeads');
@@ -38,8 +49,14 @@ export const SALE_FORMS_COPY = {
   get saved() {
     return t('saleFormsSaved');
   },
+  get settingsSaved() {
+    return t('saleFormsSettingsSaved');
+  },
   get reset() {
     return t('saleFormsReset');
+  },
+  get resetKept() {
+    return t('saleFormsResetKept');
   },
   get uploadLogo() {
     return t('saleFormsUploadLogo');
@@ -47,8 +64,32 @@ export const SALE_FORMS_COPY = {
   get removeLogo() {
     return t('saleFormsRemoveLogo');
   },
+  get logoUploaded() {
+    return t('saleFormsLogoUploaded');
+  },
+  get logoRemoved() {
+    return t('saleFormsLogoRemoved');
+  },
   get livePreview() {
     return t('saleFormsLivePreview');
+  },
+  get liveHeaderPreview() {
+    return t('saleFormsLiveHeaderPreview');
+  },
+  get headerFields() {
+    return t('saleFormsHeaderFields');
+  },
+  get headerBg() {
+    return t('saleFormsHeaderBg');
+  },
+  get accent() {
+    return t('saleFormsAccent');
+  },
+  get nextSerial() {
+    return t('saleFormsNextSerial');
+  },
+  get showManagerSig() {
+    return t('saleFormsShowManagerSig');
   },
   get loading() {
     return t('saleFormsLoading');
@@ -62,6 +103,9 @@ export const SALE_FORMS_COPY = {
   get search() {
     return t('saleFormsSearch');
   },
+  get noPhone() {
+    return t('saleFormsNoPhone');
+  },
   get statusAll() {
     return t('saleFormsStatusAll');
   },
@@ -73,6 +117,13 @@ export const SALE_FORMS_COPY = {
   },
   get statusCancelled() {
     return t('saleFormsStatusCancelled');
+  },
+  statusLabel: (status: string) => {
+    if (status === 'draft') return t('saleFormsStatusDraft');
+    if (status === 'issued') return t('saleFormsStatusIssued');
+    if (status === 'cancelled') return t('saleFormsStatusCancelled');
+    if (status === 'all') return t('saleFormsStatusAll');
+    return status;
   },
   get create() {
     return t('saleFormsCreate');
@@ -137,6 +188,15 @@ export const SALE_FORMS_COPY = {
   get loadError() {
     return t('saleFormsLoadError');
   },
+  get loadFormError() {
+    return t('saleFormsLoadFormError');
+  },
+  get loadSettingsError() {
+    return t('saleFormsLoadSettingsError');
+  },
+  get invalidSettings() {
+    return t('saleFormsInvalidSettings');
+  },
   get saveError() {
     return t('saleFormsSaveError');
   },
@@ -169,5 +229,25 @@ export const SALE_FORMS_COPY = {
   },
   get nextSerialHint() {
     return t('saleFormsNextSerialHint');
+  },
+  get newTitle() {
+    return t('saleFormsNewTitle');
+  },
+  get newFromBooking() {
+    return t('saleFormsNewFromBooking');
+  },
+  get newBlank() {
+    return t('saleFormsNewBlank');
+  },
+  get loadingBooking() {
+    return t('saleFormsLoadingBooking');
+  },
+  detailTitle: (serial: number) => t('saleFormsDetailTitle', { serial }),
+  detailStatus: (status: string) => t('saleFormsStatusLabel', { status }),
+  get notFound() {
+    return t('saleFormsNotFound');
+  },
+  get superAdminReadonly() {
+    return t('saleFormsSuperAdminReadonly');
   },
 } as const;

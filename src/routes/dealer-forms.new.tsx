@@ -1,15 +1,18 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { PageFrame, pageHead, useAppNavigation } from '@/components/manzil/PageFrame';
 import { DealerSaleFormEditor } from '@/components/manzil/DealerSaleFormEditor';
 import { autofillFromBooking, type SaleFormInput } from '@/lib/manzil/dealer-sale-forms';
+import { SALE_FORMS_COPY as C } from '@/lib/manzil/phase11-copy/sale-forms';
 
 const searchSchema = z.object({
   bookingId: z.string().uuid().optional(),
 });
 
 function NewForm() {
+  useTranslation('dealer');
   const onNavigate = useAppNavigation();
   const { bookingId } = Route.useSearch();
   const [initial, setInitial] = useState<Partial<SaleFormInput> | undefined>();
@@ -28,15 +31,15 @@ function NewForm() {
       <div className="container">
         <div className="topbar">
           <div>
-            <h1>New sale / booking form</h1>
+            <h1>{C.newTitle}</h1>
             <p className="muted" style={{ margin: 0 }}>
-              {bookingId ? 'Auto-filled from booking — edit before Issue' : 'Blank draft'}
+              {bookingId ? C.newFromBooking : C.newBlank}
             </p>
           </div>
         </div>
       </div>
       {loading ? (
-        <div className="container"><p className="muted">Loading booking…</p></div>
+        <div className="container"><p className="muted">{C.loadingBooking}</p></div>
       ) : (
         <DealerSaleFormEditor
           {...(initial ? { initial } : {})}

@@ -68,10 +68,14 @@ export const generatePaymentReceiptPdf = createServerFn({ method: "POST" })
     const sb = serviceClient() ?? userClient;
     const { data: profile } = await sb
       .from("profiles")
-      .select("id, role, full_name, email")
+      .select("id, role, full_name, email, preferred_language")
       .eq("id", userId)
       .maybeSingle();
     const role = (profile as { role?: string } | null)?.role ?? "buyer";
+    const preferred =
+      (profile as { preferred_language?: string | null } | null)?.preferred_language === "ur"
+        ? "ur"
+        : "en";
 
     const { data: payRow, error: payErr } = await sb
       .from("payments")
@@ -153,11 +157,13 @@ export const generatePaymentReceiptPdf = createServerFn({ method: "POST" })
       buyerName,
       plotLabel,
       societyName,
+      language: preferred,
       localeLines: {
         en: "Payment receipt",
         ur: "ادائیگی کی رسید — ManzilIQ",
       },
     });
+
 
     return {
       ok: true,

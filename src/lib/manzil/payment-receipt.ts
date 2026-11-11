@@ -13,6 +13,8 @@ export type ReceiptContext = {
   buyerName: string;
   plotLabel: string;
   societyName: string;
+  /** Viewer preferred language; defaults English. */
+  language?: 'en' | 'ur';
   localeLines?: { en: string; ur?: string };
 };
 
@@ -45,26 +47,69 @@ export function verificationQrSvg(hash: string, size = 120): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="Verification QR">${rects}</svg>`;
 }
 
+const RECEIPT_LABELS = {
+  en: {
+    title: "ManzilIQ payment receipt",
+    buyer: "Buyer",
+    society: "Society",
+    plot: "Plot",
+    booking: "Booking",
+    installment: "Installment",
+    amount: "Amount",
+    lateFee: "Late fee",
+    total: "Total",
+    method: "Method",
+    gatewayRef: "Gateway reference",
+    date: "Date",
+    status: "Status",
+    verifyHash: "Verification hash (matches Verify receipt)",
+    printHint: "Print or Save as PDF from your browser (File → Print → Save as PDF).",
+  },
+  ur: {
+    title: "ManzilIQ ادائیگی کی رسید",
+    buyer: "خریدار",
+    society: "سوسائٹی",
+    plot: "پلاٹ",
+    booking: "بکنگ",
+    installment: "قسط",
+    amount: "رقم",
+    lateFee: "تاخیری جرمانہ",
+    total: "کل",
+    method: "طریقہ",
+    gatewayRef: "گیٹ وے حوالہ",
+    date: "تاریخ",
+    status: "حالت",
+    verifyHash: "تصدیقی ہیش (رسید تصدیق سے مماثل)",
+    printHint: "براؤزر سے پرنٹ یا PDF محفوظ کریں (File → Print → Save as PDF)۔",
+  },
+} as const;
+
 export function buildAuthorizedReceiptHtml(ctx: ReceiptContext): string {
   const p = ctx.payment;
   const hash = receiptHashOf(p);
   const total = receiptTotal(p);
   const demo = isDemoGatewayPayment(p);
+  const lang = ctx.language === "ur" ? "ur" : "en";
+  const L = RECEIPT_LABELS[lang];
   const date = p.paid_at
-    ? new Date(p.paid_at).toLocaleString()
+    ? new Date(p.paid_at).toLocaleString(lang === "ur" ? "ur-PK-u-nu-latn" : "en-PK-u-nu-latn")
     : p.created_at
-      ? new Date(p.created_at).toLocaleString()
+      ? new Date(p.created_at).toLocaleString(lang === "ur" ? "ur-PK-u-nu-latn" : "en-PK-u-nu-latn")
       : "—";
   const qr = verificationQrSvg(hash);
   const urLine = ctx.localeLines?.ur
     ? `<p class="ur muted">${escapeHtml(ctx.localeLines.ur)}</p>`
     : `<p class="ur muted">ادائیگی کی رسید — ManzilIQ</p>`;
+  const enLine =
+    lang === "en"
+      ? ""
+      : `<p class="muted">${escapeHtml(ctx.localeLines?.en ?? "Payment receipt")}</p>`;
 
   return `<!doctype html>
-<html lang="en">
+<html lang="${lang}" dir="${lang === "ur" ? "rtl" : "ltr"}">
 <head>
   <meta charset="utf-8"/>
-  <title>Receipt ${escapeHtml(p.receipt_no ?? p.id)}</title>
+  <title>${escapeHtml(L.title)} ${escapeHtml(p.receipt_no ?? p.id)}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet"/>
@@ -124,30 +169,30 @@ export function buildAuthorizedReceiptHtml(ctx: ReceiptContext): string {
 <body>
   <div class="sheet">
     <div class="content">
-      <h1>ManzilIQ payment receipt</h1>
-      ${urLine}
-      <p class="muted">${escapeHtml(p.receipt_no ?? "—")}</p>
+      <h1 class="${lang === "ur" ? "ur" : ""}">${escapeHtml(L.title)}</h1>
+      ${lang === "ur" ? urLine : enLine || urLine}
+      <p class="muted" dir="ltr">${escapeHtml(p.receipt_no ?? "—")}</p>
       ${demo ? `<div class="demo">DEMO</div>` : ""}
       <table>
-        <tr><td>Buyer</td><td>${escapeHtml(ctx.buyerName)}</td></tr>
-        <tr><td>Society</td><td>${escapeHtml(ctx.societyName)}</td></tr>
-        <tr><td>Plot</td><td>${escapeHtml(ctx.plotLabel)}</td></tr>
-        <tr><td>Booking</td><td>${escapeHtml(p.booking_ref ?? "—")}</td></tr>
-        <tr><td>Installment</td><td>${escapeHtml(p.label ?? "—")}</td></tr>
-        <tr><td>Amount</td><td>${escapeHtml(formatPrice(p.amount))}</td></tr>
-        <tr><td>Late fee</td><td>${escapeHtml(formatPrice(p.late_fee || 0))}</td></tr>
-        <tr><td><strong>Total</strong></td><td><strong>${escapeHtml(formatPrice(total))}</strong></td></tr>
-        <tr><td>Method</td><td>${escapeHtml(String(p.gateway || p.method || "—"))}</td></tr>
-        <tr><td>Gateway reference</td><td>${escapeHtml(p.gateway_txn_id ?? "—")}</td></tr>
-        <tr><td>Date</td><td>${escapeHtml(date)}</td></tr>
-        <tr><td>Status</td><td>${escapeHtml(p.status)}</td></tr>
+        <tr><td>${escapeHtml(L.buyer)}</td><td>${escapeHtml(ctx.buyerName)}</td></tr>
+        <tr><td>${escapeHtml(L.society)}</td><td>${escapeHtml(ctx.societyName)}</td></tr>
+        <tr><td>${escapeHtml(L.plot)}</td><td dir="ltr">${escapeHtml(ctx.plotLabel)}</td></tr>
+        <tr><td>${escapeHtml(L.booking)}</td><td dir="ltr">${escapeHtml(p.booking_ref ?? "—")}</td></tr>
+        <tr><td>${escapeHtml(L.installment)}</td><td>${escapeHtml(p.label ?? "—")}</td></tr>
+        <tr><td>${escapeHtml(L.amount)}</td><td dir="ltr">${escapeHtml(formatPrice(p.amount))}</td></tr>
+        <tr><td>${escapeHtml(L.lateFee)}</td><td dir="ltr">${escapeHtml(formatPrice(p.late_fee || 0))}</td></tr>
+        <tr><td><strong>${escapeHtml(L.total)}</strong></td><td dir="ltr"><strong>${escapeHtml(formatPrice(total))}</strong></td></tr>
+        <tr><td>${escapeHtml(L.method)}</td><td>${escapeHtml(String(p.gateway || p.method || "—"))}</td></tr>
+        <tr><td>${escapeHtml(L.gatewayRef)}</td><td dir="ltr">${escapeHtml(p.gateway_txn_id ?? "—")}</td></tr>
+        <tr><td>${escapeHtml(L.date)}</td><td dir="ltr">${escapeHtml(date)}</td></tr>
+        <tr><td>${escapeHtml(L.status)}</td><td>${escapeHtml(p.status)}</td></tr>
       </table>
       <div class="foot">
         <div>${qr}</div>
         <div>
-          <div class="muted">Verification hash (matches Verify receipt)</div>
-          <div class="hash">${escapeHtml(hash)}</div>
-          <p class="muted noprint" style="margin-top:12px">Print or Save as PDF from your browser (File → Print → Save as PDF).</p>
+          <div class="muted">${escapeHtml(L.verifyHash)}</div>
+          <div class="hash" dir="ltr">${escapeHtml(hash)}</div>
+          <p class="muted noprint" style="margin-top:12px">${escapeHtml(L.printHint)}</p>
         </div>
       </div>
     </div>

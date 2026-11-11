@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { PageFrame, pageHead, useAppNavigation } from '@/components/manzil/PageFrame';
 import { DealerSaleFormSheet } from '@/components/manzil/DealerSaleFormSheet';
@@ -16,8 +17,10 @@ import {
   type DealerFormSettings,
   type DealerSaleForm,
 } from '@/lib/manzil/dealer-sale-forms';
+import { SALE_FORMS_COPY as C } from '@/lib/manzil/phase11-copy/sale-forms';
 
 function FormSettings({ onNavigate }: { onNavigate: (p: string) => void }) {
+  useTranslation('dealer');
   const { session, profile } = useAuth();
   const [s, setS] = useState<DealerFormSettings | null>(null);
   const [loading, setLoading] = useState(true);
@@ -32,7 +35,7 @@ function FormSettings({ onNavigate }: { onNavigate: (p: string) => void }) {
     try {
       setS(await fetchFormSettings(session.user.id));
     } catch (e) {
-      setError(errorText(e, 'Could not load settings. Run reference/migrations/11_dealer_sale_forms.sql'));
+      setError(errorText(e, C.loadSettingsError));
     } finally {
       setLoading(false);
     }
@@ -47,17 +50,17 @@ function FormSettings({ onNavigate }: { onNavigate: (p: string) => void }) {
     if (!session || !s) return;
     const parsed = settingsSchema.safeParse(s);
     if (!parsed.success) {
-      setError(parsed.error.issues[0]?.message ?? 'Invalid settings');
+      setError(parsed.error.issues[0]?.message ?? C.invalidSettings);
       return;
     }
     setBusy(true);
     setError(null);
     try {
       await saveFormSettings(session.user.id, { ...parsed.data, logo_url: s.logo_url });
-      setMsg('Settings saved');
+      setMsg(C.settingsSaved);
       await load();
     } catch (e) {
-      setError(errorText(e, 'Save failed'));
+      setError(errorText(e, C.saveError));
     } finally {
       setBusy(false);
     }
@@ -69,9 +72,9 @@ function FormSettings({ onNavigate }: { onNavigate: (p: string) => void }) {
     try {
       const url = await uploadDealerLogo(file);
       setS((prev) => (prev ? { ...prev, logo_url: url } : prev));
-      setMsg('Logo uploaded — click Save');
+      setMsg(C.logoUploaded);
     } catch (e) {
-      setError(errorText(e, 'Logo upload failed'));
+      setError(errorText(e, C.logoError));
     } finally {
       setBusy(false);
     }
@@ -113,15 +116,15 @@ function FormSettings({ onNavigate }: { onNavigate: (p: string) => void }) {
     <div className="container">
       <div className="topbar">
         <div>
-          <h1>Sale form header settings</h1>
-          <p className="muted" style={{ margin: 0 }}>Logo, Urdu business details, colors</p>
+          <h1>{C.settingsTitle}</h1>
+          <p className="muted" style={{ margin: 0 }}>{C.settingsSubtitle}</p>
         </div>
         <div className="link-row" style={{ margin: 0 }}>
           <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('dealer-forms')}>
-            Forms
+            {C.formsLink}
           </Button>
           <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('dealer')}>
-            Dealer portal
+            {C.portal}
           </Button>
         </div>
       </div>
@@ -129,11 +132,11 @@ function FormSettings({ onNavigate }: { onNavigate: (p: string) => void }) {
       {msg && <div className="notice" style={{ marginBottom: 12 }}>{msg}</div>}
       {error && <div className="error" role="alert">{error}</div>}
       {loading || !s ? (
-        <p className="muted">Loading…</p>
+        <p className="muted">{C.loading}</p>
       ) : (
         <div className="panel-grid">
           <div className="card">
-            <h3>Header fields</h3>
+            <h3>{C.headerFields}</h3>
             <label>Logo
               <input type="file" accept="image/*" disabled={readOnly || busy} onChange={(e) => void onLogo(e.target.files?.[0] ?? null)} />
             </label>
@@ -148,11 +151,11 @@ function FormSettings({ onNavigate }: { onNavigate: (p: string) => void }) {
                     onClick={() =>
                       void removeDealerLogo(session!.user.id, s.logo_url).then(() => {
                         setS({ ...s, logo_url: null });
-                        setMsg('Logo removed');
+                        setMsg(C.logoRemoved);
                       })
                     }
                   >
-                    Remove logo
+                    {C.removeLogo}
                   </Button>
                 )}
               </div>
@@ -183,9 +186,9 @@ function FormSettings({ onNavigate }: { onNavigate: (p: string) => void }) {
               </label>
             ))}
             <div className="form-row">
-              <label>Header bg<input type="color" disabled={readOnly} value={s.header_bg_color} onChange={(e) => setS({ ...s, header_bg_color: e.target.value })} /></label>
-              <label>Accent<input type="color" disabled={readOnly} value={s.header_accent_color} onChange={(e) => setS({ ...s, header_accent_color: e.target.value })} /></label>
-              <label>Next serial<input type="number" min={1} disabled={readOnly} value={s.next_serial} onChange={(e) => setS({ ...s, next_serial: Number(e.target.value) || 1 })} /></label>
+              <label>{C.headerBg}<input type="color" disabled={readOnly} value={s.header_bg_color} onChange={(e) => setS({ ...s, header_bg_color: e.target.value })} /></label>
+              <label>{C.accent}<input type="color" disabled={readOnly} value={s.header_accent_color} onChange={(e) => setS({ ...s, header_accent_color: e.target.value })} /></label>
+              <label>{C.nextSerial}<input type="number" min={1} disabled={readOnly} value={s.next_serial} onChange={(e) => setS({ ...s, next_serial: Number(e.target.value) || 1 })} dir="ltr" className="ltr-isolate" /></label>
             </div>
             <label className="small" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
               <input
@@ -194,12 +197,12 @@ function FormSettings({ onNavigate }: { onNavigate: (p: string) => void }) {
                 checked={s.show_manager_signature}
                 onChange={(e) => setS({ ...s, show_manager_signature: e.target.checked })}
               />
-              Show manager signature line
+              {C.showManagerSig}
             </label>
             {!readOnly && (
               <div className="link-row">
                 <Button variant="legacy" className="btn small" disabled={busy} onClick={() => void save()}>
-                  {busy ? 'Saving…' : 'Save'}
+                  {busy ? C.saving : C.save}
                 </Button>
                 <Button
                   variant="legacy"
@@ -207,18 +210,18 @@ function FormSettings({ onNavigate }: { onNavigate: (p: string) => void }) {
                   disabled={busy}
                   onClick={() =>
                     void resetFormSettings(session!.user.id).then(async () => {
-                      setMsg('Reset to defaults (serial kept)');
+                      setMsg(C.resetKept);
                       await load();
                     })
                   }
                 >
-                  Reset to default
+                  {C.reset}
                 </Button>
               </div>
             )}
           </div>
           <div>
-            <h3>Live header preview</h3>
+            <h3>{C.liveHeaderPreview}</h3>
             <DealerSaleFormSheet form={preview} settings={s ?? { ...DEFAULT_FORM_SETTINGS, dealer_id: '' }} />
           </div>
         </div>

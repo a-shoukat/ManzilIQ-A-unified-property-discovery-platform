@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PageFrame, pageHead, useAppNavigation } from '@/components/manzil/PageFrame';
 import { DealerSaleFormActions } from '@/components/manzil/DealerSaleFormActions';
 import { DealerSaleFormEditor } from '@/components/manzil/DealerSaleFormEditor';
@@ -12,8 +13,10 @@ import {
   type DealerFormSettings,
   type DealerSaleForm,
 } from '@/lib/manzil/dealer-sale-forms';
+import { SALE_FORMS_COPY as C } from '@/lib/manzil/phase11-copy/sale-forms';
 
 function EditForm() {
+  useTranslation('dealer');
   const { id } = Route.useParams();
   const onNavigate = useAppNavigation();
   const { profile } = useAuth();
@@ -29,21 +32,21 @@ function EditForm() {
         setForm(f);
         if (f) setSettings(await fetchFormSettings(f.dealer_id));
       })
-      .catch((e) => setError(errorText(e, 'Could not load form')))
+      .catch((e) => setError(errorText(e, C.loadFormError)))
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <div className="container"><p className="muted">Loading…</p></div>;
+  if (loading) return <div className="container"><p className="muted">{C.loading}</p></div>;
   if (error) return <div className="container"><div className="error">{error}</div></div>;
-  if (!form) return <div className="container"><p className="muted">Form not found.</p></div>;
+  if (!form) return <div className="container"><p className="muted">{C.notFound}</p></div>;
 
   return (
     <div>
       <div className="container">
         <div className="topbar">
           <div>
-            <h1>Form #{form.serial_no}</h1>
-            <p className="muted" style={{ margin: 0 }}>Status: {form.status}</p>
+            <h1>{C.detailTitle(form.serial_no ?? 0)}</h1>
+            <p className="muted" style={{ margin: 0 }}>{C.detailStatus(C.statusLabel(form.status))}</p>
           </div>
         </div>
         {(form.status === 'issued' || form.status === 'cancelled') && settings && (
@@ -63,7 +66,7 @@ function EditForm() {
         />
       )}
       {form.status !== 'draft' && profile?.role === 'super_admin' && (
-        <div className="container"><p className="muted">Super admin view is read-only.</p></div>
+        <div className="container"><p className="muted">{C.superAdminReadonly}</p></div>
       )}
     </div>
   );

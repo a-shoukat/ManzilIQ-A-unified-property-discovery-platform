@@ -21,7 +21,7 @@
 
 - [ ] First visit = English
 - [ ] Toggle saves to `localStorage` key `manziliq.preferred_language`
-- [ ] When signed in + migration applied, saves `profiles.preferred_language`
+- [ ] When signed in + `reference/migrations/12_preferred_language.sql` applied, saves `profiles.preferred_language`
 - [ ] Reload restores preference
 
 ## Rollback
