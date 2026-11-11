@@ -4,6 +4,10 @@ import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageF
 function AdminHub({ onNavigate }: { onNavigate: (p: string) => void }) {
   const cards = [
     { page: 'admin-verification', title: 'Verification Queue', desc: 'Societies & dealers (v2)' },
+    { page: 'admin-moderation', title: 'Listing moderation', desc: 'Approve / reject pending listings' },
+    { page: 'admin-cms', title: 'Homepage CMS', desc: 'Banners & site content' },
+    { page: 'admin-audit', title: 'Audit log', desc: 'Filterable platform audit trail' },
+    { page: 'admin-status', title: 'System status', desc: 'Integrations & failed notifications' },
     { page: 'admin-bookings', title: 'Bookings', desc: 'All booking requests (v7)' },
     { page: 'admin-disputes', title: 'Dispute Management', desc: 'Flagged transactions, mediation, freeze plots' },
     { page: 'admin-templates', title: 'Legal Templates', desc: 'Allotment, sale agreement, transfer deed' },

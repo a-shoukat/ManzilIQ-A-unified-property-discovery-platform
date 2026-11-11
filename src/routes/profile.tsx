@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { PasswordInput, PASSWORD_MISMATCH } from '@/components/manzil/PasswordInput';
 import { Button } from '@/components/ui/button';
-import { PageFrame, pageHead } from '@/components/manzil/PageFrame';
+import { PageFrame, pageHead, useAppNavigation } from '@/components/manzil/PageFrame';
 import { getSupabase } from '@/lib/manzil/supabase';
 import { useAuth } from '@/lib/manzil/auth';
 import { uploadDocument } from '@/lib/manzil/storage';
@@ -11,6 +11,7 @@ import { errorText } from '@/lib/manzil/errors';
 import { ROLE_LABELS } from '@/lib/manzil/types';
 
 function ProfilePage() {
+  const onNavigate = useAppNavigation();
   const { profile, details, refresh } = useAuth();
   const d = (details ?? {}) as { contact_phone?: string | null; address?: string | null; photo_url?: string | null };
   const [name, setName] = useState('');
@@ -101,6 +102,11 @@ function ProfilePage() {
       <div className="card wide">
         <h1>Profile & settings</h1>
         <p className="muted">{profile.email} · {ROLE_LABELS[profile.role]}</p>
+        <div className="link-row" style={{ margin: '8px 0 16px' }}>
+          <Button variant="legacy" className="btn secondary small" type="button" onClick={() => onNavigate('settings/notifications')}>
+            Notification preferences
+          </Button>
+        </div>
         <form onSubmit={save}>
           <label>Full name<input value={name} onChange={(e) => setName(e.target.value)} /></label>
           {isBuyer && <>

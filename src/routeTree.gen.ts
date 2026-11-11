@@ -13,10 +13,14 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AddPropertyRouteImport } from './routes/add-property'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin-analytics'
+import { Route as AdminAuditRouteImport } from './routes/admin-audit'
 import { Route as AdminBookingsRouteImport } from './routes/admin-bookings'
+import { Route as AdminCmsRouteImport } from './routes/admin-cms'
 import { Route as AdminDisputesRouteImport } from './routes/admin-disputes'
 import { Route as AdminFraudRouteImport } from './routes/admin-fraud'
+import { Route as AdminModerationRouteImport } from './routes/admin-moderation'
 import { Route as AdminReportsRouteImport } from './routes/admin-reports'
+import { Route as AdminStatusRouteImport } from './routes/admin-status'
 import { Route as AdminSubscriptionsRouteImport } from './routes/admin-subscriptions'
 import { Route as AdminTemplatesRouteImport } from './routes/admin-templates'
 import { Route as AdminUsersRouteImport } from './routes/admin-users'
@@ -34,13 +38,16 @@ import { Route as DealerLeadsRouteImport } from './routes/dealer-leads'
 import { Route as DealerLotsRouteImport } from './routes/dealer-lots'
 import { Route as DocumentsRouteImport } from './routes/documents'
 import { Route as InboxRouteImport } from './routes/inbox'
+import { Route as InquiriesRouteImport } from './routes/inquiries'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MapViewRouteImport } from './routes/map-view'
 import { Route as MarketTrendsRouteImport } from './routes/market-trends'
 import { Route as MasterPlanRouteImport } from './routes/master-plan'
 import { Route as MyActivityRouteImport } from './routes/my-activity'
 import { Route as MyBookingsRouteImport } from './routes/my-bookings'
+import { Route as MyInquiriesRouteImport } from './routes/my-inquiries'
 import { Route as MyPaymentsRouteImport } from './routes/my-payments'
+import { Route as PaymentHistoryRouteImport } from './routes/payment-history'
 import { Route as PriceEstimatorRouteImport } from './routes/price-estimator'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -56,6 +63,7 @@ import { Route as SocietyInventoryRouteImport } from './routes/society-inventory
 import { Route as SocietyMapRouteImport } from './routes/society-map'
 import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as PropertyIdRouteImport } from './routes/property.$id'
+import { Route as SettingsNotificationsRouteImport } from './routes/settings.notifications'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -77,9 +85,19 @@ const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   path: '/admin-analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminAuditRoute = AdminAuditRouteImport.update({
+  id: '/admin-audit',
+  path: '/admin-audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminBookingsRoute = AdminBookingsRouteImport.update({
   id: '/admin-bookings',
   path: '/admin-bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCmsRoute = AdminCmsRouteImport.update({
+  id: '/admin-cms',
+  path: '/admin-cms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminDisputesRoute = AdminDisputesRouteImport.update({
@@ -92,9 +110,19 @@ const AdminFraudRoute = AdminFraudRouteImport.update({
   path: '/admin-fraud',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminModerationRoute = AdminModerationRouteImport.update({
+  id: '/admin-moderation',
+  path: '/admin-moderation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminReportsRoute = AdminReportsRouteImport.update({
   id: '/admin-reports',
   path: '/admin-reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminStatusRoute = AdminStatusRouteImport.update({
+  id: '/admin-status',
+  path: '/admin-status',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminSubscriptionsRoute = AdminSubscriptionsRouteImport.update({
@@ -182,6 +210,11 @@ const InboxRoute = InboxRouteImport.update({
   path: '/inbox',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InquiriesRoute = InquiriesRouteImport.update({
+  id: '/inquiries',
+  path: '/inquiries',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -212,9 +245,19 @@ const MyBookingsRoute = MyBookingsRouteImport.update({
   path: '/my-bookings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MyInquiriesRoute = MyInquiriesRouteImport.update({
+  id: '/my-inquiries',
+  path: '/my-inquiries',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MyPaymentsRoute = MyPaymentsRouteImport.update({
   id: '/my-payments',
   path: '/my-payments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentHistoryRoute = PaymentHistoryRouteImport.update({
+  id: '/payment-history',
+  path: '/payment-history',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PriceEstimatorRoute = PriceEstimatorRouteImport.update({
@@ -292,16 +335,25 @@ const PropertyIdRoute = PropertyIdRouteImport.update({
   path: '/property/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsNotificationsRoute = SettingsNotificationsRouteImport.update({
+  id: '/settings/notifications',
+  path: '/settings/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/add-property': typeof AddPropertyRoute
   '/admin': typeof AdminRoute
   '/admin-analytics': typeof AdminAnalyticsRoute
+  '/admin-audit': typeof AdminAuditRoute
   '/admin-bookings': typeof AdminBookingsRoute
+  '/admin-cms': typeof AdminCmsRoute
   '/admin-disputes': typeof AdminDisputesRoute
   '/admin-fraud': typeof AdminFraudRoute
+  '/admin-moderation': typeof AdminModerationRoute
   '/admin-reports': typeof AdminReportsRoute
+  '/admin-status': typeof AdminStatusRoute
   '/admin-subscriptions': typeof AdminSubscriptionsRoute
   '/admin-templates': typeof AdminTemplatesRoute
   '/admin-users': typeof AdminUsersRoute
@@ -319,13 +371,16 @@ export interface FileRoutesByFullPath {
   '/dealer-lots': typeof DealerLotsRoute
   '/documents': typeof DocumentsRoute
   '/inbox': typeof InboxRoute
+  '/inquiries': typeof InquiriesRoute
   '/login': typeof LoginRoute
   '/map-view': typeof MapViewRoute
   '/market-trends': typeof MarketTrendsRoute
   '/master-plan': typeof MasterPlanRoute
   '/my-activity': typeof MyActivityRoute
   '/my-bookings': typeof MyBookingsRoute
+  '/my-inquiries': typeof MyInquiriesRoute
   '/my-payments': typeof MyPaymentsRoute
+  '/payment-history': typeof PaymentHistoryRoute
   '/price-estimator': typeof PriceEstimatorRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
@@ -341,16 +396,21 @@ export interface FileRoutesByFullPath {
   '/society-map': typeof SocietyMapRoute
   '/wishlist': typeof WishlistRoute
   '/property/$id': typeof PropertyIdRoute
+  '/settings/notifications': typeof SettingsNotificationsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/add-property': typeof AddPropertyRoute
   '/admin': typeof AdminRoute
   '/admin-analytics': typeof AdminAnalyticsRoute
+  '/admin-audit': typeof AdminAuditRoute
   '/admin-bookings': typeof AdminBookingsRoute
+  '/admin-cms': typeof AdminCmsRoute
   '/admin-disputes': typeof AdminDisputesRoute
   '/admin-fraud': typeof AdminFraudRoute
+  '/admin-moderation': typeof AdminModerationRoute
   '/admin-reports': typeof AdminReportsRoute
+  '/admin-status': typeof AdminStatusRoute
   '/admin-subscriptions': typeof AdminSubscriptionsRoute
   '/admin-templates': typeof AdminTemplatesRoute
   '/admin-users': typeof AdminUsersRoute
@@ -368,13 +428,16 @@ export interface FileRoutesByTo {
   '/dealer-lots': typeof DealerLotsRoute
   '/documents': typeof DocumentsRoute
   '/inbox': typeof InboxRoute
+  '/inquiries': typeof InquiriesRoute
   '/login': typeof LoginRoute
   '/map-view': typeof MapViewRoute
   '/market-trends': typeof MarketTrendsRoute
   '/master-plan': typeof MasterPlanRoute
   '/my-activity': typeof MyActivityRoute
   '/my-bookings': typeof MyBookingsRoute
+  '/my-inquiries': typeof MyInquiriesRoute
   '/my-payments': typeof MyPaymentsRoute
+  '/payment-history': typeof PaymentHistoryRoute
   '/price-estimator': typeof PriceEstimatorRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
@@ -390,6 +453,7 @@ export interface FileRoutesByTo {
   '/society-map': typeof SocietyMapRoute
   '/wishlist': typeof WishlistRoute
   '/property/$id': typeof PropertyIdRoute
+  '/settings/notifications': typeof SettingsNotificationsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -397,10 +461,14 @@ export interface FileRoutesById {
   '/add-property': typeof AddPropertyRoute
   '/admin': typeof AdminRoute
   '/admin-analytics': typeof AdminAnalyticsRoute
+  '/admin-audit': typeof AdminAuditRoute
   '/admin-bookings': typeof AdminBookingsRoute
+  '/admin-cms': typeof AdminCmsRoute
   '/admin-disputes': typeof AdminDisputesRoute
   '/admin-fraud': typeof AdminFraudRoute
+  '/admin-moderation': typeof AdminModerationRoute
   '/admin-reports': typeof AdminReportsRoute
+  '/admin-status': typeof AdminStatusRoute
   '/admin-subscriptions': typeof AdminSubscriptionsRoute
   '/admin-templates': typeof AdminTemplatesRoute
   '/admin-users': typeof AdminUsersRoute
@@ -418,13 +486,16 @@ export interface FileRoutesById {
   '/dealer-lots': typeof DealerLotsRoute
   '/documents': typeof DocumentsRoute
   '/inbox': typeof InboxRoute
+  '/inquiries': typeof InquiriesRoute
   '/login': typeof LoginRoute
   '/map-view': typeof MapViewRoute
   '/market-trends': typeof MarketTrendsRoute
   '/master-plan': typeof MasterPlanRoute
   '/my-activity': typeof MyActivityRoute
   '/my-bookings': typeof MyBookingsRoute
+  '/my-inquiries': typeof MyInquiriesRoute
   '/my-payments': typeof MyPaymentsRoute
+  '/payment-history': typeof PaymentHistoryRoute
   '/price-estimator': typeof PriceEstimatorRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
@@ -440,6 +511,7 @@ export interface FileRoutesById {
   '/society-map': typeof SocietyMapRoute
   '/wishlist': typeof WishlistRoute
   '/property/$id': typeof PropertyIdRoute
+  '/settings/notifications': typeof SettingsNotificationsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -448,10 +520,14 @@ export interface FileRouteTypes {
     | '/add-property'
     | '/admin'
     | '/admin-analytics'
+    | '/admin-audit'
     | '/admin-bookings'
+    | '/admin-cms'
     | '/admin-disputes'
     | '/admin-fraud'
+    | '/admin-moderation'
     | '/admin-reports'
+    | '/admin-status'
     | '/admin-subscriptions'
     | '/admin-templates'
     | '/admin-users'
@@ -469,13 +545,16 @@ export interface FileRouteTypes {
     | '/dealer-lots'
     | '/documents'
     | '/inbox'
+    | '/inquiries'
     | '/login'
     | '/map-view'
     | '/market-trends'
     | '/master-plan'
     | '/my-activity'
     | '/my-bookings'
+    | '/my-inquiries'
     | '/my-payments'
+    | '/payment-history'
     | '/price-estimator'
     | '/pricing'
     | '/profile'
@@ -491,16 +570,21 @@ export interface FileRouteTypes {
     | '/society-map'
     | '/wishlist'
     | '/property/$id'
+    | '/settings/notifications'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/add-property'
     | '/admin'
     | '/admin-analytics'
+    | '/admin-audit'
     | '/admin-bookings'
+    | '/admin-cms'
     | '/admin-disputes'
     | '/admin-fraud'
+    | '/admin-moderation'
     | '/admin-reports'
+    | '/admin-status'
     | '/admin-subscriptions'
     | '/admin-templates'
     | '/admin-users'
@@ -518,13 +602,16 @@ export interface FileRouteTypes {
     | '/dealer-lots'
     | '/documents'
     | '/inbox'
+    | '/inquiries'
     | '/login'
     | '/map-view'
     | '/market-trends'
     | '/master-plan'
     | '/my-activity'
     | '/my-bookings'
+    | '/my-inquiries'
     | '/my-payments'
+    | '/payment-history'
     | '/price-estimator'
     | '/pricing'
     | '/profile'
@@ -540,16 +627,21 @@ export interface FileRouteTypes {
     | '/society-map'
     | '/wishlist'
     | '/property/$id'
+    | '/settings/notifications'
   id:
     | '__root__'
     | '/'
     | '/add-property'
     | '/admin'
     | '/admin-analytics'
+    | '/admin-audit'
     | '/admin-bookings'
+    | '/admin-cms'
     | '/admin-disputes'
     | '/admin-fraud'
+    | '/admin-moderation'
     | '/admin-reports'
+    | '/admin-status'
     | '/admin-subscriptions'
     | '/admin-templates'
     | '/admin-users'
@@ -567,13 +659,16 @@ export interface FileRouteTypes {
     | '/dealer-lots'
     | '/documents'
     | '/inbox'
+    | '/inquiries'
     | '/login'
     | '/map-view'
     | '/market-trends'
     | '/master-plan'
     | '/my-activity'
     | '/my-bookings'
+    | '/my-inquiries'
     | '/my-payments'
+    | '/payment-history'
     | '/price-estimator'
     | '/pricing'
     | '/profile'
@@ -589,6 +684,7 @@ export interface FileRouteTypes {
     | '/society-map'
     | '/wishlist'
     | '/property/$id'
+    | '/settings/notifications'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -596,10 +692,14 @@ export interface RootRouteChildren {
   AddPropertyRoute: typeof AddPropertyRoute
   AdminRoute: typeof AdminRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminAuditRoute: typeof AdminAuditRoute
   AdminBookingsRoute: typeof AdminBookingsRoute
+  AdminCmsRoute: typeof AdminCmsRoute
   AdminDisputesRoute: typeof AdminDisputesRoute
   AdminFraudRoute: typeof AdminFraudRoute
+  AdminModerationRoute: typeof AdminModerationRoute
   AdminReportsRoute: typeof AdminReportsRoute
+  AdminStatusRoute: typeof AdminStatusRoute
   AdminSubscriptionsRoute: typeof AdminSubscriptionsRoute
   AdminTemplatesRoute: typeof AdminTemplatesRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -617,13 +717,16 @@ export interface RootRouteChildren {
   DealerLotsRoute: typeof DealerLotsRoute
   DocumentsRoute: typeof DocumentsRoute
   InboxRoute: typeof InboxRoute
+  InquiriesRoute: typeof InquiriesRoute
   LoginRoute: typeof LoginRoute
   MapViewRoute: typeof MapViewRoute
   MarketTrendsRoute: typeof MarketTrendsRoute
   MasterPlanRoute: typeof MasterPlanRoute
   MyActivityRoute: typeof MyActivityRoute
   MyBookingsRoute: typeof MyBookingsRoute
+  MyInquiriesRoute: typeof MyInquiriesRoute
   MyPaymentsRoute: typeof MyPaymentsRoute
+  PaymentHistoryRoute: typeof PaymentHistoryRoute
   PriceEstimatorRoute: typeof PriceEstimatorRoute
   PricingRoute: typeof PricingRoute
   ProfileRoute: typeof ProfileRoute
@@ -639,6 +742,7 @@ export interface RootRouteChildren {
   SocietyMapRoute: typeof SocietyMapRoute
   WishlistRoute: typeof WishlistRoute
   PropertyIdRoute: typeof PropertyIdRoute
+  SettingsNotificationsRoute: typeof SettingsNotificationsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -671,11 +775,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin-audit': {
+      id: '/admin-audit'
+      path: '/admin-audit'
+      fullPath: '/admin-audit'
+      preLoaderRoute: typeof AdminAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin-bookings': {
       id: '/admin-bookings'
       path: '/admin-bookings'
       fullPath: '/admin-bookings'
       preLoaderRoute: typeof AdminBookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-cms': {
+      id: '/admin-cms'
+      path: '/admin-cms'
+      fullPath: '/admin-cms'
+      preLoaderRoute: typeof AdminCmsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin-disputes': {
@@ -692,11 +810,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminFraudRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin-moderation': {
+      id: '/admin-moderation'
+      path: '/admin-moderation'
+      fullPath: '/admin-moderation'
+      preLoaderRoute: typeof AdminModerationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin-reports': {
       id: '/admin-reports'
       path: '/admin-reports'
       fullPath: '/admin-reports'
       preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-status': {
+      id: '/admin-status'
+      path: '/admin-status'
+      fullPath: '/admin-status'
+      preLoaderRoute: typeof AdminStatusRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin-subscriptions': {
@@ -818,6 +950,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InboxRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/inquiries': {
+      id: '/inquiries'
+      path: '/inquiries'
+      fullPath: '/inquiries'
+      preLoaderRoute: typeof InquiriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -860,11 +999,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MyBookingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/my-inquiries': {
+      id: '/my-inquiries'
+      path: '/my-inquiries'
+      fullPath: '/my-inquiries'
+      preLoaderRoute: typeof MyInquiriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/my-payments': {
       id: '/my-payments'
       path: '/my-payments'
       fullPath: '/my-payments'
       preLoaderRoute: typeof MyPaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment-history': {
+      id: '/payment-history'
+      path: '/payment-history'
+      fullPath: '/payment-history'
+      preLoaderRoute: typeof PaymentHistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/price-estimator': {
@@ -972,6 +1125,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PropertyIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings/notifications': {
+      id: '/settings/notifications'
+      path: '/settings/notifications'
+      fullPath: '/settings/notifications'
+      preLoaderRoute: typeof SettingsNotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -980,10 +1140,14 @@ const rootRouteChildren: RootRouteChildren = {
   AddPropertyRoute: AddPropertyRoute,
   AdminRoute: AdminRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminAuditRoute: AdminAuditRoute,
   AdminBookingsRoute: AdminBookingsRoute,
+  AdminCmsRoute: AdminCmsRoute,
   AdminDisputesRoute: AdminDisputesRoute,
   AdminFraudRoute: AdminFraudRoute,
+  AdminModerationRoute: AdminModerationRoute,
   AdminReportsRoute: AdminReportsRoute,
+  AdminStatusRoute: AdminStatusRoute,
   AdminSubscriptionsRoute: AdminSubscriptionsRoute,
   AdminTemplatesRoute: AdminTemplatesRoute,
   AdminUsersRoute: AdminUsersRoute,
@@ -1001,13 +1165,16 @@ const rootRouteChildren: RootRouteChildren = {
   DealerLotsRoute: DealerLotsRoute,
   DocumentsRoute: DocumentsRoute,
   InboxRoute: InboxRoute,
+  InquiriesRoute: InquiriesRoute,
   LoginRoute: LoginRoute,
   MapViewRoute: MapViewRoute,
   MarketTrendsRoute: MarketTrendsRoute,
   MasterPlanRoute: MasterPlanRoute,
   MyActivityRoute: MyActivityRoute,
   MyBookingsRoute: MyBookingsRoute,
+  MyInquiriesRoute: MyInquiriesRoute,
   MyPaymentsRoute: MyPaymentsRoute,
+  PaymentHistoryRoute: PaymentHistoryRoute,
   PriceEstimatorRoute: PriceEstimatorRoute,
   PricingRoute: PricingRoute,
   ProfileRoute: ProfileRoute,
@@ -1023,6 +1190,7 @@ const rootRouteChildren: RootRouteChildren = {
   SocietyMapRoute: SocietyMapRoute,
   WishlistRoute: WishlistRoute,
   PropertyIdRoute: PropertyIdRoute,
+  SettingsNotificationsRoute: SettingsNotificationsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
