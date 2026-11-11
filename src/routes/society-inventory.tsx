@@ -1,5 +1,6 @@
 import { errorText } from '@/lib/manzil/errors';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
 import { useEffect, useState } from 'react';
@@ -10,6 +11,7 @@ import { useSocietyId } from './society';
 
 /** WBS: Society Portal — Plot Inventory Management (7 features) */
 function Inventory({ onNavigate }: { onNavigate: (p: string) => void }) {
+  const { t } = useTranslation('society');
   const { societyId, societies, setSocietyId } = useSocietyId();
   const [plots, setPlots] = useState<Plot[]>([]);
   const [blockFilter, setBlockFilter] = useState('');
@@ -112,7 +114,7 @@ function Inventory({ onNavigate }: { onNavigate: (p: string) => void }) {
     <div className="container">
       <div className="topbar">
         <div>
-          <h1>Plot inventory</h1>
+          <h1>{t('inventoryTitle')}</h1>
           <p className="muted" style={{ margin: 0 }}>{plots.length} plots</p>
         </div>
         <div className="link-row" style={{ margin: 0 }}>

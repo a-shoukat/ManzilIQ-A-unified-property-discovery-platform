@@ -1,1 +1,22 @@
-{}
+{
+  "title": "پلاٹ کی بکنگ",
+  "myBookings": "میری بکنگز",
+  "bookingRequests": "بکنگ کی درخواستیں",
+  "tokenAmount": "ٹوکن رقم",
+  "bayanaAmount": "بیعانہ",
+  "installmentPlan": "قسط کا منصوبہ",
+  "submitBooking": "بکنگ جمع کروائیں",
+  "cancelBooking": "بکنگ منسوخ کریں",
+  "approveBooking": "بکنگ منظور کریں",
+  "rejectBooking": "بکنگ مسترد کریں",
+  "statusPending": "زیر التوا",
+  "statusApproved": "منظور شدہ",
+  "statusRejected": "مسترد",
+  "statusCancelled": "منسوخ",
+  "noBookings": "ابھی کوئی بکنگ نہیں۔",
+  "selectPlot": "پلاٹ منتخب کریں",
+  "buyerDetails": "خریدار کی تفصیلات",
+  "bookingRef": "بکنگ ریفرنس",
+  "allotment": "الاٹمنٹ",
+  "cancellation": "منسوخی"
+}

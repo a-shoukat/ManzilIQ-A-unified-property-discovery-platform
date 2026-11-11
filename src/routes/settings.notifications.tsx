@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
 import { useEffect, useState } from 'react';
@@ -14,6 +15,7 @@ import {
 
 /** Screen 5 — Notification preferences (all roles). */
 function NotificationSettings({ onNavigate }: { onNavigate: (p: string) => void }) {
+  const { t } = useTranslation(['notifications', 'common']);
   const { session } = useAuth();
   const [prefs, setPrefs] = useState<NotificationPrefs>({ ...DEFAULT_PREFS, events: { ...DEFAULT_PREFS.events } });
   const [loading, setLoading] = useState(true);
@@ -36,7 +38,7 @@ function NotificationSettings({ onNavigate }: { onNavigate: (p: string) => void 
     setError(null);
     try {
       await saveNotificationPrefs(session.user.id, prefs);
-      setMsg('Preferences saved');
+      setMsg(t('notifications:saved'));
     } catch (e) {
       setError(
         errorText(
@@ -53,7 +55,7 @@ function NotificationSettings({ onNavigate }: { onNavigate: (p: string) => void 
     <div className="container">
       <div className="topbar">
         <div>
-          <h1>Notification preferences</h1>
+          <h1>{t('notifications:preferences')}</h1>
           <p className="muted" style={{ margin: 0 }}>Channels and event types</p>
         </div>
         <div className="link-row" style={{ margin: 0 }}>

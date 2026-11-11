@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
 import { useEffect, useState } from 'react';
@@ -21,6 +22,7 @@ import {
  * Buyers and society_admin share this additive route.
  */
 function PaymentHistory({ onNavigate }: { onNavigate: (p: string) => void }) {
+  const { t } = useTranslation(['payments', 'common']);
   const { session, profile } = useAuth();
   const [list, setList] = useState<GatewayPayment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,7 +72,7 @@ function PaymentHistory({ onNavigate }: { onNavigate: (p: string) => void }) {
     <div className="container">
       <div className="topbar">
         <div>
-          <h1>{isSociety ? 'Society payment history' : 'Payment history & receipts'}</h1>
+          <h1>{t('payments:history')}</h1>
           <p className="muted" style={{ margin: 0 }}>
             Gateway references, receipts, verification
           </p>

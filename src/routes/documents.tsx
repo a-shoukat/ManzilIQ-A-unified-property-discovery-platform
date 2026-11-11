@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
 import { useEffect, useState } from 'react';
@@ -14,6 +15,7 @@ const docTypeOptions = Object.keys(DOC_TITLES) as GeneratedDocType[];
 
 /** Module 11 — Document & Legal System: locker, generation, audit trail */
 function Documents({ onNavigate }: { onNavigate: (p: string) => void }) {
+  const { t } = useTranslation(['legal', 'common']);
   const { session, profile } = useAuth();
   const { societyId } = useSocietyId();
   const [docs, setDocs] = useState<GeneratedDocument[]>([]);
@@ -29,7 +31,7 @@ function Documents({ onNavigate }: { onNavigate: (p: string) => void }) {
   const openPdf = (d: GeneratedDocument) => {
     const html = buildLegalPdfHtml({ title: DOC_TITLES[d.doc_type], body: d.body, reference: d.booking_ref ?? d.id.slice(0, 8), generatedAt: d.created_at, version: d.version });
     const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
-    if (!window.open(url, '_blank')) setMsg('Allow pop-ups to save the PDF.');
+    if (!window.open(url, '_blank')) setMsg(t('legal:allowPopups'));
     setTimeout(() => URL.revokeObjectURL(url), 60000);
   };
 
@@ -58,19 +60,19 @@ function Documents({ onNavigate }: { onNavigate: (p: string) => void }) {
   const doGenerate = async () => {
     const b = bookings.find((x) => x.id === genBooking);
     if (!b) {
-      setMsg('Select a booking first.');
+      setMsg(t('legal:selectBooking'));
       return;
     }
     if (SIGNABLE_DOCS.includes(genType) && sigs.length < 2) {
-      setMsg('Both parties must sign (type or draw) before generating.');
+      setMsg(t('legal:signatures'));
       return;
     }
     try {
       await generateDocument(b, genType, undefined, SIGNABLE_DOCS.includes(genType) ? sigs : undefined);
-      setMsg(`${DOC_TITLES[genType]} generated.`);
+      setMsg(t('legal:generated'));
       load();
     } catch (err) {
-      setMsg(err instanceof Error ? err.message : 'Generation failed');
+      setMsg(err instanceof Error ? err.message : t('legal:generated'));
     }
   };
 
@@ -89,12 +91,12 @@ function Documents({ onNavigate }: { onNavigate: (p: string) => void }) {
     <div className="container">
       <div className="topbar">
         <div>
-          <h1>{profile?.role === 'buyer' ? 'My document locker' : 'Documents'}</h1>
+          <h1>{t('legal:title')}</h1>
           <p className="muted" style={{ margin: 0 }}>
-            {profile?.role === 'super_admin' ? 'Audit trail — all documents' : `${docs.length} documents`}
+            {t('legal:subtitle')}
           </p>
         </div>
-        <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('dashboard')}>Dashboard</Button>
+        <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('dashboard')}>{t('common:dashboard')}</Button>
       </div>
 
       {msg && <div className="notice" style={{ marginBottom: 12 }}>{msg}</div>}

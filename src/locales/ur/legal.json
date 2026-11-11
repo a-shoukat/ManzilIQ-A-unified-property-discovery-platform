@@ -1,1 +1,21 @@
-{}
+{
+  "title": "دستاویزات",
+  "subtitle": "قانونی لاکر، تیاری اور دستخط",
+  "generate": "دستاویز تیار کریں",
+  "saleAgreement": "بیع نامہ",
+  "allotmentLetter": "الاٹمنٹ خط",
+  "transferDeed": "منتقلی نامہ",
+  "noc": "این او سی",
+  "cancellation": "منسوخی",
+  "receipt": "رسید",
+  "view": "دیکھیں",
+  "downloadPdf": "PDF ڈاؤن لوڈ کریں",
+  "sign": "دستخط کریں",
+  "signatures": "دستخط",
+  "noDocuments": "ابھی کوئی دستاویز نہیں۔",
+  "allowPopups": "PDF محفوظ کرنے کے لیے پاپ اپس کی اجازت دیں۔",
+  "selectBooking": "بکنگ منتخب کریں",
+  "docType": "دستاویز کی قسم",
+  "generated": "دستاویز تیار ہو گئی",
+  "watermarkDraft": "مسودہ"
+}

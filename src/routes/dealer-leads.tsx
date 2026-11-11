@@ -2,6 +2,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from 'sonner';
 import { errorText } from '@/lib/manzil/errors';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
 import { useEffect, useState } from 'react';
@@ -23,6 +24,7 @@ const STATUSES: LeadStatus[] = ['new', 'hot', 'warm', 'cold', 'converted', 'lost
 
 /** WBS: Dealer Portal — Customer Lead Management (6) + Deal Pipeline (6 stages) */
 function Leads({ onNavigate }: { onNavigate: (p: string) => void }) {
+  const { t } = useTranslation('dealer');
   const { session } = useAuth();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [plots, setPlots] = useState<Plot[]>([]);
@@ -136,7 +138,7 @@ function Leads({ onNavigate }: { onNavigate: (p: string) => void }) {
     <div className="container">
       <div className="topbar">
         <div>
-          <h1>Leads & pipeline</h1>
+          <h1>{t('leadsHeading')}</h1>
           <p className="muted" style={{ margin: 0 }}>{leads.length} leads</p>
         </div>
         <div className="link-row" style={{ margin: 0 }}>
