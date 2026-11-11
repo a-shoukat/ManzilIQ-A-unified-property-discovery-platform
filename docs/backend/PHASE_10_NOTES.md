@@ -31,5 +31,11 @@ Phase 9 workflow used `actions/setup-node` with `cache: npm` but the repo only h
 - Isolatable copy: `src/lib/manzil/phase10-copy/{inquiries,notifications,moderation,cms,audit,payments,status}.ts`
 - Screen 6: Phase 3 PDF receipt server fn MISSING → PDF download button skipped on `/payment-history`
 
+### Phase 10.5 (`cursor/phase10-5-cms-pdf-dcf3`)
+- Homepage `/` loads `site_content` / `site_banners` via `getHomepageCms` (30s TTL) with hardcoded fallback
+- Seed SQL: `reference/migrations/10_5_homepage_cms_seed.sql`
+- `generatePaymentReceiptPdf` — HTML print-to-PDF (Vercel-safe; Noto Nastaliq Urdu + Source Sans 3); button restored on `/payment-history`
+- Optional: `viewing` / `negotiating` inquiry statuses — `10_5_inquiry_statuses.sql`
+
 ### Verify
 `bunx tsc --noEmit` · `bunx vitest run` · `bun run build`

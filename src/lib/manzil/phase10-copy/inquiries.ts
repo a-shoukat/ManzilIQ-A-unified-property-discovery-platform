@@ -24,7 +24,7 @@ export const INQUIRY_COPY = {
   all: "All",
   newBadge: "new",
   filterHint:
-    "Status filters match Phase 4 DB values (new / contacted / qualified / converted / closed).",
+    "Status filters: new / contacted / viewing / negotiating / qualified / converted / closed.",
   loadError: "Could not load inquiries",
   replyError: "Could not send reply",
   statusError: "Could not update status",
