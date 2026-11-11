@@ -7,7 +7,7 @@ export const CMS_COPY = {
   reset: "Reset to default",
   adminHub: "Admin hub",
   homepageNote:
-    "Public marketplace homepage is unchanged until homepage wiring is approved (Needs decision). Edits here persist to site_banners / site_content only.",
+    "Edits apply to the public marketplace homepage (/). Reset restores the seeded default copy and hero banner.",
   loading: "Loading…",
   siteContent: "Site content",
   saveContent: "Save content",

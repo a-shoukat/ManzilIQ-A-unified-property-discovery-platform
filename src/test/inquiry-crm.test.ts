@@ -19,7 +19,15 @@ const base = (status: Inquiry["status"]): Inquiry => ({
 
 describe("inquiry CRM UI helpers", () => {
   it("exposes Phase 4 status filters", () => {
-    expect(INQUIRY_STATUSES).toEqual(["new", "contacted", "qualified", "converted", "closed"]);
+    expect(INQUIRY_STATUSES).toEqual([
+      "new",
+      "contacted",
+      "viewing",
+      "negotiating",
+      "qualified",
+      "converted",
+      "closed",
+    ]);
   });
 
   it("counts unread as status=new", () => {

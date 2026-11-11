@@ -1,7 +1,9 @@
 import { getSupabase } from "./supabase";
 import { notify } from "./notify";
 
-export type InquiryStatus = "new" | "contacted" | "qualified" | "converted" | "closed";
+import type { InquiryStatusValue } from "./inquiry-status";
+
+export type InquiryStatus = InquiryStatusValue;
 
 export interface Inquiry {
   id: string;

@@ -12,10 +12,12 @@ import {
 } from "./inquiries";
 import { createLead } from "./dealer";
 
-/** Phase 4 statuses (DB check constraint). Spec viewing/negotiating → Needs decision. */
+/** Phase 4 + Phase 10.5 statuses (see 10_5_inquiry_statuses.sql). */
 export const INQUIRY_STATUSES: InquiryStatus[] = [
   "new",
   "contacted",
+  "viewing",
+  "negotiating",
   "qualified",
   "converted",
   "closed",
@@ -52,10 +54,7 @@ export async function fetchInquiryThread(inquiryId: string): Promise<{
 export { fetchOwnerInquiries, replyToInquiry, setInquiryStatus, fetchInquiryReplies };
 
 /** Create a dealer lead from an inquiry and link it (additive — does not alter createLead). */
-export async function convertInquiryToLead(
-  inquiry: Inquiry,
-  dealerId: string,
-): Promise<string> {
+export async function convertInquiryToLead(inquiry: Inquiry, dealerId: string): Promise<string> {
   const sb = getSupabase();
   if (!sb) throw new Error("Database not connected");
   await createLead(dealerId, {
