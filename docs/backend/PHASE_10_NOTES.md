@@ -27,5 +27,9 @@ See store doc `docs/manziliq-phase10-summary.md` — `/my-payments` untouched; h
 ### CI fix
 Phase 9 workflow used `actions/setup-node` with `cache: npm` but the repo only has `bun.lock`, so the **test** job failed before install. Workflow now uses `oven-sh/setup-bun` + vitest/tsc/build. Full-repo `eslint` remains skipped in CI (pre-existing Prettier debt).
 
+### Spec-gap follow-up (`cursor/phase10-spec-gaps-dcf3`)
+- Isolatable copy: `src/lib/manzil/phase10-copy/{inquiries,notifications,moderation,cms,audit,payments,status}.ts`
+- Screen 6: Phase 3 PDF receipt server fn MISSING → PDF download button skipped on `/payment-history`
+
 ### Verify
 `bunx tsc --noEmit` · `bunx vitest run` · `bun run build`

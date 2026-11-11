@@ -15,6 +15,7 @@ import {
   unreadInquiryCount,
 } from '@/lib/manzil/inquiry-crm';
 import type { Inquiry, InquiryReply, InquiryStatus } from '@/lib/manzil/inquiries';
+import { INQUIRY_COPY as C } from '@/lib/manzil/phase10-copy/inquiries';
 
 /** Screen 1 — Owner/dealer/society inquiry inbox (dealer leads CRM layout). */
 function InquiriesInbox({ onNavigate }: { onNavigate: (p: string) => void }) {
@@ -37,7 +38,7 @@ function InquiriesInbox({ onNavigate }: { onNavigate: (p: string) => void }) {
     try {
       setList(await fetchOwnerInquiries(session.user.id));
     } catch (e) {
-      setError(errorText(e, 'Could not load inquiries'));
+      setError(errorText(e, C.loadError));
       setList([]);
     } finally {
       setLoading(false);
@@ -70,9 +71,9 @@ function InquiriesInbox({ onNavigate }: { onNavigate: (p: string) => void }) {
     try {
       await setInquiryStatus(id, status);
       setList((prev) => prev.map((i) => (i.id === id ? { ...i, status } : i)));
-      setMsg(`Status set to ${status}`);
+      setMsg(C.statusSet(status));
     } catch (e) {
-      setError(errorText(e, 'Could not update status'));
+      setError(errorText(e, C.statusError));
     } finally {
       setBusy(false);
     }
@@ -92,9 +93,9 @@ function InquiriesInbox({ onNavigate }: { onNavigate: (p: string) => void }) {
       setBody('');
       setReplies((await fetchInquiryThread(inquiryId)).replies);
       await load();
-      setMsg('Reply sent');
+      setMsg(C.replySent);
     } catch (e) {
-      setFormErr(errorText(e, 'Could not send reply'));
+      setFormErr(errorText(e, C.replyError));
     } finally {
       setBusy(false);
     }
@@ -102,16 +103,16 @@ function InquiriesInbox({ onNavigate }: { onNavigate: (p: string) => void }) {
 
   const convert = async (inq: Inquiry) => {
     if (!session || !isDealer) {
-      setMsg('Convert to lead is available for dealer accounts (dealer leads pipeline).');
+      setMsg(C.convertDealerOnly);
       return;
     }
     setBusy(true);
     try {
       await convertInquiryToLead(inq, session.user.id);
-      setMsg('Converted to lead');
+      setMsg(C.convertedMsg);
       await load();
     } catch (e) {
-      setError(errorText(e, 'Could not convert to lead'));
+      setError(errorText(e, C.convertError));
     } finally {
       setBusy(false);
     }
@@ -121,28 +122,29 @@ function InquiriesInbox({ onNavigate }: { onNavigate: (p: string) => void }) {
     <div className="container">
       <div className="topbar">
         <div>
-          <h1>Inquiries</h1>
+          <h1>{C.ownerTitle}</h1>
           <p className="muted" style={{ margin: 0 }}>
-            {list.length} inquiries
+            {C.ownerSubtitle(list.length)}
             {unread > 0 && (
-              <span className="side-count" style={{ marginLeft: 8 }}>{unread} new</span>
+              <span className="side-count" style={{ marginLeft: 8 }}>{unread} {C.newBadge}</span>
             )}
           </p>
         </div>
         <div className="link-row" style={{ margin: 0 }}>
           {isDealer && (
             <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('dealer-leads')}>
-              Leads pipeline
+              {C.leadsPipeline}
             </Button>
           )}
           <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('dashboard')}>
-            Dashboard
+            {C.dashboard}
           </Button>
         </div>
       </div>
 
       {msg && <div className="notice" style={{ marginBottom: 12 }}>{msg}</div>}
       {error && <div className="error" role="alert">{error}</div>}
+      <p className="muted small">{C.filterHint}</p>
 
       <div className="link-row" style={{ marginBottom: 12 }}>
         <Button
@@ -150,7 +152,7 @@ function InquiriesInbox({ onNavigate }: { onNavigate: (p: string) => void }) {
           className={`btn secondary small${statusFilter === 'all' ? ' active' : ''}`}
           onClick={() => setStatusFilter('all')}
         >
-          All
+          {C.all}
         </Button>
         {INQUIRY_STATUSES.map((s) => (
           <Button
@@ -165,9 +167,9 @@ function InquiriesInbox({ onNavigate }: { onNavigate: (p: string) => void }) {
       </div>
 
       {loading ? (
-        <p className="muted">Loading…</p>
+        <p className="muted">{C.loading}</p>
       ) : visible.length === 0 ? (
-        <p className="muted">No inquiries in this filter.</p>
+        <p className="muted">{C.emptyFilter}</p>
       ) : (
         visible.map((inq) => (
           <div key={inq.id} className={`queue-card${inq.status === 'new' ? '' : ' read-dim'}`}>
@@ -187,7 +189,7 @@ function InquiriesInbox({ onNavigate }: { onNavigate: (p: string) => void }) {
             </div>
             <div className="queue-actions" style={{ flexWrap: 'wrap', gap: 8 }}>
               <label className="small">
-                Status
+                {C.status}
                 <select
                   value={inq.status}
                   disabled={busy}
@@ -199,19 +201,19 @@ function InquiriesInbox({ onNavigate }: { onNavigate: (p: string) => void }) {
                 </select>
               </label>
               <Button variant="legacy" className="btn secondary small" onClick={() => void openThread(inq.id)}>
-                {openId === inq.id ? 'Hide thread' : 'Thread'}
+                {openId === inq.id ? C.hideThread : C.thread}
               </Button>
               {isDealer && !inq.lead_id && (
                 <Button variant="legacy" className="btn small" disabled={busy} onClick={() => void convert(inq)}>
-                  Convert to lead
+                  {C.convertToLead}
                 </Button>
               )}
-              {inq.lead_id && <span className="muted small">Linked to lead</span>}
+              {inq.lead_id && <span className="muted small">{C.linkedToLead}</span>}
             </div>
             {openId === inq.id && (
               <div style={{ marginTop: 12 }}>
                 {replies.length === 0 ? (
-                  <p className="muted small">No replies yet.</p>
+                  <p className="muted small">{C.noReplies}</p>
                 ) : (
                   replies.map((r) => (
                     <div key={r.id} className="detail-item" style={{ marginBottom: 8 }}>
@@ -221,12 +223,12 @@ function InquiriesInbox({ onNavigate }: { onNavigate: (p: string) => void }) {
                   ))
                 )}
                 <label>
-                  Reply
+                  {C.reply}
                   <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={3} />
                 </label>
                 {formErr && <div className="error" role="alert">{formErr}</div>}
                 <Button variant="legacy" className="btn small" disabled={busy} onClick={() => void sendReply(inq.id)}>
-                  {busy ? 'Sending…' : 'Send reply'}
+                  {busy ? C.sending : C.sendReply}
                 </Button>
               </div>
             )}
@@ -238,7 +240,7 @@ function InquiriesInbox({ onNavigate }: { onNavigate: (p: string) => void }) {
 }
 
 export const Route = createFileRoute('/inquiries')({
-  head: () => pageHead('Inquiries'),
+  head: () => pageHead(C.ownerTitle),
   component: RoutePage,
 });
 function RoutePage() {
