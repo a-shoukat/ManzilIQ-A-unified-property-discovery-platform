@@ -18,6 +18,7 @@ import {
 } from '@/lib/manzil/dealer';
 import { LEAD_LABELS, filterByLabel, leadLabelOf, type LeadLabel } from '@/lib/manzil/deal-pipeline';
 import { PIPELINE_STAGES, type Lead, type LeadActivity, type LeadStatus, type Plot } from '@/lib/manzil/types';
+import { GenerateSaleFormButton } from '@/components/manzil/GenerateSaleFormButton';
 
 const STATUSES: LeadStatus[] = ['new', 'hot', 'warm', 'cold', 'converted', 'lost'];
 
@@ -246,6 +247,7 @@ function Leads({ onNavigate }: { onNavigate: (p: string) => void }) {
                 <Button variant="legacy" className="btn secondary small" onClick={() => openDetail(lead.id)}>
                   {openLead === lead.id ? 'Hide' : 'History'}
                 </Button>
+                <GenerateSaleFormButton bookingId={lead.booking_id ?? null} />
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="legacy" className="link inline danger-text" disabled={deleting === lead.id}>{deleting === lead.id ? 'Deleting…' : 'Delete'}</Button>

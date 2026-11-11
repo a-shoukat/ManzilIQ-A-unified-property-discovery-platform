@@ -62,8 +62,13 @@ import { Route as SocietyFinancialsRouteImport } from './routes/society-financia
 import { Route as SocietyInventoryRouteImport } from './routes/society-inventory'
 import { Route as SocietyMapRouteImport } from './routes/society-map'
 import { Route as WishlistRouteImport } from './routes/wishlist'
+import { Route as DealerFormSettingsRouteImport } from './routes/dealer.form-settings'
+import { Route as DealerFormsRouteImport } from './routes/dealer.forms'
+import { Route as FTokenRouteImport } from './routes/f.$token'
 import { Route as PropertyIdRouteImport } from './routes/property.$id'
 import { Route as SettingsNotificationsRouteImport } from './routes/settings.notifications'
+import { Route as DealerFormsIdRouteImport } from './routes/dealer.forms.$id'
+import { Route as DealerFormsNewRouteImport } from './routes/dealer.forms.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -330,6 +335,21 @@ const WishlistRoute = WishlistRouteImport.update({
   path: '/wishlist',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DealerFormSettingsRoute = DealerFormSettingsRouteImport.update({
+  id: '/form-settings',
+  path: '/form-settings',
+  getParentRoute: () => DealerRoute,
+} as any)
+const DealerFormsRoute = DealerFormsRouteImport.update({
+  id: '/forms',
+  path: '/forms',
+  getParentRoute: () => DealerRoute,
+} as any)
+const FTokenRoute = FTokenRouteImport.update({
+  id: '/f/$token',
+  path: '/f/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PropertyIdRoute = PropertyIdRouteImport.update({
   id: '/property/$id',
   path: '/property/$id',
@@ -339,6 +359,16 @@ const SettingsNotificationsRoute = SettingsNotificationsRouteImport.update({
   id: '/settings/notifications',
   path: '/settings/notifications',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DealerFormsIdRoute = DealerFormsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => DealerFormsRoute,
+} as any)
+const DealerFormsNewRoute = DealerFormsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => DealerFormsRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -362,7 +392,7 @@ export interface FileRoutesByFullPath {
   '/broadcast': typeof BroadcastRoute
   '/compare': typeof CompareRoute
   '/dashboard': typeof DashboardRoute
-  '/dealer': typeof DealerRoute
+  '/dealer': typeof DealerRouteWithChildren
   '/dealer-analytics': typeof DealerAnalyticsRoute
   '/dealer-book': typeof DealerBookRoute
   '/dealer-commissions': typeof DealerCommissionsRoute
@@ -395,8 +425,13 @@ export interface FileRoutesByFullPath {
   '/society-inventory': typeof SocietyInventoryRoute
   '/society-map': typeof SocietyMapRoute
   '/wishlist': typeof WishlistRoute
+  '/dealer/form-settings': typeof DealerFormSettingsRoute
+  '/dealer/forms': typeof DealerFormsRouteWithChildren
+  '/f/$token': typeof FTokenRoute
   '/property/$id': typeof PropertyIdRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
+  '/dealer/forms/$id': typeof DealerFormsIdRoute
+  '/dealer/forms/new': typeof DealerFormsNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -419,7 +454,7 @@ export interface FileRoutesByTo {
   '/broadcast': typeof BroadcastRoute
   '/compare': typeof CompareRoute
   '/dashboard': typeof DashboardRoute
-  '/dealer': typeof DealerRoute
+  '/dealer': typeof DealerRouteWithChildren
   '/dealer-analytics': typeof DealerAnalyticsRoute
   '/dealer-book': typeof DealerBookRoute
   '/dealer-commissions': typeof DealerCommissionsRoute
@@ -452,8 +487,13 @@ export interface FileRoutesByTo {
   '/society-inventory': typeof SocietyInventoryRoute
   '/society-map': typeof SocietyMapRoute
   '/wishlist': typeof WishlistRoute
+  '/dealer/form-settings': typeof DealerFormSettingsRoute
+  '/dealer/forms': typeof DealerFormsRouteWithChildren
+  '/f/$token': typeof FTokenRoute
   '/property/$id': typeof PropertyIdRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
+  '/dealer/forms/$id': typeof DealerFormsIdRoute
+  '/dealer/forms/new': typeof DealerFormsNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -477,7 +517,7 @@ export interface FileRoutesById {
   '/broadcast': typeof BroadcastRoute
   '/compare': typeof CompareRoute
   '/dashboard': typeof DashboardRoute
-  '/dealer': typeof DealerRoute
+  '/dealer': typeof DealerRouteWithChildren
   '/dealer-analytics': typeof DealerAnalyticsRoute
   '/dealer-book': typeof DealerBookRoute
   '/dealer-commissions': typeof DealerCommissionsRoute
@@ -510,8 +550,13 @@ export interface FileRoutesById {
   '/society-inventory': typeof SocietyInventoryRoute
   '/society-map': typeof SocietyMapRoute
   '/wishlist': typeof WishlistRoute
+  '/dealer/form-settings': typeof DealerFormSettingsRoute
+  '/dealer/forms': typeof DealerFormsRouteWithChildren
+  '/f/$token': typeof FTokenRoute
   '/property/$id': typeof PropertyIdRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
+  '/dealer/forms/$id': typeof DealerFormsIdRoute
+  '/dealer/forms/new': typeof DealerFormsNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -569,8 +614,13 @@ export interface FileRouteTypes {
     | '/society-inventory'
     | '/society-map'
     | '/wishlist'
+    | '/dealer/form-settings'
+    | '/dealer/forms'
+    | '/f/$token'
     | '/property/$id'
     | '/settings/notifications'
+    | '/dealer/forms/$id'
+    | '/dealer/forms/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -626,8 +676,13 @@ export interface FileRouteTypes {
     | '/society-inventory'
     | '/society-map'
     | '/wishlist'
+    | '/dealer/form-settings'
+    | '/dealer/forms'
+    | '/f/$token'
     | '/property/$id'
     | '/settings/notifications'
+    | '/dealer/forms/$id'
+    | '/dealer/forms/new'
   id:
     | '__root__'
     | '/'
@@ -683,8 +738,13 @@ export interface FileRouteTypes {
     | '/society-inventory'
     | '/society-map'
     | '/wishlist'
+    | '/dealer/form-settings'
+    | '/dealer/forms'
+    | '/f/$token'
     | '/property/$id'
     | '/settings/notifications'
+    | '/dealer/forms/$id'
+    | '/dealer/forms/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -708,7 +768,7 @@ export interface RootRouteChildren {
   BroadcastRoute: typeof BroadcastRoute
   CompareRoute: typeof CompareRoute
   DashboardRoute: typeof DashboardRoute
-  DealerRoute: typeof DealerRoute
+  DealerRoute: typeof DealerRouteWithChildren
   DealerAnalyticsRoute: typeof DealerAnalyticsRoute
   DealerBookRoute: typeof DealerBookRoute
   DealerCommissionsRoute: typeof DealerCommissionsRoute
@@ -741,6 +801,7 @@ export interface RootRouteChildren {
   SocietyInventoryRoute: typeof SocietyInventoryRoute
   SocietyMapRoute: typeof SocietyMapRoute
   WishlistRoute: typeof WishlistRoute
+  FTokenRoute: typeof FTokenRoute
   PropertyIdRoute: typeof PropertyIdRoute
   SettingsNotificationsRoute: typeof SettingsNotificationsRoute
 }
@@ -1118,6 +1179,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WishlistRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dealer/form-settings': {
+      id: '/dealer/form-settings'
+      path: '/form-settings'
+      fullPath: '/dealer/form-settings'
+      preLoaderRoute: typeof DealerFormSettingsRouteImport
+      parentRoute: typeof DealerRoute
+    }
+    '/dealer/forms': {
+      id: '/dealer/forms'
+      path: '/forms'
+      fullPath: '/dealer/forms'
+      preLoaderRoute: typeof DealerFormsRouteImport
+      parentRoute: typeof DealerRoute
+    }
+    '/f/$token': {
+      id: '/f/$token'
+      path: '/f/$token'
+      fullPath: '/f/$token'
+      preLoaderRoute: typeof FTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/property/$id': {
       id: '/property/$id'
       path: '/property/$id'
@@ -1132,8 +1214,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsNotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dealer/forms/$id': {
+      id: '/dealer/forms/$id'
+      path: '/$id'
+      fullPath: '/dealer/forms/$id'
+      preLoaderRoute: typeof DealerFormsIdRouteImport
+      parentRoute: typeof DealerFormsRoute
+    }
+    '/dealer/forms/new': {
+      id: '/dealer/forms/new'
+      path: '/new'
+      fullPath: '/dealer/forms/new'
+      preLoaderRoute: typeof DealerFormsNewRouteImport
+      parentRoute: typeof DealerFormsRoute
+    }
   }
 }
+
+interface DealerFormsRouteChildren {
+  DealerFormsIdRoute: typeof DealerFormsIdRoute
+  DealerFormsNewRoute: typeof DealerFormsNewRoute
+}
+
+const DealerFormsRouteChildren: DealerFormsRouteChildren = {
+  DealerFormsIdRoute: DealerFormsIdRoute,
+  DealerFormsNewRoute: DealerFormsNewRoute,
+}
+
+const DealerFormsRouteWithChildren = DealerFormsRoute._addFileChildren(
+  DealerFormsRouteChildren,
+)
+
+interface DealerRouteChildren {
+  DealerFormSettingsRoute: typeof DealerFormSettingsRoute
+  DealerFormsRoute: typeof DealerFormsRouteWithChildren
+}
+
+const DealerRouteChildren: DealerRouteChildren = {
+  DealerFormSettingsRoute: DealerFormSettingsRoute,
+  DealerFormsRoute: DealerFormsRouteWithChildren,
+}
+
+const DealerRouteWithChildren =
+  DealerRoute._addFileChildren(DealerRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -1156,7 +1279,7 @@ const rootRouteChildren: RootRouteChildren = {
   BroadcastRoute: BroadcastRoute,
   CompareRoute: CompareRoute,
   DashboardRoute: DashboardRoute,
-  DealerRoute: DealerRoute,
+  DealerRoute: DealerRouteWithChildren,
   DealerAnalyticsRoute: DealerAnalyticsRoute,
   DealerBookRoute: DealerBookRoute,
   DealerCommissionsRoute: DealerCommissionsRoute,
@@ -1189,6 +1312,7 @@ const rootRouteChildren: RootRouteChildren = {
   SocietyInventoryRoute: SocietyInventoryRoute,
   SocietyMapRoute: SocietyMapRoute,
   WishlistRoute: WishlistRoute,
+  FTokenRoute: FTokenRoute,
   PropertyIdRoute: PropertyIdRoute,
   SettingsNotificationsRoute: SettingsNotificationsRoute,
 }
