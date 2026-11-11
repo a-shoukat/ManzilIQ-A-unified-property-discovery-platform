@@ -105,14 +105,15 @@ export type PublicSaleFormView = {
   header: DealerFormSettings;
 };
 
+/** Seeded Afridi Estate defaults — only place Afridi branding is hard-coded. */
 export const DEFAULT_FORM_SETTINGS: Omit<DealerFormSettings, "dealer_id" | "updated_at"> = {
   logo_url: null,
-  business_name_ur: "",
-  business_name_en: "",
-  society_name_ur: "",
+  business_name_ur: "افریدی اسٹیٹ",
+  business_name_en: "Afridi Estate",
+  society_name_ur: "گارڈن ٹاؤن · ڈاکٹرز کالونی",
   scheme_badge_ur: "گارڈن ٹاؤن",
   phase_badge_ur: "ڈاکٹرز کالونی فیز 3",
-  tagline_ur: "",
+  tagline_ur: "خرید و فروخت جائیداد",
   address_ur: "",
   ceo_label_ur: "سی ای او",
   ceo_name_ur: "",

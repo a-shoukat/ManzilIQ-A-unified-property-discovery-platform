@@ -204,29 +204,6 @@ export function DealerSaleFormEditor({
           </div>
           <div className="form-row">
             <label>سابقہ رقم<input type="number" min={0} step={1} disabled={locked} value={form.previous_amount} onChange={(e) => set('previous_amount', e.target.value)} /></label>
-            <label>
-              کل رقم وصول
-              <input
-                type="number"
-                min={0}
-                step={1}
-                disabled={locked}
-                value={form.total_received ?? 0}
-                onChange={(e) => setForm((f) => ({ ...f, total_received: Number(e.target.value), amounts_manually_edited: true }))}
-              />
-            </label>
-          </div>
-          <div className="form-row">
-            <label>
-              بقایا رقم
-              <input
-                type="number"
-                step={1}
-                disabled={locked}
-                value={form.balance_amount ?? 0}
-                onChange={(e) => setForm((f) => ({ ...f, balance_amount: Number(e.target.value), amounts_manually_edited: true }))}
-              />
-            </label>
             <label className="small" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <input
                 type="checkbox"
@@ -245,8 +222,35 @@ export function DealerSaleFormEditor({
               Totals edited (manual override)
             </label>
           </div>
-          {!form.amounts_manually_edited && (
+          <div className="form-row">
+            <label>
+              کل رقم وصول
+              <input
+                type="number"
+                min={0}
+                step={1}
+                readOnly={!form.amounts_manually_edited}
+                disabled={locked || !form.amounts_manually_edited}
+                value={form.amounts_manually_edited ? (form.total_received ?? 0) : auto.total_received}
+                onChange={(e) => setForm((f) => ({ ...f, total_received: Number(e.target.value), amounts_manually_edited: true }))}
+              />
+            </label>
+            <label>
+              بقایا رقم
+              <input
+                type="number"
+                step={1}
+                readOnly={!form.amounts_manually_edited}
+                disabled={locked || !form.amounts_manually_edited}
+                value={form.amounts_manually_edited ? (form.balance_amount ?? 0) : auto.balance_amount}
+                onChange={(e) => setForm((f) => ({ ...f, balance_amount: Number(e.target.value), amounts_manually_edited: true }))}
+              />
+            </label>
+          </div>
+          {!form.amounts_manually_edited ? (
             <p className="muted small">Auto: کل وصول = ٹوکن + سابقہ · بقایا = کل قیمت − کل وصول</p>
+          ) : (
+            <p className="muted small">ترمیم شدہ — printed form shows (ترمیم شدہ) flag</p>
           )}
           <div className="form-row">
             <label>بقایا رقم مورخہ<input type="date" disabled={locked} value={form.balance_due_date ?? ''} onChange={(e) => set('balance_due_date', e.target.value || null)} /></label>

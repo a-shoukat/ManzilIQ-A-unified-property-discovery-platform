@@ -38,7 +38,8 @@ export function totalsWereEdited(
 
 export function formatRupeeUr(n: number): string {
   const abs = Math.round(Math.abs(n));
-  const formatted = abs.toLocaleString("en-PK");
+  // Force Western digits (0-9) even under ur locales — never Eastern Arabic-Indic.
+  const formatted = abs.toLocaleString("en-PK-u-nu-latn");
   const sign = n < 0 ? "-" : "";
   return `${sign}${formatted} روپے`;
 }

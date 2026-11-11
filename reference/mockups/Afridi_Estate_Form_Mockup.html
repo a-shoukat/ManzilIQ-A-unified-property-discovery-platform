@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+  <meta charset="utf-8"/>
+  <title>Afridi Estate Form Mockup (approved visual reference)</title>
+  <!-- Visual reference only. Live form reads dealer_form_settings; Afridi values are the seeded default. -->
+  <style>
+    :root {
+      --header-bg: #1a4d2e;
+      --header-accent: #c9a227;
+      --ink: #111;
+      --rule: #9a9a9a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #e8e8e8;
+      font-family: "Noto Nastaliq Urdu", "Source Sans 3", serif;
+      line-height: 2.05;
+      color: var(--ink);
+    }
+    .sheet {
+      width: 148mm;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid #bbb;
+      position: relative;
+      overflow: hidden;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .letterhead {
+      background: var(--header-bg);
+      color: #fff;
+      padding: 10px 12px 12px;
+      border-bottom: 5px solid var(--header-accent);
+      text-align: center;
+    }
+    .letterhead-top {
+      display: grid;
+      grid-template-columns: 72px 1fr 88px;
+      gap: 8px;
+      align-items: start;
+    }
+    .logo-slot {
+      width: 64px; height: 64px;
+      background: #fff;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .logo-slot img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .titles { text-align: center; min-width: 0; }
+    .biz-ur { font-size: 22px; font-weight: 700; line-height: 1.55; margin: 0; }
+    .biz-en {
+      font-family: "Source Sans 3", system-ui, sans-serif;
+      font-size: 12px; direction: ltr; unicode-bidi: isolate; opacity: .92; margin-top: 2px;
+    }
+    .tagline { font-size: 12px; opacity: .95; margin-top: 2px; }
+    .badges { display: flex; flex-direction: column; gap: 4px; align-items: stretch; }
+    .badge {
+      background: var(--header-accent);
+      color: #111;
+      font-size: 11px; font-weight: 700;
+      padding: 2px 8px; border-radius: 3px; text-align: center;
+    }
+    .scheme-bar {
+      margin-top: 8px;
+      font-size: 13px;
+      letter-spacing: .02em;
+      opacity: .98;
+    }
+    .address-pill {
+      margin-top: 8px;
+      background: rgba(0,0,0,.18);
+      border-radius: 999px;
+      padding: 4px 14px;
+      font-size: 12px;
+      display: inline-block;
+      max-width: 100%;
+    }
+    .ceo-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 8px;
+      font-size: 12px;
+    }
+    .body { padding: 8px 12px 14px; }
+    .ruled-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 14px;
+      border-bottom: 1px solid var(--rule);
+      padding: 3px 0 2px;
+    }
+    .ruled-row.full { grid-template-columns: 1fr; }
+    .cell { display: flex; gap: 6px; align-items: baseline; min-width: 0; }
+    .label { white-space: nowrap; font-weight: 700; font-size: 13px; }
+    .value {
+      flex: 1;
+      border-bottom: 1px dotted #aaa;
+      min-height: 1.7em;
+      font-size: 13px;
+      padding: 0 4px;
+    }
+    .ltr { direction: ltr; unicode-bidi: isolate; display: inline-block; }
+    .edited { color: #a60; font-size: 11px; margin-inline-start: 4px; }
+    .signatures {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      margin-top: 36px;
+      text-align: center;
+      font-size: 13px;
+    }
+    .sig-rule {
+      border-top: 1.5px solid #222;
+      margin: 0 8px 6px;
+      height: 0;
+    }
+    .sig-label { padding-top: 2px; }
+    .footer { text-align: center; font-size: 11px; color: #444; margin-top: 10px; }
+    .verified { text-align: center; font-size: 12px; color: #1a4d2e; font-weight: 700; margin-top: 8px; }
+    .watermark {
+      position: absolute; inset: 28% 8%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 72px; font-weight: 700; color: rgba(180,0,0,.26);
+      transform: rotate(-24deg); pointer-events: none; z-index: 5;
+    }
+    @page { size: A5; margin: 8mm; }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .sheet { border: none; width: 100%; }
+      .sheet, .letterhead, .badge, .address-pill {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+  <article class="sheet">
+    <!-- Cancelled forms show this overlay -->
+    <!-- <div class="watermark" aria-hidden="true">منسوخ</div> -->
+    <header class="letterhead">
+      <div class="letterhead-top">
+        <div class="logo-slot"><!-- logo from settings --></div>
+        <div class="titles">
+          <div class="biz-ur">افریدی اسٹیٹ</div>
+          <div class="biz-en">Afridi Estate</div>
+          <div class="tagline">خرید و فروخت جائیداد</div>
+        </div>
+        <div class="badges">
+          <span class="badge">گارڈن ٹاؤن</span>
+          <span class="badge">ڈاکٹرز کالونی فیز 3</span>
+        </div>
+      </div>
+      <div class="scheme-bar">سوسائٹی / سکیم لائن settings.society_name_ur سے</div>
+      <div class="address-pill">ایڈریس پِل — settings.address_ur</div>
+      <div class="ceo-row">
+        <span>سی ای او: نام</span>
+        <span>فون: <span class="ltr">0300-0000000</span></span>
+      </div>
+    </header>
+    <div class="body">
+      <div class="ruled-row"><div class="cell"><span class="label">نمبر شمار</span><span class="value ltr">1</span></div><div class="cell"><span class="label">تاریخ</span><span class="value ltr">2026-01-15</span></div></div>
+      <div class="ruled-row"><div class="cell"><span class="label">نام خریدار</span><span class="value">—</span></div><div class="cell"><span class="label">ولدیت/زوجہ</span><span class="value">—</span></div></div>
+      <div class="ruled-row"><div class="cell"><span class="label">شناختی کارڈ</span><span class="value ltr">—</span></div><div class="cell"><span class="label">رابطہ نمبر</span><span class="value ltr">—</span></div></div>
+      <div class="ruled-row full"><div class="cell"><span class="label">ایڈریس</span><span class="value">—</span></div></div>
+      <div class="ruled-row"><div class="cell"><span class="label">نام فروخت کنندہ</span><span class="value">—</span></div><div class="cell"><span class="label">ولدیت/زوجہ</span><span class="value">—</span></div></div>
+      <div class="ruled-row"><div class="cell"><span class="label">سائز</span><span class="value">—</span></div><div class="cell"><span class="label">ریٹ فی مرلہ</span><span class="value ltr">0 روپے</span></div></div>
+      <div class="ruled-row"><div class="cell"><span class="label">کل قیمت</span><span class="value ltr">0 روپے</span></div><div class="cell"><span class="label">فائل فیس + کمیشن</span><span class="value ltr">0 روپے</span></div></div>
+      <div class="ruled-row"><div class="cell"><span class="label">ٹوکن وصول</span><span class="value ltr">0 روپے</span></div><div class="cell"><span class="label">سابقہ رقم</span><span class="value ltr">0 روپے</span></div></div>
+      <div class="ruled-row"><div class="cell"><span class="label">کل رقم وصول</span><span class="value ltr">0 روپے</span></div><div class="cell"><span class="label">بقایا رقم</span><span class="value ltr">0 روپے</span></div></div>
+      <div class="ruled-row"><div class="cell"><span class="label">بقایا رقم مورخہ</span><span class="value">—</span></div><div class="cell"><span class="label">بیعانہ مورخہ</span><span class="value">—</span></div></div>
+      <div class="signatures">
+        <div><div class="sig-rule"></div><div class="sig-label">دستخط فروخت کنندہ</div></div>
+        <div><div class="sig-rule"></div><div class="sig-label">دستخط مینجر</div></div>
+      </div>
+    </div>
+  </article>
+</body>
+</html>

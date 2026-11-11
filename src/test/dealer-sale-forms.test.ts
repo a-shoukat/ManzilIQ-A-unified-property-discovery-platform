@@ -48,9 +48,83 @@ describe("dealer sale form totals", () => {
     ).toBe(true);
   });
 
-  it("formats rupees with Urdu suffix", () => {
-    expect(formatRupeeUr(1_250_000)).toContain("روپے");
-    expect(formatRupeeUr(1_250_000)).toMatch(/1[,.]?250[,.]?000/);
+  it("formats rupees with Urdu suffix and Western digits only", () => {
+    const s = formatRupeeUr(1_250_000);
+    expect(s).toContain("روپے");
+    expect(s).toMatch(/1[,.]?250[,.]?000/);
+    expect(s).not.toMatch(/[۰-۹٠-٩]/);
+  });
+});
+
+describe("dealer sale form PDF HTML", () => {
+  it("embeds Nastaliq, print colors, signatures, watermark, and settings header", async () => {
+    const { buildDealerSaleFormPdfHtml } = await import("@/lib/manzil/dealer-sale-form-pdf");
+    const settings: DealerFormSettings = {
+      dealer_id: "d1",
+      logo_url: null,
+      business_name_ur: "ٹیسٹ اسٹیٹ",
+      business_name_en: "Test Estate",
+      society_name_ur: "ٹیسٹ سوسائٹی",
+      scheme_badge_ur: "سکیم",
+      phase_badge_ur: "",
+      tagline_ur: "ٹیگ",
+      address_ur: "ایڈریس لائن",
+      ceo_label_ur: "سی ای او",
+      ceo_name_ur: "نام",
+      phone: "03001234567",
+      header_bg_color: "#1a4d2e",
+      header_accent_color: "#c9a227",
+      footer_note_ur: "",
+      show_manager_signature: true,
+      next_serial: 1,
+      updated_at: "",
+    };
+    const form = {
+      id: "f1",
+      dealer_id: "d1",
+      booking_id: null,
+      plot_id: null,
+      serial_no: 7,
+      form_date: "2026-11-12",
+      buyer_name: "علی",
+      buyer_guardian_name: "—",
+      buyer_cnic: "35202-1234567-1",
+      buyer_phone: "03001112233",
+      buyer_address: "لاہور",
+      seller_name: "فروخت",
+      seller_guardian_name: "—",
+      plot_size_text: "10 مرلہ",
+      rate_per_marla: 500000,
+      total_price: 5000000,
+      file_fee_commission: 0,
+      token_received: 500000,
+      previous_amount: 0,
+      total_received: 500000,
+      balance_amount: 4500000,
+      amounts_manually_edited: false,
+      balance_due_date: null,
+      bayana_date: null,
+      notes: "",
+      status: "cancelled" as const,
+      public_share_token: null,
+      created_at: "",
+      updated_at: "",
+    } as DealerSaleForm;
+    const html = buildDealerSaleFormPdfHtml(form, settings, "a5");
+    expect(html).toContain("data:font/woff2;base64,");
+    expect(html).not.toContain("fonts.googleapis.com");
+    expect(html).toContain("print-color-adjust: exact");
+    expect(html).toContain("@page { size: A5");
+    expect(html).toContain("دستخط فروخت کنندہ");
+    expect(html).toContain("دستخط مینجر");
+    expect(html).toContain("منسوخ");
+    expect(html).toContain("ٹیسٹ اسٹیٹ");
+    expect(html).toContain("ایڈریس لائن");
+    expect(html).toContain("روپے");
+    expect(html).not.toMatch(/[۰-۹٠-٩]/);
+    // Empty phase badge must not appear as blank chip
+    expect(html).not.toMatch(/class="badge"><\/span>\s*$/m);
+    expect(html).toContain("سکیم");
   });
 });
 

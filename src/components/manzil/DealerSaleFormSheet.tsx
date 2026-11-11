@@ -1,44 +1,46 @@
 import type { DealerFormSettings, DealerSaleForm } from '@/lib/manzil/dealer-sale-forms';
 import { formatRupeeUr } from '@/lib/manzil/dealer-sale-form-math';
+/** Screen preview uses root Noto Nastaliq; PDF HTML embeds woff2 (see dealer-sale-form-pdf). */
 
-const NOTO =
-  "https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&display=swap";
-
+/** Western digits + روپے; never Eastern Arabic-Indic digits. */
 function Ltr({ children }: { children: React.ReactNode }) {
   return (
-    <span dir="ltr" style={{ unicodeBidi: 'isolate', display: 'inline-block' }}>
+    <span dir="ltr" className="ltr" style={{ unicodeBidi: 'isolate', display: 'inline-block' }}>
       {children}
     </span>
   );
 }
 
-function Row({
-  leftLabel,
-  leftValue,
-  rightLabel,
-  rightValue,
+function Cell({
+  label,
+  children,
 }: {
-  leftLabel: string;
-  leftValue: React.ReactNode;
-  rightLabel?: string;
-  rightValue?: React.ReactNode;
+  label: string;
+  children: React.ReactNode;
 }) {
   return (
-    <div className="dsf-row">
-      <div className="dsf-cell">
-        <span className="dsf-label">{leftLabel}</span>
-        <span className="dsf-value">{leftValue || <span className="dsf-blank">&nbsp;</span>}</span>
-      </div>
-      {rightLabel != null && (
-        <div className="dsf-cell">
-          <span className="dsf-label">{rightLabel}</span>
-          <span className="dsf-value">{rightValue || <span className="dsf-blank">&nbsp;</span>}</span>
-        </div>
-      )}
+    <div className="cell">
+      <span className="label">{label}</span>
+      <span className="value">{children ?? <span className="blank">&nbsp;</span>}</span>
     </div>
   );
 }
 
+function RuledRow({
+  children,
+  full,
+}: {
+  children: React.ReactNode;
+  full?: boolean;
+}) {
+  return <div className={`ruled-row${full ? ' full' : ''}`}>{children}</div>;
+}
+
+/**
+ * Printed Urdu sale receipt — structure mirrors
+ * reference/mockups/Afridi_Estate_Form_Mockup.html.
+ * All letterhead fields come from dealer_form_settings.
+ */
 export function DealerSaleFormSheet({
   form,
   settings,
@@ -49,186 +51,293 @@ export function DealerSaleFormSheet({
   pageSize?: 'a4' | 'a5';
 }) {
   const cancelled = form.status === 'cancelled';
+  const edited = !!(form.amounts_manually_edited || form.totals_edited);
+  const page = pageSize === 'a4' ? 'A4' : 'A5';
+  const maxW = pageSize === 'a4' ? '210mm' : '148mm';
+
+  const showSchemeBadge = Boolean(settings.scheme_badge_ur?.trim());
+  const showPhaseBadge = Boolean(settings.phase_badge_ur?.trim());
+  const showBadges = showSchemeBadge || showPhaseBadge;
+
   return (
-    <div className={`dsf-sheet dsf-${pageSize}${cancelled ? ' dsf-cancelled' : ''}`} dir="rtl" id="dealer-sale-form-print">
-      <link rel="stylesheet" href={NOTO} />
+    <article
+      className={`sheet dsf-${pageSize}${cancelled ? ' cancelled' : ''}`}
+      dir="rtl"
+      id="dealer-sale-form-print"
+      style={
+        {
+          ['--header-bg' as string]: settings.header_bg_color,
+          ['--header-accent' as string]: settings.header_accent_color,
+          maxWidth: maxW,
+        } as React.CSSProperties
+      }
+    >
       <style>{`
-        .dsf-sheet {
-          font-family: 'Noto Nastaliq Urdu', serif;
-          line-height: 2.1;
+        #dealer-sale-form-print.sheet {
+          font-family: "Noto Nastaliq Urdu", "Source Sans 3", serif;
+          line-height: 2.05;
           color: #111;
           background: #fff;
           width: 100%;
-          max-width: ${pageSize === 'a4' ? '210mm' : '148mm'};
           margin: 0 auto;
-          border: 1px solid #ccc;
+          border: 1px solid #bbb;
           position: relative;
           overflow: hidden;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
         }
-        .dsf-header {
-          background: ${settings.header_bg_color};
+        #dealer-sale-form-print .letterhead {
+          background: var(--header-bg, #1a4d2e);
           color: #fff;
-          padding: 12px 14px 10px;
+          padding: 10px 12px 12px;
+          border-bottom: 5px solid var(--header-accent, #c9a227);
           text-align: center;
-          border-bottom: 4px solid ${settings.header_accent_color};
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
         }
-        .dsf-header-top { display:flex; align-items:center; justify-content:space-between; gap:8px; }
-        .dsf-logo { width:56px; height:56px; object-fit:contain; background:#fff; border-radius:6px; }
-        .dsf-badges { display:flex; flex-direction:column; gap:4px; align-items:flex-start; font-size:11px; }
-        .dsf-badge { background:${settings.header_accent_color}; color:#111; padding:2px 8px; border-radius:3px; font-weight:700; }
-        .dsf-society { font-size:13px; opacity:.95; margin-top:4px; }
-        .dsf-biz { font-size:22px; font-weight:700; margin:6px 0 2px; line-height:1.6; }
-        .dsf-biz-en { font-size:12px; opacity:.9; font-family: system-ui, sans-serif; direction:ltr; unicode-bidi:isolate; }
-        .dsf-address { font-size:12px; background:rgba(0,0,0,.15); margin-top:8px; padding:4px 8px; }
-        .dsf-ceo { display:flex; justify-content:space-between; font-size:12px; margin-top:6px; gap:8px; }
-        .dsf-body { padding:10px 12px 14px; }
-        .dsf-row { display:grid; grid-template-columns:1fr 1fr; gap:8px 12px; border-bottom:1px solid #bbb; padding:4px 0; }
-        .dsf-row.full { grid-template-columns:1fr; }
-        .dsf-cell { display:flex; gap:6px; align-items:baseline; min-width:0; }
-        .dsf-label { white-space:nowrap; font-weight:700; font-size:13px; color:#222; }
-        .dsf-value { flex:1; border-bottom:1px dotted #999; min-height:1.6em; font-size:13px; padding:0 4px; }
-        .dsf-blank { display:inline-block; min-width:4em; }
-        .dsf-signs { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:28px; }
-        .dsf-sign { text-align:center; font-size:13px; }
-        .dsf-sign-line { border-top:1px solid #333; margin-top:40px; padding-top:4px; }
-        .dsf-footer { font-size:11px; text-align:center; color:#444; margin-top:12px; }
-        .dsf-edited { color:#a60; font-size:11px; margin-inline-start:4px; }
-        .dsf-verified { text-align:center; font-size:12px; margin-top:8px; color:#1a4d2e; font-weight:700; }
-        .dsf-cancelled::after {
-          content: 'منسوخ';
-          position:absolute; inset:30% 10%;
-          font-size:64px; font-weight:700; color:rgba(180,0,0,.28);
-          display:flex; align-items:center; justify-content:center;
-          transform: rotate(-24deg); pointer-events:none; z-index:5;
+        #dealer-sale-form-print .letterhead-top {
+          display: grid;
+          grid-template-columns: 72px 1fr ${showBadges ? '88px' : '0fr'};
+          gap: 8px;
+          align-items: start;
+        }
+        #dealer-sale-form-print .logo-slot {
+          width: 64px; height: 64px;
+          background: #fff;
+          border-radius: 8px;
+          display: flex; align-items: center; justify-content: center;
+          overflow: hidden;
+        }
+        #dealer-sale-form-print .logo-slot img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        #dealer-sale-form-print .titles { text-align: center; min-width: 0; }
+        #dealer-sale-form-print .biz-ur { font-size: 22px; font-weight: 700; line-height: 1.55; margin: 0; }
+        #dealer-sale-form-print .biz-en {
+          font-family: "Source Sans 3", system-ui, sans-serif;
+          font-size: 12px; direction: ltr; unicode-bidi: isolate; opacity: .92; margin-top: 2px;
+        }
+        #dealer-sale-form-print .tagline { font-size: 12px; opacity: .95; margin-top: 2px; }
+        #dealer-sale-form-print .badges { display: flex; flex-direction: column; gap: 4px; align-items: stretch; }
+        #dealer-sale-form-print .badge {
+          background: var(--header-accent, #c9a227);
+          color: #111;
+          font-size: 11px; font-weight: 700;
+          padding: 2px 8px; border-radius: 3px; text-align: center;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        #dealer-sale-form-print .scheme-bar {
+          margin-top: 8px;
+          font-size: 13px;
+          letter-spacing: .02em;
+          opacity: .98;
+        }
+        #dealer-sale-form-print .address-pill {
+          margin-top: 8px;
+          background: rgba(0,0,0,.18);
+          border-radius: 999px;
+          padding: 4px 14px;
+          font-size: 12px;
+          display: inline-block;
+          max-width: 100%;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        #dealer-sale-form-print .ceo-row {
+          display: flex;
+          justify-content: space-between;
+          gap: 10px;
+          margin-top: 8px;
+          font-size: 12px;
+        }
+        #dealer-sale-form-print .body { padding: 8px 12px 14px; }
+        #dealer-sale-form-print .ruled-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px 14px;
+          border-bottom: 1px solid #9a9a9a;
+          padding: 3px 0 2px;
+        }
+        #dealer-sale-form-print .ruled-row.full { grid-template-columns: 1fr; }
+        #dealer-sale-form-print .cell { display: flex; gap: 6px; align-items: baseline; min-width: 0; }
+        #dealer-sale-form-print .label { white-space: nowrap; font-weight: 700; font-size: 13px; }
+        #dealer-sale-form-print .value {
+          flex: 1;
+          border-bottom: 1px dotted #aaa;
+          min-height: 1.7em;
+          font-size: 13px;
+          padding: 0 4px;
+        }
+        #dealer-sale-form-print .blank { display: inline-block; min-width: 4em; }
+        #dealer-sale-form-print .edited { color: #a60; font-size: 11px; margin-inline-start: 4px; }
+        #dealer-sale-form-print .signatures {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 28px;
+          margin-top: 36px;
+          text-align: center;
+          font-size: 13px;
+        }
+        #dealer-sale-form-print .sig-rule {
+          border-top: 1.5px solid #222;
+          margin: 0 8px 6px;
+          height: 0;
+        }
+        #dealer-sale-form-print .sig-label { padding-top: 2px; }
+        #dealer-sale-form-print .footer { text-align: center; font-size: 11px; color: #444; margin-top: 10px; }
+        #dealer-sale-form-print .verified { text-align: center; font-size: 12px; color: #1a4d2e; font-weight: 700; margin-top: 8px; }
+        #dealer-sale-form-print.cancelled::after {
+          content: "منسوخ";
+          position: absolute; inset: 28% 8%;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 72px; font-weight: 700; color: rgba(180,0,0,.26);
+          transform: rotate(-24deg); pointer-events: none; z-index: 5;
         }
         @media print {
-          @page { size: ${pageSize === 'a4' ? 'A4' : 'A5'}; margin: 8mm; }
+          @page { size: ${page}; margin: 8mm; }
           body * { visibility: hidden !important; }
-          .dsf-sheet, .dsf-sheet * { visibility: visible !important; }
-          .dsf-sheet { position: absolute; left:0; top:0; width:100%; max-width:none; border:none; box-shadow:none; }
-          .no-print { display:none !important; }
+          #dealer-sale-form-print, #dealer-sale-form-print * { visibility: visible !important; }
+          #dealer-sale-form-print.sheet {
+            position: absolute; left: 0; top: 0; width: 100%; max-width: none; border: none;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+          .no-print { display: none !important; }
         }
       `}</style>
 
-      <header className="dsf-header">
-        <div className="dsf-header-top">
-          <div className="dsf-badges">
-            {settings.scheme_badge_ur && <span className="dsf-badge">{settings.scheme_badge_ur}</span>}
-            {settings.phase_badge_ur && <span className="dsf-badge">{settings.phase_badge_ur}</span>}
+      {cancelled && (
+        <div className="watermark no-print" aria-hidden="true" style={{ display: 'none' }}>
+          منسوخ
+        </div>
+      )}
+
+      <header className="letterhead">
+        <div className="letterhead-top">
+          <div className="logo-slot">
+            {settings.logo_url ? <img src={settings.logo_url} alt="" /> : null}
           </div>
-          {settings.logo_url ? (
-            <img className="dsf-logo" src={settings.logo_url} alt="" />
+          <div className="titles">
+            <div className="biz-ur">{settings.business_name_ur || '—'}</div>
+            {settings.business_name_en?.trim() ? (
+              <div className="biz-en">{settings.business_name_en}</div>
+            ) : null}
+            {settings.tagline_ur?.trim() ? <div className="tagline">{settings.tagline_ur}</div> : null}
+          </div>
+          {showBadges ? (
+            <div className="badges">
+              {showSchemeBadge ? <span className="badge">{settings.scheme_badge_ur}</span> : null}
+              {showPhaseBadge ? <span className="badge">{settings.phase_badge_ur}</span> : null}
+            </div>
           ) : (
-            <div className="dsf-logo" />
+            <div />
           )}
         </div>
-        {settings.society_name_ur && <div className="dsf-society">{settings.society_name_ur}</div>}
-        <div className="dsf-biz">{settings.business_name_ur || '—'}</div>
-        {settings.business_name_en && <div className="dsf-biz-en">{settings.business_name_en}</div>}
-        {settings.tagline_ur && <div style={{ fontSize: 12 }}>{settings.tagline_ur}</div>}
-        {settings.address_ur && <div className="dsf-address">{settings.address_ur}</div>}
-        <div className="dsf-ceo">
+        {settings.society_name_ur?.trim() ? (
+          <div className="scheme-bar">{settings.society_name_ur}</div>
+        ) : null}
+        {settings.address_ur?.trim() ? (
+          <div className="address-pill">{settings.address_ur}</div>
+        ) : null}
+        <div className="ceo-row">
           <span>
-            {settings.ceo_label_ur}: {settings.ceo_name_ur || '—'}
+            {settings.ceo_label_ur || 'سی ای او'}
+            {settings.ceo_name_ur?.trim() ? `: ${settings.ceo_name_ur}` : ''}
           </span>
           <span>
-            فون: <Ltr>{settings.phone || '—'}</Ltr>
+            فون: <Ltr>{settings.phone?.trim() || '—'}</Ltr>
           </span>
         </div>
       </header>
 
-      <div className="dsf-body">
-        <Row
-          leftLabel="نمبر شمار"
-          leftValue={<Ltr>{form.serial_no != null ? String(form.serial_no) : '—'}</Ltr>}
-          rightLabel="تاریخ"
-          rightValue={<Ltr>{form.form_date}</Ltr>}
-        />
-        <Row
-          leftLabel="نام خریدار"
-          leftValue={form.buyer_name}
-          rightLabel="ولدیت/زوجہ"
-          rightValue={form.buyer_guardian_name}
-        />
-        <Row
-          leftLabel="شناختی کارڈ"
-          leftValue={<Ltr>{form.buyer_cnic}</Ltr>}
-          rightLabel="رابطہ نمبر"
-          rightValue={<Ltr>{form.buyer_phone}</Ltr>}
-        />
-        <div className="dsf-row full">
-          <div className="dsf-cell">
-            <span className="dsf-label">ایڈریس</span>
-            <span className="dsf-value">{form.buyer_address || <span className="dsf-blank">&nbsp;</span>}</span>
-          </div>
-        </div>
-        <Row
-          leftLabel="نام فروخت کنندہ"
-          leftValue={form.seller_name}
-          rightLabel="ولدیت/زوجہ"
-          rightValue={form.seller_guardian_name}
-        />
-        <Row
-          leftLabel="سائز"
-          leftValue={form.plot_size_text}
-          rightLabel="ریٹ فی مرلہ"
-          rightValue={<Ltr>{formatRupeeUr(Number(form.rate_per_marla))}</Ltr>}
-        />
-        <Row
-          leftLabel="کل قیمت"
-          leftValue={<Ltr>{formatRupeeUr(Number(form.total_price))}</Ltr>}
-          rightLabel="فائل فیس + کمیشن"
-          rightValue={<Ltr>{formatRupeeUr(Number(form.file_fee_commission))}</Ltr>}
-        />
-        <Row
-          leftLabel="ٹوکن وصول"
-          leftValue={<Ltr>{formatRupeeUr(Number(form.token_received))}</Ltr>}
-          rightLabel="سابقہ رقم"
-          rightValue={<Ltr>{formatRupeeUr(Number(form.previous_amount))}</Ltr>}
-        />
-        <Row
-          leftLabel="کل رقم وصول"
-          leftValue={
-            <>
-              <Ltr>{formatRupeeUr(Number(form.total_received))}</Ltr>
-              {(form.amounts_manually_edited || form.totals_edited) && (
-                <span className="dsf-edited">(ترمیم شدہ)</span>
-              )}
-            </>
-          }
-          rightLabel="بقایا رقم"
-          rightValue={
-            <>
-              <Ltr>{formatRupeeUr(Number(form.balance_amount))}</Ltr>
-              {(form.amounts_manually_edited || form.totals_edited) && (
-                <span className="dsf-edited">(ترمیم شدہ)</span>
-              )}
-            </>
-          }
-        />
-        <Row
-          leftLabel="بقایا رقم مورخہ"
-          leftValue={<Ltr>{form.balance_due_date ?? '—'}</Ltr>}
-          rightLabel="بیعانہ مورخہ"
-          rightValue={<Ltr>{form.bayana_date ?? '—'}</Ltr>}
-        />
+      <div className="body">
+        <RuledRow>
+          <Cell label="نمبر شمار">
+            <Ltr>{form.serial_no != null ? String(form.serial_no) : '—'}</Ltr>
+          </Cell>
+          <Cell label="تاریخ">
+            <Ltr>{form.form_date}</Ltr>
+          </Cell>
+        </RuledRow>
+        <RuledRow>
+          <Cell label="نام خریدار">{form.buyer_name}</Cell>
+          <Cell label="ولدیت/زوجہ">{form.buyer_guardian_name}</Cell>
+        </RuledRow>
+        <RuledRow>
+          <Cell label="شناختی کارڈ">
+            <Ltr>{form.buyer_cnic}</Ltr>
+          </Cell>
+          <Cell label="رابطہ نمبر">
+            <Ltr>{form.buyer_phone}</Ltr>
+          </Cell>
+        </RuledRow>
+        <RuledRow full>
+          <Cell label="ایڈریس">{form.buyer_address}</Cell>
+        </RuledRow>
+        <RuledRow>
+          <Cell label="نام فروخت کنندہ">{form.seller_name}</Cell>
+          <Cell label="ولدیت/زوجہ">{form.seller_guardian_name}</Cell>
+        </RuledRow>
+        <RuledRow>
+          <Cell label="سائز">{form.plot_size_text}</Cell>
+          <Cell label="ریٹ فی مرلہ">
+            <Ltr>{formatRupeeUr(Number(form.rate_per_marla))}</Ltr>
+          </Cell>
+        </RuledRow>
+        <RuledRow>
+          <Cell label="کل قیمت">
+            <Ltr>{formatRupeeUr(Number(form.total_price))}</Ltr>
+          </Cell>
+          <Cell label="فائل فیس + کمیشن">
+            <Ltr>{formatRupeeUr(Number(form.file_fee_commission))}</Ltr>
+          </Cell>
+        </RuledRow>
+        <RuledRow>
+          <Cell label="ٹوکن وصول">
+            <Ltr>{formatRupeeUr(Number(form.token_received))}</Ltr>
+          </Cell>
+          <Cell label="سابقہ رقم">
+            <Ltr>{formatRupeeUr(Number(form.previous_amount))}</Ltr>
+          </Cell>
+        </RuledRow>
+        <RuledRow>
+          <Cell label="کل رقم وصول">
+            <Ltr>{formatRupeeUr(Number(form.total_received))}</Ltr>
+            {edited ? <span className="edited">(ترمیم شدہ)</span> : null}
+          </Cell>
+          <Cell label="بقایا رقم">
+            <Ltr>{formatRupeeUr(Number(form.balance_amount))}</Ltr>
+            {edited ? <span className="edited">(ترمیم شدہ)</span> : null}
+          </Cell>
+        </RuledRow>
+        <RuledRow>
+          <Cell label="بقایا رقم مورخہ">
+            <Ltr>{form.balance_due_date ?? '—'}</Ltr>
+          </Cell>
+          <Cell label="بیعانہ مورخہ">
+            <Ltr>{form.bayana_date ?? '—'}</Ltr>
+          </Cell>
+        </RuledRow>
 
-        <div className="dsf-signs">
-          <div className="dsf-sign">
-            <div className="dsf-sign-line">دستخط فروخت کنندہ</div>
+        <div className="signatures">
+          <div>
+            <div className="sig-rule" />
+            <div className="sig-label">دستخط فروخت کنندہ</div>
           </div>
-          {settings.show_manager_signature && (
-            <div className="dsf-sign">
-              <div className="dsf-sign-line">دستخط مینجر</div>
+          {settings.show_manager_signature ? (
+            <div>
+              <div className="sig-rule" />
+              <div className="sig-label">دستخط مینجر</div>
             </div>
+          ) : (
+            <div />
           )}
         </div>
 
-        {settings.footer_note_ur && <div className="dsf-footer">{settings.footer_note_ur}</div>}
-        {form.status === 'issued' && (
-          <div className="dsf-verified">✓ تصدیق شدہ از ڈیلر — Verified by dealer</div>
-        )}
+        {settings.footer_note_ur?.trim() ? <div className="footer">{settings.footer_note_ur}</div> : null}
+        {form.status === 'issued' ? (
+          <div className="verified">✓ تصدیق شدہ از ڈیلر — Verified by dealer</div>
+        ) : null}
       </div>
-    </div>
+    </article>
   );
 }
