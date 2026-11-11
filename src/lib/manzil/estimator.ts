@@ -1,10 +1,10 @@
-import { getSupabase } from './supabase';
+import { getSupabase } from "./supabase";
 
 export interface EstimateInput {
   city: string;
   area: string;
   sizeMarla: number;
-  category: 'residential' | 'commercial';
+  category: "residential" | "commercial";
   bedrooms: number | null;
   society: string;
 }
@@ -13,7 +13,7 @@ export interface EstimateResult {
   low: number;
   mid: number;
   high: number;
-  method: 'ai' | 'local';
+  method: "ai" | "local";
   reasoning: string;
   samples: number;
   confidence: number; // 0..100
@@ -30,18 +30,28 @@ interface Sample {
 
 /** Solve (A)x = b via Gaussian elimination with partial pivoting. */
 function solveLinear(A: number[][], b: number[]): number[] {
- const n=b.length;
- const M=A.map((row,i)=>[...row,b[i] ?? 0]);
- const value=(r:number,c:number)=>M[r]?.[c] ?? 0;
- for(let col=0;col<n;col++){
-  let pivot=col;
-  for(let r=col+1;r<n;r++) if(Math.abs(value(r,col))>Math.abs(value(pivot,col))) pivot=r;
-  if(Math.abs(value(pivot,col))<1e-12) continue;
-  const row=M[col];const pivotRow=M[pivot]; if(!row||!pivotRow)continue;
-  M[col]=pivotRow;M[pivot]=row;
-  for(let r=0;r<n;r++) {if(r===col)continue;const current=M[r];if(!current)continue;const f=value(r,col)/value(col,col);for(let c=col;c<=n;c++)current[c]=value(r,c)-f*value(col,c);}
- }
- return M.map((row,i)=>Math.abs(row[i] ?? 0)<1e-12?0:(row[n] ?? 0)/(row[i] ?? 1));
+  const n = b.length;
+  const M = A.map((row, i) => [...row, b[i] ?? 0]);
+  const value = (r: number, c: number) => M[r]?.[c] ?? 0;
+  for (let col = 0; col < n; col++) {
+    let pivot = col;
+    for (let r = col + 1; r < n; r++)
+      if (Math.abs(value(r, col)) > Math.abs(value(pivot, col))) pivot = r;
+    if (Math.abs(value(pivot, col)) < 1e-12) continue;
+    const row = M[col];
+    const pivotRow = M[pivot];
+    if (!row || !pivotRow) continue;
+    M[col] = pivotRow;
+    M[pivot] = row;
+    for (let r = 0; r < n; r++) {
+      if (r === col) continue;
+      const current = M[r];
+      if (!current) continue;
+      const f = value(r, col) / value(col, col);
+      for (let c = col; c <= n; c++) current[c] = value(r, c) - f * value(col, c);
+    }
+  }
+  return M.map((row, i) => (Math.abs(row[i] ?? 0) < 1e-12 ? 0 : (row[n] ?? 0) / (row[i] ?? 1)));
 }
 
 /**
@@ -57,49 +67,58 @@ export async function estimateLocal(input: EstimateInput): Promise<EstimateResul
 
   if (supabase) {
     const { data: plots } = await supabase
-      .from('plots')
-      .select('base_price, size_marla, category')
-      .gt('size_marla', 0)
-      .gt('base_price', 0)
+      .from("plots")
+      .select("base_price, size_marla, category")
+      .gt("size_marla", 0)
+      .gt("base_price", 0)
       .limit(400);
-    for (const p of (plots as { base_price: number; size_marla: number; category: string }[] | null) ?? []) {
+    for (const p of (plots as
+      { base_price: number; size_marla: number; category: string }[] | null) ?? []) {
       samples.push({
         price: Number(p.base_price),
         size: Number(p.size_marla),
-        commercial: p.category === 'commercial' ? 1 : 0,
+        commercial: p.category === "commercial" ? 1 : 0,
         bedrooms: 0,
-        city: '',
-        society: '',
+        city: "",
+        society: "",
       });
     }
     const { data: props } = await supabase
-      .from('properties')
-      .select('price, plot_size_marla, category, city, society_name')
-      .gt('plot_size_marla', 0)
-      .gt('price', 0)
+      .from("properties")
+      .select("price, plot_size_marla, category, city, society_name")
+      .gt("plot_size_marla", 0)
+      .gt("price", 0)
       .limit(400);
-    for (const p of (props as { price: number; plot_size_marla: number; category: string; city: string; society_name: string }[] | null) ?? []) {
+    for (const p of (props as
+      | {
+          price: number;
+          plot_size_marla: number;
+          category: string;
+          city: string;
+          society_name: string;
+        }[]
+      | null) ?? []) {
       samples.push({
         price: Number(p.price),
         size: Number(p.plot_size_marla),
-        commercial: p.category === 'commercial' ? 1 : 0,
+        commercial: p.category === "commercial" ? 1 : 0,
         bedrooms: 0,
-        city: (p.city ?? '').toLowerCase().trim(),
-        society: (p.society_name ?? '').toLowerCase().trim(),
+        city: (p.city ?? "").toLowerCase().trim(),
+        society: (p.society_name ?? "").toLowerCase().trim(),
       });
     }
   }
 
   if (samples.length < 5) {
     // regional priors (PKR per marla)
-    const perMarla = input.category === 'commercial' ? 2200000 : 950000;
+    const perMarla = input.category === "commercial" ? 2200000 : 950000;
     const mid = Math.round(perMarla * input.sizeMarla);
     return {
       low: Math.round(mid * 0.8),
       mid,
       high: Math.round(mid * 1.2),
-      method: 'local',
-      reasoning: 'Not enough local data yet — estimate uses regional baseline rates.',
+      method: "local",
+      reasoning: "Not enough local data yet — estimate uses regional baseline rates.",
       samples: samples.length,
       confidence: 35,
     };
@@ -112,8 +131,14 @@ export async function estimateLocal(input: EstimateInput): Promise<EstimateResul
     if (s.city) cityCounts.set(s.city, (cityCounts.get(s.city) ?? 0) + 1);
     if (s.society) socCounts.set(s.society, (socCounts.get(s.society) ?? 0) + 1);
   }
-  const cities = [...cityCounts.entries()].filter(([, c]) => c >= 3).map(([c]) => c).slice(0, 8);
-  const societies = [...socCounts.entries()].filter(([, c]) => c >= 3).map(([c]) => c).slice(0, 12);
+  const cities = [...cityCounts.entries()]
+    .filter(([, c]) => c >= 3)
+    .map(([c]) => c)
+    .slice(0, 8);
+  const societies = [...socCounts.entries()]
+    .filter(([, c]) => c >= 3)
+    .map(([c]) => c)
+    .slice(0, 12);
 
   const cols = 4 + cities.length + societies.length;
   const XtX: number[][] = Array.from({ length: cols }, () => new Array(cols).fill(0));
@@ -138,7 +163,10 @@ export async function estimateLocal(input: EstimateInput): Promise<EstimateResul
     }
   }
   // ridge regularization (skip intercept)
-  for (let i = 1; i < cols; i++) { const row = XtX[i]; if (row) row[i] = (row[i] ?? 0) + 2.0; }
+  for (let i = 1; i < cols; i++) {
+    const row = XtX[i];
+    if (row) row[i] = (row[i] ?? 0) + 2.0;
+  }
 
   const beta = solveLinear(XtX, Xty);
 
@@ -147,7 +175,7 @@ export async function estimateLocal(input: EstimateInput): Promise<EstimateResul
   const q: Sample = {
     price: 0,
     size: Math.max(input.sizeMarla, 0.5),
-    commercial: input.category === 'commercial' ? 1 : 0,
+    commercial: input.category === "commercial" ? 1 : 0,
     bedrooms: input.bedrooms ?? 0,
     city: inCity,
     society: inSoc,
@@ -175,20 +203,20 @@ export async function estimateLocal(input: EstimateInput): Promise<EstimateResul
   const drivers: string[] = [];
   const socIdx = societies.indexOf(inSoc);
   const cityIdx = cities.indexOf(inCity);
-  if (socIdx >= 0 && Math.abs((beta[4 + cities.length + socIdx] ?? 0)) > 0.02) {
-    const pct = Math.round((Math.exp((beta[4 + cities.length + socIdx] ?? 0)) - 1) * 100);
-    drivers.push(`society "${input.society}" ${pct >= 0 ? '+' : ''}${pct}%`);
-  } else if (cityIdx >= 0 && Math.abs((beta[4 + cityIdx] ?? 0)) > 0.02) {
-    const pct = Math.round((Math.exp((beta[4 + cityIdx] ?? 0)) - 1) * 100);
-    drivers.push(`city "${input.city}" ${pct >= 0 ? '+' : ''}${pct}%`);
+  if (socIdx >= 0 && Math.abs(beta[4 + cities.length + socIdx] ?? 0) > 0.02) {
+    const pct = Math.round((Math.exp(beta[4 + cities.length + socIdx] ?? 0) - 1) * 100);
+    drivers.push(`society "${input.society}" ${pct >= 0 ? "+" : ""}${pct}%`);
+  } else if (cityIdx >= 0 && Math.abs(beta[4 + cityIdx] ?? 0) > 0.02) {
+    const pct = Math.round((Math.exp(beta[4 + cityIdx] ?? 0) - 1) * 100);
+    drivers.push(`city "${input.city}" ${pct >= 0 ? "+" : ""}${pct}%`);
   }
-  if (Math.abs((beta[2] ?? 0)) > 0.02) {
-    const pct = Math.round((Math.exp((beta[2] ?? 0)) - 1) * 100);
-    drivers.push(`commercial ${pct >= 0 ? '+' : ''}${pct}%`);
+  if (Math.abs(beta[2] ?? 0) > 0.02) {
+    const pct = Math.round((Math.exp(beta[2] ?? 0) - 1) * 100);
+    drivers.push(`commercial ${pct >= 0 ? "+" : ""}${pct}%`);
   }
-  if (q.bedrooms > 0 && Math.abs((beta[3] ?? 0)) > 0.005) {
+  if (q.bedrooms > 0 && Math.abs(beta[3] ?? 0) > 0.005) {
     const pct = Math.round((Math.exp((beta[3] ?? 0) * q.bedrooms) - 1) * 100);
-    drivers.push(`${q.bedrooms} bedrooms ${pct >= 0 ? '+' : ''}${pct}%`);
+    drivers.push(`${q.bedrooms} bedrooms ${pct >= 0 ? "+" : ""}${pct}%`);
   }
 
   const confidence = Math.round(40 + r2 * 55 + Math.min(samples.length / 40, 1) * 5);
@@ -197,12 +225,53 @@ export async function estimateLocal(input: EstimateInput): Promise<EstimateResul
     low,
     mid,
     high,
-    method: 'local',
-    reasoning: `Regression model trained on ${samples.length} local records (R² ${(r2 * 100).toFixed(0)}%).${drivers.length ? ' Key drivers: ' + drivers.join(', ') + '.' : ''}`,
+    method: "local",
+    reasoning: `Regression model trained on ${samples.length} local records (R² ${(r2 * 100).toFixed(0)}%).${drivers.length ? " Key drivers: " + drivers.join(", ") + "." : ""}`,
     samples: samples.length,
     confidence: Math.min(confidence, 97),
   };
 }
 
-export function isAiConfigured(): boolean { return false; }
-export async function estimatePrice(input: EstimateInput): Promise<EstimateResult> { return estimateLocal(input); }
+export function isAiConfigured(): boolean {
+  const url = (import.meta.env["VITE_AI_ESTIMATE_URL"] as string | undefined) || "";
+  return !!url.trim();
+}
+
+/** Prefer remote AI service when configured; always fall back to local regression. */
+export async function estimatePrice(input: EstimateInput): Promise<EstimateResult> {
+  if (isAiConfigured()) {
+    try {
+      const { remoteEstimate, logPricePrediction } = await import("./ai-pricing.functions");
+      const remote = await remoteEstimate({ data: input });
+      if (remote.ok && remote.result && typeof remote.result === "object") {
+        const r = remote.result as Partial<EstimateResult>;
+        if (typeof r.mid === "number" && typeof r.low === "number" && typeof r.high === "number") {
+          const result: EstimateResult = {
+            low: r.low,
+            mid: r.mid,
+            high: r.high,
+            method: "ai",
+            reasoning: r.reasoning ?? "Remote AI estimate service.",
+            samples: r.samples ?? 0,
+            confidence: r.confidence ?? 70,
+          };
+          return result;
+        }
+      }
+      // Remote unavailable — local path + best-effort log
+      const local = await estimateLocal(input);
+      void logPricePrediction({ data: { input, result: local, method: "local_fallback" } });
+      return local;
+    } catch {
+      /* fall through */
+    }
+  }
+  const local = await estimateLocal(input);
+  try {
+    const { logPricePrediction } = await import("./ai-pricing.functions");
+    void logPricePrediction({ data: { input, result: local, method: "local" } });
+  } catch {
+    /* ignore */
+  }
+  return local;
+}
