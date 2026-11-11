@@ -16,6 +16,7 @@ import {
   upsertSiteContent,
   type SiteBanner,
 } from '@/lib/manzil/cms';
+import { CMS_COPY as C } from '@/lib/manzil/phase10-copy/cms';
 
 /** Screen 3 — Homepage CMS (admin only). Does not wire public homepage (Needs decision). */
 function AdminCms({ onNavigate }: { onNavigate: (p: string) => void }) {
@@ -48,7 +49,7 @@ function AdminCms({ onNavigate }: { onNavigate: (p: string) => void }) {
       }
       setUrls(next);
     } catch (e) {
-      setError(errorText(e, 'Could not load CMS. Run reference/migrations/10_phase10_ui_support.sql if tables are missing.'));
+      setError(errorText(e, C.loadError));
     } finally {
       setLoading(false);
     }
@@ -118,36 +119,33 @@ function AdminCms({ onNavigate }: { onNavigate: (p: string) => void }) {
     <div className="container">
       <div className="topbar">
         <div>
-          <h1>Homepage CMS</h1>
-          <p className="muted" style={{ margin: 0 }}>Banners & site content (admin)</p>
+          <h1>{C.title}</h1>
+          <p className="muted" style={{ margin: 0 }}>{C.subtitle}</p>
         </div>
         <div className="link-row" style={{ margin: 0 }}>
           <Button variant="legacy" className="btn secondary small" onClick={() => setPreview(!preview)}>
-            {preview ? 'Hide preview' : 'Preview'}
+            {preview ? C.hidePreview : C.preview}
           </Button>
           <Button variant="legacy" className="btn secondary small" disabled={busy} onClick={() => void reset()}>
-            Reset to default
+            {C.reset}
           </Button>
           <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('admin')}>
-            Admin hub
+            {C.adminHub}
           </Button>
         </div>
       </div>
 
-      <div className="notice" style={{ marginBottom: 12 }}>
-        Public marketplace homepage is unchanged until homepage wiring is approved (Needs decision).
-        Edits here persist to site_banners / site_content only.
-      </div>
+      <div className="notice" style={{ marginBottom: 12 }}>{C.homepageNote}</div>
 
       {msg && <div className="notice" style={{ marginBottom: 12 }}>{msg}</div>}
       {error && <div className="error" role="alert">{error}</div>}
       {loading ? (
-        <p className="muted">Loading…</p>
+        <p className="muted">{C.loading}</p>
       ) : (
         <>
           {preview && (
             <div className="card" style={{ marginBottom: 16 }}>
-              <h3>Preview</h3>
+              <h3>{C.preview}</h3>
               <p className="muted small">{content['marketplace_eyebrow']}</p>
               <h2>{content['marketplace_title']}</h2>
               <p>{content['marketplace_subtitle']}</p>
@@ -166,7 +164,7 @@ function AdminCms({ onNavigate }: { onNavigate: (p: string) => void }) {
           )}
 
           <div className="card" style={{ marginBottom: 16 }}>
-            <h3>Site content</h3>
+            <h3>{C.siteContent}</h3>
             {Object.keys(content).map((key) => (
               <label key={key}>
                 {key}
@@ -178,14 +176,14 @@ function AdminCms({ onNavigate }: { onNavigate: (p: string) => void }) {
               </label>
             ))}
             <Button variant="legacy" className="btn small" disabled={busy} onClick={() => void saveContent()}>
-              Save content
+              {C.saveContent}
             </Button>
           </div>
 
           <div className="card" style={{ marginBottom: 16 }}>
-            <h3>Banners ({banners.length})</h3>
+            <h3>{C.banners(banners.length)}</h3>
             {banners.length === 0 ? (
-              <p className="muted">No banners yet.</p>
+              <p className="muted">{C.noBanners}</p>
             ) : (
               banners.map((b) => (
                 <div key={b.id} className="queue-card">
@@ -212,7 +210,7 @@ function AdminCms({ onNavigate }: { onNavigate: (p: string) => void }) {
                         active: !b.active,
                       }).then(load)}
                     >
-                      Toggle active
+                      {C.toggleActive}
                     </Button>
                     <Button
                       variant="legacy"
@@ -220,26 +218,26 @@ function AdminCms({ onNavigate }: { onNavigate: (p: string) => void }) {
                       disabled={busy}
                       onClick={() => void deleteBanner(b.id).then(load)}
                     >
-                      Delete
+                      {C.delete}
                     </Button>
                   </div>
                 </div>
               ))
             )}
 
-            <h3 style={{ marginTop: 16 }}>Add banner</h3>
+            <h3 style={{ marginTop: 16 }}>{C.addBanner}</h3>
             <form onSubmit={(e) => void addBanner(e)}>
               <div className="form-row">
-                <label>Title<input value={title} onChange={(e) => setTitle(e.target.value)} required /></label>
-                <label>Sort order<input type="number" min={0} value={sort} onChange={(e) => setSort(e.target.value)} /></label>
+                <label>{C.titleField}<input value={title} onChange={(e) => setTitle(e.target.value)} required /></label>
+                <label>{C.sortOrder}<input type="number" min={0} value={sort} onChange={(e) => setSort(e.target.value)} /></label>
               </div>
-              <label>Subtitle<input value={subtitle} onChange={(e) => setSubtitle(e.target.value)} /></label>
-              <label>Link href<input value={href} onChange={(e) => setHref(e.target.value)} placeholder="/ or https://…" /></label>
-              <label>Image<input type="file" accept="image/*" onChange={(e) => setImage(e.target.files?.[0] ?? null)} /></label>
+              <label>{C.subtitleField}<input value={subtitle} onChange={(e) => setSubtitle(e.target.value)} /></label>
+              <label>{C.href}<input value={href} onChange={(e) => setHref(e.target.value)} placeholder="/ or https://…" /></label>
+              <label>{C.image}<input type="file" accept="image/*" onChange={(e) => setImage(e.target.files?.[0] ?? null)} /></label>
               <label className="small">
-                <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} /> Active
+                <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} /> {C.active}
               </label>
-              <Button variant="legacy" className="btn small" disabled={busy}>{busy ? 'Saving…' : 'Add banner'}</Button>
+              <Button variant="legacy" className="btn small" disabled={busy}>{busy ? C.saving : C.add}</Button>
             </form>
           </div>
         </>
@@ -249,7 +247,7 @@ function AdminCms({ onNavigate }: { onNavigate: (p: string) => void }) {
 }
 
 export const Route = createFileRoute('/admin-cms')({
-  head: () => pageHead('Homepage CMS'),
+  head: () => pageHead(C.title),
   component: RoutePage,
 });
 function RoutePage() {

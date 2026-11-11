@@ -11,6 +11,7 @@ import {
   replyToInquiry,
 } from '@/lib/manzil/inquiry-crm';
 import type { Inquiry, InquiryReply } from '@/lib/manzil/inquiries';
+import { INQUIRY_COPY as C } from '@/lib/manzil/phase10-copy/inquiries';
 
 /** Screen 1 — Buyer inquiry list + thread (matches inbox / leads CRM style). */
 function MyInquiries({ onNavigate }: { onNavigate: (p: string) => void }) {
@@ -31,7 +32,7 @@ function MyInquiries({ onNavigate }: { onNavigate: (p: string) => void }) {
     try {
       setList(await fetchMyInquiries(session.user.id));
     } catch (e) {
-      setError(errorText(e, 'Could not load inquiries'));
+      setError(errorText(e, C.loadError));
       setList([]);
     } finally {
       setLoading(false);
@@ -68,7 +69,7 @@ function MyInquiries({ onNavigate }: { onNavigate: (p: string) => void }) {
       setReplies((await fetchInquiryThread(inquiryId)).replies);
       await load();
     } catch (e) {
-      setFormErr(errorText(e, 'Could not send reply'));
+      setFormErr(errorText(e, C.replyError));
     } finally {
       setBusy(false);
     }
@@ -78,20 +79,20 @@ function MyInquiries({ onNavigate }: { onNavigate: (p: string) => void }) {
     <div className="container">
       <div className="topbar">
         <div>
-          <h1>My inquiries</h1>
-          <p className="muted" style={{ margin: 0 }}>Messages you sent about listings</p>
+          <h1>{C.myTitle}</h1>
+          <p className="muted" style={{ margin: 0 }}>{C.mySubtitle}</p>
         </div>
         <div className="link-row" style={{ margin: 0 }}>
-          <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('inbox')}>Inbox</Button>
-          <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('dashboard')}>Dashboard</Button>
+          <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('inbox')}>{C.inbox}</Button>
+          <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('dashboard')}>{C.dashboard}</Button>
         </div>
       </div>
 
       {error && <div className="error" role="alert">{error}</div>}
       {loading ? (
-        <p className="muted">Loading…</p>
+        <p className="muted">{C.loading}</p>
       ) : list.length === 0 ? (
-        <p className="muted">No inquiries yet. Contact a listing owner from a property page.</p>
+        <p className="muted">{C.emptyMine}</p>
       ) : (
         list.map((inq) => (
           <div key={inq.id} className="queue-card">
@@ -107,13 +108,13 @@ function MyInquiries({ onNavigate }: { onNavigate: (p: string) => void }) {
             </div>
             <div className="link-row">
               <Button variant="legacy" className="btn secondary small" onClick={() => void openThread(inq.id)}>
-                {openId === inq.id ? 'Hide thread' : 'Open thread'}
+                {openId === inq.id ? C.hideThread : C.openThread}
               </Button>
             </div>
             {openId === inq.id && (
               <div style={{ marginTop: 12 }}>
                 {replies.length === 0 ? (
-                  <p className="muted small">No replies yet.</p>
+                  <p className="muted small">{C.noReplies}</p>
                 ) : (
                   replies.map((r) => (
                     <div key={r.id} className="detail-item" style={{ marginBottom: 8 }}>
@@ -123,12 +124,12 @@ function MyInquiries({ onNavigate }: { onNavigate: (p: string) => void }) {
                   ))
                 )}
                 <label>
-                  Your reply
+                  {C.yourReply}
                   <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={3} />
                 </label>
                 {formErr && <div className="error" role="alert">{formErr}</div>}
                 <Button variant="legacy" className="btn small" disabled={busy} onClick={() => void sendReply(inq.id)}>
-                  {busy ? 'Sending…' : 'Send reply'}
+                  {busy ? C.sending : C.sendReply}
                 </Button>
               </div>
             )}
@@ -140,7 +141,7 @@ function MyInquiries({ onNavigate }: { onNavigate: (p: string) => void }) {
 }
 
 export const Route = createFileRoute('/my-inquiries')({
-  head: () => pageHead('My inquiries'),
+  head: () => pageHead(C.myTitle),
   component: RoutePage,
 });
 function RoutePage() {

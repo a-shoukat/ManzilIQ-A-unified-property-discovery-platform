@@ -13,6 +13,7 @@ import {
   rejectSchema,
   type ModerationRow,
 } from '@/lib/manzil/moderation-ui';
+import { MODERATION_COPY as C } from '@/lib/manzil/phase10-copy/moderation';
 
 /** Screen 2 — Admin listing moderation queue (admin-verification style). */
 function AdminModeration({ onNavigate }: { onNavigate: (p: string, arg?: string) => void }) {
@@ -30,7 +31,7 @@ function AdminModeration({ onNavigate }: { onNavigate: (p: string, arg?: string)
     try {
       setRows(await fetchModerationQueue());
     } catch (e) {
-      setError(errorText(e, 'Could not load moderation queue'));
+      setError(errorText(e, C.loadError));
       setRows([]);
     } finally {
       setLoading(false);
@@ -48,7 +49,7 @@ function AdminModeration({ onNavigate }: { onNavigate: (p: string, arg?: string)
       await approveListing(id, session.user.id);
       await load();
     } catch (e) {
-      setError(errorText(e, 'Approve failed'));
+      setError(errorText(e, C.approveError));
     } finally {
       setActing(null);
     }
@@ -66,7 +67,7 @@ function AdminModeration({ onNavigate }: { onNavigate: (p: string, arg?: string)
       await rejectListing(id, session.user.id, parsed.data.reason);
       await load();
     } catch (e) {
-      setError(errorText(e, 'Reject failed'));
+      setError(errorText(e, C.rejectError));
     } finally {
       setActing(null);
     }
@@ -77,36 +78,33 @@ function AdminModeration({ onNavigate }: { onNavigate: (p: string, arg?: string)
       <div className="card wide">
         <div className="topbar">
           <div>
-            <h1>Listing moderation</h1>
-            <p className="muted" style={{ margin: 0 }}>Pending listings awaiting approve / reject</p>
+            <h1>{C.title}</h1>
+            <p className="muted" style={{ margin: 0 }}>{C.subtitle}</p>
           </div>
           <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('admin')}>
-            Admin hub
+            {C.adminHub}
           </Button>
         </div>
 
         {!approvalOn && (
-          <div className="notice warn-box" style={{ marginBottom: 12 }}>
-            REQUIRE_LISTING_APPROVAL is off (VITE_REQUIRE_LISTING_APPROVAL unset). Queue still lists
-            pending rows when present; live publish gating is inactive until the flag is enabled.
-          </div>
+          <div className="notice warn-box" style={{ marginBottom: 12 }}>{C.approvalOff}</div>
         )}
 
         {error && <div className="error" role="alert">{error}</div>}
         {loading ? (
-          <p className="muted">Loading…</p>
+          <p className="muted">{C.loading}</p>
         ) : rows.length === 0 ? (
-          <p className="muted">No pending listings.</p>
+          <p className="muted">{C.empty}</p>
         ) : (
           <div className="table-wrap">
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Photo</th>
-                  <th>Listing</th>
-                  <th>Owner</th>
-                  <th>Price</th>
-                  <th>Flags</th>
+                  <th>{C.photo}</th>
+                  <th>{C.listing}</th>
+                  <th>{C.owner}</th>
+                  <th>{C.price}</th>
+                  <th>{C.flags}</th>
                   <th></th>
                 </tr>
               </thead>
@@ -130,24 +128,24 @@ function AdminModeration({ onNavigate }: { onNavigate: (p: string, arg?: string)
                       {r.fraud_note ? (
                         <span className="badge warn">{r.fraud_note}</span>
                       ) : (
-                        <span className="muted small">None</span>
+                        <span className="muted small">{C.none}</span>
                       )}
                     </td>
                     <td>
                       <div className="queue-actions">
                         <input
-                          placeholder="Reject reason"
+                          placeholder={C.rejectReason}
                           value={reasons[r.id] ?? ''}
                           onChange={(e) => setReasons({ ...reasons, [r.id]: e.target.value })}
                         />
                         <Button variant="legacy" className="btn small" disabled={acting === r.id} onClick={() => void approve(r.id)}>
-                          Approve
+                          {C.approve}
                         </Button>
                         <Button variant="legacy" className="btn secondary small" disabled={acting === r.id} onClick={() => void reject(r.id)}>
-                          Reject
+                          {C.reject}
                         </Button>
                         <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('property', r.id)}>
-                          Open
+                          {C.open}
                         </Button>
                       </div>
                     </td>
@@ -163,7 +161,7 @@ function AdminModeration({ onNavigate }: { onNavigate: (p: string, arg?: string)
 }
 
 export const Route = createFileRoute('/admin-moderation')({
-  head: () => pageHead('Listing moderation'),
+  head: () => pageHead(C.title),
   component: RoutePage,
 });
 function RoutePage() {

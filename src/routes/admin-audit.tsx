@@ -11,6 +11,7 @@ import {
   paginate,
   type AuditRow,
 } from '@/lib/manzil/audit-ui';
+import { AUDIT_COPY as C } from '@/lib/manzil/phase10-copy/audit';
 
 const PAGE_SIZE = 25;
 
@@ -58,15 +59,15 @@ function AdminAudit({ onNavigate }: { onNavigate: (p: string) => void }) {
     <div className="container">
       <div className="topbar">
         <div>
-          <h1>Audit log</h1>
-          <p className="muted" style={{ margin: 0 }}>{filtered.length} events (loaded {rows.length})</p>
+          <h1>{C.title}</h1>
+          <p className="muted" style={{ margin: 0 }}>{C.subtitle(filtered.length, rows.length)}</p>
         </div>
         <div className="link-row" style={{ margin: 0 }}>
           <Button variant="legacy" className="btn secondary small" onClick={() => exportAuditCsv(filtered)}>
-            Export CSV
+            {C.exportCsv}
           </Button>
           <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('admin')}>
-            Admin hub
+            {C.adminHub}
           </Button>
         </div>
       </div>
@@ -161,7 +162,7 @@ function AdminAudit({ onNavigate }: { onNavigate: (p: string) => void }) {
 }
 
 export const Route = createFileRoute('/admin-audit')({
-  head: () => pageHead('Audit log'),
+  head: () => pageHead(C.title),
   component: RoutePage,
 });
 function RoutePage() {

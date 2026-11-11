@@ -11,6 +11,7 @@ import {
   saveNotificationPrefs,
   type NotificationPrefs,
 } from '@/lib/manzil/notification-prefs';
+import { NOTIF_PREFS_COPY as C } from '@/lib/manzil/phase10-copy/notifications';
 
 /** Screen 5 — Notification preferences (all roles). */
 function NotificationSettings({ onNavigate }: { onNavigate: (p: string) => void }) {
@@ -26,7 +27,7 @@ function NotificationSettings({ onNavigate }: { onNavigate: (p: string) => void 
     setLoading(true);
     fetchNotificationPrefs(session.user.id)
       .then(setPrefs)
-      .catch((e) => setError(errorText(e, 'Could not load preferences')))
+      .catch((e) => setError(errorText(e, C.loadError)))
       .finally(() => setLoading(false));
   }, [session]);
 
@@ -36,14 +37,9 @@ function NotificationSettings({ onNavigate }: { onNavigate: (p: string) => void 
     setError(null);
     try {
       await saveNotificationPrefs(session.user.id, prefs);
-      setMsg('Preferences saved');
+      setMsg(C.saved);
     } catch (e) {
-      setError(
-        errorText(
-          e,
-          'Could not save. Run reference/migrations/10_phase10_ui_support.sql if the table is missing.',
-        ),
-      );
+      setError(errorText(e, C.saveError));
     } finally {
       setBusy(false);
     }
@@ -53,15 +49,15 @@ function NotificationSettings({ onNavigate }: { onNavigate: (p: string) => void 
     <div className="container">
       <div className="topbar">
         <div>
-          <h1>Notification preferences</h1>
-          <p className="muted" style={{ margin: 0 }}>Channels and event types</p>
+          <h1>{C.title}</h1>
+          <p className="muted" style={{ margin: 0 }}>{C.subtitle}</p>
         </div>
         <div className="link-row" style={{ margin: 0 }}>
           <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('profile')}>
-            Profile & settings
+            {C.profileLink}
           </Button>
           <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('inbox')}>
-            Inbox
+            {C.inboxLink}
           </Button>
         </div>
       </div>
@@ -70,16 +66,16 @@ function NotificationSettings({ onNavigate }: { onNavigate: (p: string) => void 
       {error && <div className="error" role="alert">{error}</div>}
 
       {loading ? (
-        <p className="muted">Loading…</p>
+        <p className="muted">{C.loading}</p>
       ) : (
         <div className="card wide">
-          <h3>Channels</h3>
+          <h3>{C.channels}</h3>
           {(
             [
-              ['in_app', 'In-app'],
-              ['email', 'Email'],
-              ['sms', 'SMS'],
-              ['push', 'Push'],
+              ['in_app', C.channelLabels.in_app],
+              ['email', C.channelLabels.email],
+              ['sms', C.channelLabels.sms],
+              ['push', C.channelLabels.push],
             ] as const
           ).map(([key, label]) => (
             <label key={key} className="small" style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
@@ -92,7 +88,7 @@ function NotificationSettings({ onNavigate }: { onNavigate: (p: string) => void 
             </label>
           ))}
 
-          <h3 style={{ marginTop: 16 }}>Events</h3>
+          <h3 style={{ marginTop: 16 }}>{C.events}</h3>
           {EVENT_TYPES.map((ev) => (
             <label key={ev} className="small" style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
               <input
@@ -110,7 +106,7 @@ function NotificationSettings({ onNavigate }: { onNavigate: (p: string) => void 
           ))}
 
           <Button variant="legacy" className="btn small" disabled={busy} onClick={() => void save()}>
-            {busy ? 'Saving…' : 'Save preferences'}
+            {busy ? C.saving : C.save}
           </Button>
         </div>
       )}
@@ -119,7 +115,7 @@ function NotificationSettings({ onNavigate }: { onNavigate: (p: string) => void 
 }
 
 export const Route = createFileRoute('/settings/notifications')({
-  head: () => pageHead('Notification preferences'),
+  head: () => pageHead(C.title),
   component: RoutePage,
 });
 function RoutePage() {
