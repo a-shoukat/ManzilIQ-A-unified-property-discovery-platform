@@ -1,0 +1,23 @@
+{
+  "title": "Payments",
+  "history": "Payment history",
+  "installment": "Installment",
+  "overdue": "Overdue",
+  "lateFee": "Late fee",
+  "payNow": "Pay now",
+  "amount": "Amount",
+  "dueDate": "Due date",
+  "paidOn": "Paid on",
+  "pending": "Pending",
+  "paid": "Paid",
+  "balance": "Balance",
+  "totalPrice": "Total price",
+  "receipt": "Receipt",
+  "downloadReceipt": "Download receipt",
+  "noPayments": "No payments yet.",
+  "jazzCash": "JazzCash",
+  "easyPaisa": "EasyPaisa",
+  "mockWallet": "Demo wallet checkout",
+  "paymentSuccessful": "Payment successful",
+  "paymentFailed": "Payment failed"
+}

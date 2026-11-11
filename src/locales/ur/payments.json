@@ -1,0 +1,23 @@
+{
+  "title": "ادائیگیاں",
+  "history": "ادائیگی کی تاریخ",
+  "installment": "قسط",
+  "overdue": "واجب الادا",
+  "lateFee": "تاخیری جرمانہ",
+  "payNow": "ابھی ادا کریں",
+  "amount": "رقم",
+  "dueDate": "آخری تاریخ",
+  "paidOn": "ادائیگی کی تاریخ",
+  "pending": "زیر التوا",
+  "paid": "ادا شدہ",
+  "balance": "بقایا رقم",
+  "totalPrice": "کل قیمت",
+  "receipt": "رسید",
+  "downloadReceipt": "رسید ڈاؤن لوڈ کریں",
+  "noPayments": "ابھی کوئی ادائیگی نہیں۔",
+  "jazzCash": "JazzCash",
+  "easyPaisa": "EasyPaisa",
+  "mockWallet": "ڈیمو والیٹ چیک آؤٹ",
+  "paymentSuccessful": "ادائیگی کامیاب",
+  "paymentFailed": "ادائیگی ناکام"
+}

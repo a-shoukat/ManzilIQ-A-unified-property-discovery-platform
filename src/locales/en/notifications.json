@@ -1,0 +1,17 @@
+{
+  "inboxTitle": "Notifications",
+  "markAllRead": "Mark all read",
+  "markRead": "Mark read",
+  "empty": "No notifications yet.",
+  "reminders": "Payment reminders",
+  "lateAlert": "Late: {{label}} — {{amount}} (incl. late fee)",
+  "dueSoon": "Due in 3 days: {{label}} — {{amount}} (due {{date}})",
+  "preferences": "Notification preferences",
+  "email": "Email",
+  "sms": "SMS",
+  "push": "Push",
+  "inApp": "In-app",
+  "broadcast": "Broadcast",
+  "sendBroadcast": "Send broadcast",
+  "saved": "Preferences saved"
+}

@@ -9,6 +9,8 @@ export interface Profile {
   verification_status: VerificationStatus;
   rejection_reason?: string | null;
   full_name?: string | null;
+  /** 'en' | 'ur' — optional until migration applied */
+  preferred_language?: 'en' | 'ur' | null;
   created_at: string;
 }
 

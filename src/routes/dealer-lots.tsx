@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
 import { useEffect, useState } from 'react';
@@ -9,6 +10,7 @@ import type { Lot, Plot } from '@/lib/manzil/types';
 
 /** WBS: Dealer Portal — Plot Inventory / Lot View (5 features) */
 function MyLots({ onNavigate }: { onNavigate: (p: string) => void }) {
+  const { t } = useTranslation('dealer');
   const { session } = useAuth();
   const [lots, setLots] = useState<Lot[]>([]);
   const [openLot, setOpenLot] = useState<string | null>(null);
@@ -60,7 +62,7 @@ function MyLots({ onNavigate }: { onNavigate: (p: string) => void }) {
     <div className="container">
       <div className="topbar">
         <div>
-          <h1>My lots & plots</h1>
+          <h1>{t('myLotsHeading')}</h1>
           <p className="muted" style={{ margin: 0 }}>Only your assigned plots</p>
         </div>
         <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('dealer')}>Dealer portal</Button>

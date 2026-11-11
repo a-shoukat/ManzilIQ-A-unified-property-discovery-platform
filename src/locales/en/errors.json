@@ -1,0 +1,9 @@
+{
+  "generic": "Something went wrong. Please try again.",
+  "permissionDenied": "{{fallback}}: permission denied for this account.",
+  "notConnected": "Database not connected",
+  "network": "Network error. Check your connection.",
+  "unauthorized": "Please sign in to continue.",
+  "notFound": "Not found",
+  "forbidden": "You do not have permission for this action."
+}

@@ -1,6 +1,7 @@
 import { MockWalletCheckout } from '@/components/manzil/MockWalletCheckout';
 import { receiptTotal, canPay } from '@/lib/manzil/payment-rules';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
 import { useEffect, useState } from 'react';
@@ -19,6 +20,7 @@ const METHODS: { id: PaymentMethod; label: string }[] = [
 
 /** WBS: Payment & Financial System — customer side (tracking + receipts) */
 function MyPayments({ onNavigate }: { onNavigate: (p: string) => void }) {
+  const { t } = useTranslation(['payments', 'common']);
   const { session } = useAuth();
   const [list, setList] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,7 +65,7 @@ function MyPayments({ onNavigate }: { onNavigate: (p: string) => void }) {
     <div className="container">
       <div className="topbar">
         <div>
-          <h1>My payments</h1>
+          <h1>{t('payments:title')}</h1>
           <p className="muted" style={{ margin: 0 }}>Due calendar & history</p>
         </div>
         <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('dashboard')}>Dashboard</Button>

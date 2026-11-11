@@ -1,6 +1,7 @@
 import { assignablePlots } from '@/lib/manzil/plot-rules';
 import { fetchBookedPlotIds } from '@/lib/manzil/society';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 import { dealerLabel } from '@/lib/manzil/booking-rules';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
@@ -18,6 +19,7 @@ import type { Lot } from '@/lib/manzil/types';import { useSocietyId } from './so
 
 /** WBS: Society Portal — Dealer Management (6) + Lot Assignment (society side) */
 function Dealers({ onNavigate }: { onNavigate: (p: string) => void }) {
+  const { t } = useTranslation('society');
   const { societyId } = useSocietyId();
   const [requests, setRequests] = useState<Awaited<ReturnType<typeof fetchDealerRequests>>>([]);
   const [lots, setLots] = useState<Lot[]>([]);
@@ -98,7 +100,7 @@ function Dealers({ onNavigate }: { onNavigate: (p: string) => void }) {
     <div className="container">
       <div className="topbar">
         <div>
-          <h1>Dealer management</h1>
+          <h1>{t('dealersTitle')}</h1>
           <p className="muted" style={{ margin: 0 }}>Requests, lots, commission</p>
         </div>
         <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('society')}>Society portal</Button>

@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 import { createFileRoute } from "@tanstack/react-router";
 import { PageFrame, useAppNavigation, pageHead } from "@/components/manzil/PageFrame";
 import { useEffect, useState } from "react";
@@ -18,6 +19,7 @@ import { PAYMENTS_COPY as C } from "@/lib/manzil/phase10-copy/payments";
 
 /** Screen 6 — Gateway payment history + authorized receipt download. */
 function PaymentHistory({ onNavigate }: { onNavigate: (p: string) => void }) {
+  const { t } = useTranslation(['payments', 'common']);
   const { session, profile } = useAuth();
   const [list, setList] = useState<GatewayPayment[]>([]);
   const [loading, setLoading] = useState(true);

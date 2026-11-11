@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
 import { useEffect, useState } from 'react';
@@ -15,6 +16,7 @@ import { NOTIF_PREFS_COPY as C } from '@/lib/manzil/phase10-copy/notifications';
 
 /** Screen 5 — Notification preferences (all roles). */
 function NotificationSettings({ onNavigate }: { onNavigate: (p: string) => void }) {
+  const { t } = useTranslation(['notifications', 'common']);
   const { session } = useAuth();
   const [prefs, setPrefs] = useState<NotificationPrefs>({ ...DEFAULT_PREFS, events: { ...DEFAULT_PREFS.events } });
   const [loading, setLoading] = useState(true);
