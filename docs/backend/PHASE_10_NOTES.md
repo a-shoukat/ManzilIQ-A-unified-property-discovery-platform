@@ -24,5 +24,8 @@
 ### Needs decision
 See store doc `docs/manziliq-phase10-summary.md` — `/my-payments` untouched; homepage CMS not wired; inquiry statuses match Phase 4 DB.
 
+### CI fix
+Phase 9 workflow used `actions/setup-node` with `cache: npm` but the repo only has `bun.lock`, so the **test** job failed before install. Workflow now uses `oven-sh/setup-bun` + vitest/tsc/build. Full-repo `eslint` remains skipped in CI (pre-existing Prettier debt).
+
 ### Verify
 `bunx tsc --noEmit` · `bunx vitest run` · `bun run build`
