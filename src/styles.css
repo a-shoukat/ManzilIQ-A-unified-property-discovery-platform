@@ -1216,6 +1216,10 @@ textarea {
 .wallet-easypaisa { border-top-color: var(--success); }
 .wallet-brand { display: flex; align-items: center; gap: 8px; }
 .wallet-demo { margin-left: auto; font-size: 10px; font-weight: 700; letter-spacing: .08em; padding: 2px 8px; border-radius: 999px; background: var(--muted); color: var(--muted-foreground); }
+.wallet-demo.wallet-live { background: color-mix(in oklab, var(--success) 18%, transparent); color: var(--success); }
+.pins-map-section { margin: 1.25rem 0 1.75rem; }
+.pins-map-card { margin-bottom: 1.5rem; overflow: hidden; }
+.pins-map-card .leaflet-container { font: inherit; z-index: 0; }
 .wallet-amount { font-size: 26px; font-weight: 700; margin: 4px 0 6px; }
 .wallet-processing { display: flex; align-items: center; gap: 10px; padding: 18px 0; }
 .spin { animation: wallet-spin 1s linear infinite; }
@@ -1309,3 +1313,63 @@ textarea {
 .gs-item:hover{background:var(--accent);}.gs-item strong{font-size:12px;font-weight:600;}.gs-item span{font-size:11px;color:var(--muted-foreground);}
 .gs-empty{padding:14px 10px;font-size:12px;color:var(--muted-foreground);}
 @media(max-width:760px){.global-search{margin:0 6px;max-width:none;}.global-search-menu{position:fixed;top:64px;left:8px;right:8px;}}
+
+/* —— i18n / RTL foundation (Urdu only; English LTR unchanged) —— */
+html[dir="rtl"] body {
+  font-family: "Noto Nastaliq Urdu", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  line-height: 2;
+}
+html[dir="rtl"] .dir-flip { transform: scaleX(-1); }
+html[dir="rtl"] .ltr-isolate,
+html[dir="rtl"] [dir="ltr"] {
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: start;
+}
+html[dir="rtl"] .sidebar {
+  inset: 0 0 0 auto;
+  border-right: 0;
+  border-left: 1px solid var(--border);
+}
+html[dir="rtl"] .workspace { margin-left: 0; margin-right: 238px; }
+html[dir="rtl"] .side-count { margin-left: 0; margin-right: auto; }
+html[dir="rtl"] .side-link,
+html[dir="rtl"] .account-button,
+html[dir="rtl"] .listing-title,
+html[dir="rtl"] .gs-item { text-align: right; }
+html[dir="rtl"] .password-field input { padding-right: 13px; padding-left: 45px; }
+html[dir="rtl"] .password-field > button { right: auto; left: 3px; }
+html[dir="rtl"] .banner-content { left: auto; right: 31px; }
+html[dir="rtl"] .banner-shade { background: linear-gradient(270deg, var(--hero-shade), transparent 78%); }
+html[dir="rtl"] .banner-caption { right: auto; left: 17px; }
+html[dir="rtl"] .listing-purpose { left: auto; right: 12px; }
+html[dir="rtl"] .listing-status { right: auto; left: 12px; }
+html[dir="rtl"] .listing-compare { right: auto; left: 12px; }
+html[dir="rtl"] .listing-heart { right: auto; left: 48px; }
+html[dir="rtl"] .search-hint,
+html[dir="rtl"] .estimate-strip .quiet-link { margin-left: 0; margin-right: auto; }
+html[dir="rtl"] .ai-fab { right: auto; left: 24px; }
+html[dir="rtl"] .ai-panel { right: auto; left: 24px; }
+html[dir="rtl"] .lang-switch {
+  font-size: 11px;
+  height: 34px;
+  min-width: 44px;
+  padding-inline: 10px;
+}
+html[lang="en"] .lang-switch {
+  font-size: 11px;
+  height: 34px;
+  min-width: 44px;
+  padding-inline: 10px;
+}
+@media (max-width: 1150px) {
+  html[dir="rtl"] .workspace { margin-right: 210px; }
+}
+@media (max-width: 760px) {
+  html[dir="rtl"] .sidebar { transform: translateX(100%); }
+  html[dir="rtl"] .sidebar.open { transform: translateX(0); }
+  html[dir="rtl"] .workspace { margin-right: 0; }
+  html[dir="rtl"] .banner-content { right: 23px; }
+  html[dir="rtl"] .ai-fab { left: 16px; }
+  html[dir="rtl"] .ai-panel { left: 16px; }
+}

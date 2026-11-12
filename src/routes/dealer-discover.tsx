@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
 import { useEffect, useState } from 'react';
@@ -8,6 +9,7 @@ import type { SocietySummary } from '@/lib/manzil/types';
 
 /** WBS: Dealer Portal — Society Discovery & Join (5 features) */
 function Discover({ onNavigate }: { onNavigate: (p: string) => void }) {
+  const { t } = useTranslation('dealer');
   const { session } = useAuth();
   const [societies, setSocieties] = useState<SocietySummary[]>([]);
   const [reqMap, setReqMap] = useState<Record<string, string>>({});
@@ -47,7 +49,7 @@ function Discover({ onNavigate }: { onNavigate: (p: string) => void }) {
     <div className="container">
       <div className="topbar">
         <div>
-          <h1>Discover societies</h1>
+          <h1>{t('discoverHeading')}</h1>
           <p className="muted" style={{ margin: 0 }}>Browse registered societies & request to join</p>
         </div>
         <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('dealer')}>Dealer portal</Button>

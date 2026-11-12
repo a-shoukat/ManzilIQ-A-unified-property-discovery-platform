@@ -1,16 +1,19 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { PasswordInput, PASSWORD_MISMATCH } from '@/components/manzil/PasswordInput';
+import { PasswordInput } from '@/components/manzil/PasswordInput';
+import { LanguageSwitch } from '@/components/manzil/LanguageSwitch';
 import { Button } from '@/components/ui/button';
-import { PageFrame, pageHead } from '@/components/manzil/PageFrame';
+import { PageFrame, pageHead, useAppNavigation } from '@/components/manzil/PageFrame';
 import { getSupabase } from '@/lib/manzil/supabase';
 import { useAuth } from '@/lib/manzil/auth';
 import { uploadDocument } from '@/lib/manzil/storage';
 import { errorText } from '@/lib/manzil/errors';
-import { ROLE_LABELS } from '@/lib/manzil/types';
 
 function ProfilePage() {
+  const { t } = useTranslation(['auth', 'common']);
+  const onNavigate = useAppNavigation();
   const { profile, details, refresh } = useAuth();
   const d = (details ?? {}) as { contact_phone?: string | null; address?: string | null; photo_url?: string | null };
   const [name, setName] = useState('');
@@ -24,6 +27,7 @@ function ProfilePage() {
   const [current, setCurrent] = useState('');
   const [pw, setPw] = useState('');
   const [pw2, setPw2] = useState('');
+  const passwordMismatch = t('auth:passwordMismatch');
 
   useEffect(() => {
     setName(profile?.full_name ?? '');
@@ -48,8 +52,8 @@ function ProfilePage() {
         if (e2) throw e2;
       }
       await refresh();
-      toast.success('Profile saved');
-    } catch (err) { toast.error(errorText(err, 'Could not save profile')); }
+      toast.success(t('auth:profileSaved'));
+    } catch (err) { toast.error(errorText(err, t('auth:couldNotSaveProfile'))); }
     finally { setSaving(false); }
   };
 
@@ -57,12 +61,12 @@ function ProfilePage() {
   const dd = (details ?? {}) as { cnic_front_url?: string | null; cnic_doc_url?: string | null };
   const hasCnic = !!(dd.cnic_front_url || dd.cnic_doc_url);
   const status = profile?.verification_status ?? 'pending';
-  const statusLabel = status === 'approved' ? 'Verified' : status === 'pending' ? 'Pending' : 'Rejected';
+  const statusLabel = status === 'approved' ? t('auth:verified') : status === 'pending' ? t('auth:pending') : t('auth:rejected');
 
   const submitCnic = async (e: React.FormEvent) => {
     e.preventDefault();
     const db = getSupabase(); if (!db || !profile) return;
-    if (!cnicFront || (isBuyer && !cnicBack)) { toast.error(isBuyer ? 'Please upload both sides of your CNIC.' : 'Please upload your CNIC image.'); return; }
+    if (!cnicFront || (isBuyer && !cnicBack)) { toast.error(isBuyer ? t('auth:uploadBothCnic') : t('auth:uploadCnicImage')); return; }
     setCnicBusy(true);
     try {
       const front = await uploadDocument(cnicFront);
@@ -78,65 +82,72 @@ function ProfilePage() {
       if (sErr) throw sErr;
       setCnicFront(null); setCnicBack(null);
       await refresh();
-      toast.success('CNIC submitted for review');
-    } catch (err) { toast.error(errorText(err, 'Could not upload CNIC')); }
+      toast.success(t('auth:cnicSubmitted'));
+    } catch (err) { toast.error(errorText(err, t('auth:couldNotUploadCnic'))); }
     finally { setCnicBusy(false); }
   };
 
   const changePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     const db = getSupabase(); if (!db || !profile) return;
-    if (pw.length < 8) { toast.error('New password must be at least 8 characters.'); return; }
-    if (pw !== pw2) { toast.error(PASSWORD_MISMATCH); return; }
+    if (pw.length < 8) { toast.error(t('auth:newPasswordMin8')); return; }
+    if (pw !== pw2) { toast.error(passwordMismatch); return; }
     const check = await db.auth.signInWithPassword({ email: profile.email, password: current });
-    if (check.error) { toast.error('Current password is incorrect.'); return; }
+    if (check.error) { toast.error(t('auth:currentPasswordIncorrect')); return; }
     const { error } = await db.auth.updateUser({ password: pw });
-    if (error) toast.error(errorText(error, 'Could not change password'));
-    else { toast.success('Password changed'); setCurrent(''); setPw(''); setPw2(''); }
+    if (error) toast.error(errorText(error, t('auth:couldNotChangePassword')));
+    else { toast.success(t('auth:passwordChanged')); setCurrent(''); setPw(''); setPw2(''); }
   };
 
-  if (!profile) return <div className="container"><p className="muted">Loading…</p></div>;
+  if (!profile) return <div className="container"><p className="muted">{t('auth:loadingEllipsis')}</p></div>;
   return (
     <div className="container">
       <div className="card wide">
-        <h1>Profile & settings</h1>
-        <p className="muted">{profile.email} · {ROLE_LABELS[profile.role]}</p>
+        <h1>{t('auth:profileTitle')}</h1>
+        <p className="muted">{profile.email} · {t(`common:roles.${profile.role}`)}</p>
+        <div className="link-row" style={{ margin: '8px 0 16px', display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Button variant="legacy" className="btn secondary small" type="button" onClick={() => onNavigate('settings/notifications')}>
+            {t('common:notificationPrefs')}
+          </Button>
+          <span className="muted small">{t('auth:languagePreference')}</span>
+          <LanguageSwitch />
+        </div>
         <form onSubmit={save}>
-          <label>Full name<input value={name} onChange={(e) => setName(e.target.value)} /></label>
+          <label>{t('auth:fullName')}<input value={name} onChange={(e) => setName(e.target.value)} /></label>
           {isBuyer && <>
             <div className="form-row">
-              <label>Phone<input value={phone} onChange={(e) => setPhone(e.target.value)} /></label>
-              <label>Address<input value={address} onChange={(e) => setAddress(e.target.value)} /></label>
+              <label>{t('auth:phone')}<input value={phone} onChange={(e) => setPhone(e.target.value)} dir="ltr" className="ltr-isolate" /></label>
+              <label>{t('common:address')}<input value={address} onChange={(e) => setAddress(e.target.value)} /></label>
             </div>
-            <label>Profile photo<input type="file" accept="image/*" onChange={(e) => setPhoto(e.target.files?.[0] ?? null)} /></label>
+            <label>{t('auth:profilePhoto')}<input type="file" accept="image/*" onChange={(e) => setPhoto(e.target.files?.[0] ?? null)} /></label>
           </>}
-          {!isBuyer && <p className="muted small">Business details (firm, society, licence) are managed through your verification record.</p>}
-          <Button disabled={saving}>{saving ? 'Saving…' : 'Save profile'}</Button>
+          {!isBuyer && <p className="muted small">{t('auth:businessDetailsNote')}</p>}
+          <Button disabled={saving}>{saving ? t('auth:saving') : t('auth:saveProfile')}</Button>
         </form>
-        <h3>CNIC verification</h3>
+        <h3>{t('auth:cnicVerification')}</h3>
         <p className="small">
-          Status: <span className={`badge ${status === 'approved' ? 'ok' : 'warn'}`}>{statusLabel}</span>
-          {canCnic && !hasCnic && <span className="muted"> · No CNIC uploaded yet</span>}
+          {t('auth:status')}: <span className={`badge ${status === 'approved' ? 'ok' : 'warn'}`}>{statusLabel}</span>
+          {canCnic && !hasCnic && <span className="muted"> · {t('auth:noCnicUploaded')}</span>}
         </p>
-        {status !== 'approved' && status !== 'pending' && profile.rejection_reason && <div className="error">Reason: {profile.rejection_reason}</div>}
+        {status !== 'approved' && status !== 'pending' && profile.rejection_reason && <div className="error">{t('auth:reason', { reason: profile.rejection_reason })}</div>}
         {canCnic && status !== 'approved' && (
           <form onSubmit={submitCnic}>
             <div className="form-row">
-              <label>{isBuyer ? 'CNIC front image' : 'CNIC image'}<input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" onChange={(e) => setCnicFront(e.target.files?.[0] ?? null)} /></label>
-              {isBuyer && <label>CNIC back image<input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" onChange={(e) => setCnicBack(e.target.files?.[0] ?? null)} /></label>}
+              <label>{isBuyer ? t('auth:cnicFrontImage') : t('auth:cnicImage')}<input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" onChange={(e) => setCnicFront(e.target.files?.[0] ?? null)} /></label>
+              {isBuyer && <label>{t('auth:cnicBackImage')}<input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" onChange={(e) => setCnicBack(e.target.files?.[0] ?? null)} /></label>}
             </div>
-            <Button variant="outline" disabled={cnicBusy}>{cnicBusy ? 'Uploading…' : hasCnic ? 'Re-upload CNIC' : 'Upload CNIC'}</Button>
+            <Button variant="outline" disabled={cnicBusy}>{cnicBusy ? t('auth:uploading') : hasCnic ? t('auth:reuploadCnic') : t('auth:uploadCnic')}</Button>
           </form>
         )}
-        <h3>Change password</h3>
+        <h3>{t('auth:changePassword')}</h3>
         <form onSubmit={changePassword}>
-          <label>Current password<PasswordInput required autoComplete="current-password" value={current} onChange={(e) => setCurrent(e.target.value)} /></label>
+          <label>{t('auth:currentPassword')}<PasswordInput required autoComplete="current-password" value={current} onChange={(e) => setCurrent(e.target.value)} /></label>
           <div className="form-row">
-            <label>New password<PasswordInput required autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} /></label>
-            <label>Confirm new password<PasswordInput required autoComplete="new-password" value={pw2} onChange={(e) => setPw2(e.target.value)} /></label>
+            <label>{t('auth:newPassword')}<PasswordInput required autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} /></label>
+            <label>{t('auth:confirmNewPassword')}<PasswordInput required autoComplete="new-password" value={pw2} onChange={(e) => setPw2(e.target.value)} /></label>
           </div>
-          {pw2 && pw2 !== pw && <div className="error" role="alert">{PASSWORD_MISMATCH}</div>}
-          <Button variant="outline">Change password</Button>
+          {pw2 && pw2 !== pw && <div className="error" role="alert">{passwordMismatch}</div>}
+          <Button variant="outline">{t('auth:changePassword')}</Button>
         </form>
       </div>
     </div>

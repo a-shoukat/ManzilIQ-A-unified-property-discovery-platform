@@ -1,0 +1,22 @@
+{
+  "title": "Book a plot",
+  "myBookings": "My bookings",
+  "bookingRequests": "Booking requests",
+  "tokenAmount": "Token amount",
+  "bayanaAmount": "Bayana (down payment)",
+  "installmentPlan": "Installment plan",
+  "submitBooking": "Submit booking",
+  "cancelBooking": "Cancel booking",
+  "approveBooking": "Approve booking",
+  "rejectBooking": "Reject booking",
+  "statusPending": "Pending",
+  "statusApproved": "Approved",
+  "statusRejected": "Rejected",
+  "statusCancelled": "Cancelled",
+  "noBookings": "No bookings yet.",
+  "selectPlot": "Select plot",
+  "buyerDetails": "Buyer details",
+  "bookingRef": "Booking reference",
+  "allotment": "Allotment",
+  "cancellation": "Cancellation"
+}
