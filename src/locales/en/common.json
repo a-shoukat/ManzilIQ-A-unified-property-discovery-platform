@@ -147,6 +147,11 @@
   "pageDidntLoad": "This page didn't load",
   "somethingWentWrong": "Something went wrong on our end. You can try refreshing or head back home.",
   "tryAgainBtn": "Try again",
+  "retry": "Retry",
+  "all": "All",
+  "notAvailable": "N/A",
+  "rejected": "Rejected",
+  "plotsAvailable": "plots available",
   "hidePassword": "Hide password",
   "showPassword": "Show password",
   "roles": {

@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { brandLogoSrcAt, BRAND_LOGO_CANDIDATES } from "@/lib/manzil/brand-logo";
+import { brandLogoCandidateCount, brandLogoSrcAt } from "@/lib/manzil/brand-logo";
 
 type Props = {
   className?: string;
-  /** When true, show compact icon-sized branding (login). */
+  /** When true, show compact icon-sized branding (login / forgot). */
   compact?: boolean;
 };
 
@@ -13,16 +13,20 @@ type Props = {
  */
 export function BrandLogo({ className, compact }: Props) {
   const [idx, setIdx] = useState(0);
-  const src = brandLogoSrcAt(idx);
-  const showWordmark = !src || idx >= BRAND_LOGO_CANDIDATES.length;
+  const src = brandLogoSrcAt(idx, !!compact);
+  const showWordmark = !src || idx >= brandLogoCandidateCount(!!compact);
 
   if (showWordmark) {
     return (
-      <span className={`brand-wordmark${compact ? " compact" : ""}${className ? ` ${className}` : ""}`} aria-label="ManzilIQ">
+      <span
+        className={`brand-wordmark${compact ? " compact" : ""}${className ? ` ${className}` : ""}`}
+        aria-label="ManzilIQ"
+      >
         <span className="brand-mark" aria-hidden>
           M
         </span>
-        <span className="brand-text">ManzilIQ</span>
+        {!compact && <span className="brand-text">ManzilIQ</span>}
+        {compact && <span className="sr-only">ManzilIQ</span>}
       </span>
     );
   }
@@ -31,7 +35,9 @@ export function BrandLogo({ className, compact }: Props) {
     <img
       src={src}
       alt="ManzilIQ"
-      className={className ?? "brand-logo"}
+      className={className ?? (compact ? "brand-logo brand-logo-compact" : "brand-logo")}
+      width={compact ? 55 : undefined}
+      height={compact ? 55 : undefined}
       onError={() => setIdx((i) => i + 1)}
     />
   );

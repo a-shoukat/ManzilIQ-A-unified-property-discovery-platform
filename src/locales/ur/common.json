@@ -147,6 +147,11 @@
   "pageDidntLoad": "یہ صفحہ لوڈ نہیں ہوا",
   "somethingWentWrong": "ہمارے پاس کچھ غلط ہو گیا۔ آپ صفحہ تازہ کر سکتے ہیں یا صفحۂ اول پر جا سکتے ہیں۔",
   "tryAgainBtn": "دوبارہ کوشش کریں",
+  "retry": "دوبارہ کوشش",
+  "all": "سب",
+  "notAvailable": "دستیاب نہیں",
+  "rejected": "مسترد",
+  "plotsAvailable": "پلاٹس دستیاب",
   "hidePassword": "پاس ورڈ چھپائیں",
   "showPassword": "پاس ورڈ دکھائیں",
   "roles": {
