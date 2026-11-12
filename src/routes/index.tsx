@@ -25,6 +25,7 @@ import {
 } from '@/lib/manzil/homepage-cms';
 import { bannerImageUrl } from '@/lib/manzil/cms';
 import { PropertyPinsMap } from '@/components/manzil/PropertyPinsMap';
+import { normalizeCity } from '@/lib/manzil/format';
 
 if (typeof window !== 'undefined') void fetchProperties();
 export const Route = createFileRoute('/')({ head:()=>pageHead('Marketplace — Find your next property'), component:Index });
@@ -53,8 +54,9 @@ function Index() {
   return ()=>{ cancelled=true; };
  },[]);
  const { profile:viewer }=useAuth(); const shown=filterForViewer(all,viewer?.role);
- const cities=[...new Set(shown.map(p=>p.city))];
- const filtered=featuredFirst(shown.filter(p=>(!q||`${p.title} ${p.area??''} ${p.society_name??''}`.toLowerCase().includes(q.toLowerCase()))&&(!city||p.city===city)&&(!category||p.category===category)&&(!purpose||p.purpose===purpose)&&(!status||p.status===status)&&(!maxPrice||p.price<=Number(maxPrice))).sort((a,b)=>sort==='price-asc'?a.price-b.price:sort==='price-desc'?b.price-a.price:sort==='size-desc'?b.plot_size_marla-a.plot_size_marla:new Date(b.created_at).getTime()-new Date(a.created_at).getTime()));
+ const cities=[...new Set(shown.map(p=>normalizeCity(p.city)).filter(Boolean))].sort();
+ const cityNorm=normalizeCity(city);
+ const filtered=featuredFirst(shown.filter(p=>(!q||`${p.title} ${p.area??''} ${p.society_name??''}`.toLowerCase().includes(q.toLowerCase()))&&(!cityNorm||normalizeCity(p.city)===cityNorm)&&(!category||p.category===category)&&(!purpose||p.purpose===purpose)&&(!status||p.status===status)&&(!maxPrice||p.price<=Number(maxPrice))).sort((a,b)=>sort==='price-asc'?a.price-b.price:sort==='price-desc'?b.price-a.price:sort==='size-desc'?b.plot_size_marla-a.plot_size_marla:new Date(b.created_at).getTime()-new Date(a.created_at).getTime()));
  const reset=()=>{setQ('');setCity('');setCategory('');setPurpose('');setStatus('');setMaxPrice('')};
  const content=cms.content;
  const purposeTabs = [['','allProperties'],['sale','buy'],['rent','rent']] as const;

@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
 import { useAuth } from '@/lib/manzil/auth';
 import { ROLE_LABELS } from '@/lib/manzil/types';
+import { joinDisplay, titleCase } from '@/lib/manzil/format';
 import { useEffect, useState } from 'react';
 import { getSupabase } from '@/lib/manzil/supabase';
 import { CustomerRegistrationForm, DealerRegistrationForm, SocietyRegistrationForm } from '@/components/manzil/RegistrationForms';
@@ -152,7 +153,9 @@ function Dashboard({ onNavigate }: { onNavigate: (p: string) => void }) {
           <div>
             <h1>{isAdmin ? 'Super admin dashboard' : 'ManzilIQ'}</h1>
             <p className="muted" style={{ margin: 0 }}>
-              {profile ? ROLE_LABELS[profile.role] : ''} {isAdmin ? '· full platform control' : 'dashboard'}
+              {isAdmin
+                ? joinDisplay(ROLE_LABELS.super_admin, 'Full platform control')
+                : joinDisplay(profile ? ROLE_LABELS[profile.role] : '', titleCase('dashboard'))}
             </p>
           </div>
           <Button variant="legacy" className="btn secondary small" onClick={async () => { await signOut(); onNavigate('login'); }}>

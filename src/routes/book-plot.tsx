@@ -108,7 +108,7 @@ function BookPlot({ onNavigate }: { onNavigate: (p: string) => void }) {
                 <option value="">{plotsLoading ? 'Loading plots…' : 'Choose a plot…'}</option>
                 {!plotsLoading && plots.map((p) => (
                   <option key={p.id} value={p.id}>
-                    {plotOptionLabel(p)} · {p.size_marla}M · {formatPrice(p.base_price)}
+                    {plotOptionLabel(p)} · {p.size_marla} Marla · {formatPrice(p.base_price)}
                   </option>
                 ))}
               </select>

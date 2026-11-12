@@ -9,6 +9,8 @@ import { fetchPlots } from '@/lib/manzil/society';
 import { errorText } from '@/lib/manzil/errors';
 import { formatSize } from '@/lib/manzil/phase3-rules';
 import { formatPrice } from '@/lib/manzil/properties';
+import { formatPlotHeading, formatStatusLabel } from '@/lib/manzil/format';
+import { plotOptionLabel } from '@/lib/manzil/bookable-plots';
 import { deleteRegion, fetchMasterPlanUrl, fetchRegions, MAP_ACCEPT, saveRegion, subscribeSocietyMap, uploadMasterPlan } from '@/lib/manzil/master-plan';
 import { buildTranscript, isUnlinked, mappingProgress, mapStatus, MAP_STATUS_LABEL, statusSummary, type MapRegion, type MapStatus, rectToPct } from '@/lib/manzil/master-plan-rules';
 
@@ -152,7 +154,7 @@ export function MasterPlanWorkspace({ societyId, societyName, editable, onBook }
             <div className="mp-link-list">
               {linkCandidates.map((p) => (
                 <Button key={p.id} size="sm" variant={mappedIds.has(p.id) ? 'outline' : 'secondary'} onClick={() => void linkTo(p)}>
-                  {p.block}-{p.plot_no}{mappedIds.has(p.id) ? ' (mapped)' : ''}
+                  {plotOptionLabel(p)}{mappedIds.has(p.id) ? ' (mapped)' : ''}
                 </Button>
               ))}
               {linkCandidates.length === 0 && <span className="muted small">No plots match.</span>}
@@ -173,7 +175,7 @@ export function MasterPlanWorkspace({ societyId, societyName, editable, onBook }
         )}
         {detail && (
           <div className="card card-full" ref={detailRef}>
-            <div className="topbar"><h3 style={{ margin: 0 }}>Plot {detail.block}-{detail.plot_no}</h3><Button size="sm" variant="secondary" onClick={() => setDetail(null)}>Close</Button></div>
+            <div className="topbar"><h3 style={{ margin: 0 }}>{formatPlotHeading(detail)}</h3><Button size="sm" variant="secondary" onClick={() => setDetail(null)}>Close</Button></div>
             <div className="detail-grid">
               <div className="detail-item"><span className="detail-key">Block</span><span>{detail.block}</span></div>
               <div className="detail-item"><span className="detail-key">Size</span><span>{formatSize(detail.size_marla)}</span></div>

@@ -19,14 +19,7 @@ import { saveSubscription } from '@/lib/manzil/subscription';
 import { SOCIETY_PROFILE_REQUIRED, societyAdminsWithProfile } from '@/lib/manzil/subscription-grant';
 import { useAuth } from '@/lib/manzil/auth';
 import type { Profile } from '@/lib/manzil/types';
-
-function titleCaseRole(role: string) {
-  return role.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-function titleCaseStatus(status: string) {
-  return status.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-}
+import { formatDate, formatStatusLabel, titleCase } from '@/lib/manzil/format';
 
 function AdminSubscriptions() {
   const { t } = useTranslation(['admin', 'common']);
@@ -134,7 +127,7 @@ function AdminSubscriptions() {
                 className="filter-pill"
                 onClick={() => setRole(r)}
               >
-                {r === 'all' ? t('common:all') : titleCaseRole(r)}
+                {r === 'all' ? t('common:all') : titleCase(r)}
               </Button>
             ))}
           </div>
@@ -169,16 +162,16 @@ function AdminSubscriptions() {
                       ? (s.status === 'cancelled' ? 'cancelled' : 'expired')
                       : s.status;
                   const endLabel = s?.current_period_end
-                    ? new Date(s.current_period_end).toLocaleDateString()
+                    ? formatDate(s.current_period_end)
                     : t('common:notAvailable');
                   return (
                     <tr key={u.id}>
                       <td>
                         <span className="email-ellipsis" title={u.email}>{u.email}</span>
                       </td>
-                      <td>{titleCaseRole(u.role)}</td>
+                      <td>{titleCase(u.role)}</td>
                       <td>{s ? getPlan(s.plan_id)?.name ?? s.plan_id : plan?.name}</td>
-                      <td><span className="status-pill">{titleCaseStatus(status)}</span></td>
+                      <td><span className="status-pill">{formatStatusLabel(status)}</span></td>
                       <td>{endLabel}</td>
                       <td>
                         <div className="link-row row-actions">

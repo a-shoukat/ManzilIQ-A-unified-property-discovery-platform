@@ -5,6 +5,8 @@ import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageF
 import { useEffect, useState } from 'react';
 import { fetchApprovedSocieties, fetchPlots } from '@/lib/manzil/society';
 import { formatPrice } from '@/lib/manzil/properties';
+import { formatDateTime, formatPlotHeading, formatStatusLabel } from '@/lib/manzil/format';
+import { plotOptionLabel } from '@/lib/manzil/bookable-plots';
 import type { Plot } from '@/lib/manzil/types';
 import { useSocietyId } from './society';
 import { MasterPlanWorkspace } from '@/components/manzil/MasterPlanWorkspace';
@@ -100,7 +102,7 @@ function PlotMap({ onNavigate }: { onNavigate: (p: string) => void }) {
 
       <div className="map-legend">
         {Object.entries(STATUS_COLOR).map(([s, c]) => (
-          <span key={s} className="legend-item"><i style={{ background: c }} />{s}</span>
+          <span key={s} className="legend-item"><i style={{ background: c }} />{formatStatusLabel(s)}</span>
         ))}
       </div>
 
@@ -114,7 +116,7 @@ function PlotMap({ onNavigate }: { onNavigate: (p: string) => void }) {
               className={`map-cell${selected?.id === p.id ? ' selected' : ''}`}
               style={{ background: STATUS_COLOR[p.status] }}
               onClick={() => setSelected(p)}
-              title={`${p.block}-${p.plot_no}`}
+              title={plotOptionLabel(p)}
             >
               {p.plot_no}
             </Button>
@@ -125,14 +127,14 @@ function PlotMap({ onNavigate }: { onNavigate: (p: string) => void }) {
       {selected && (
         <div className="card" style={{ marginTop: 16 }}>
           <div className="topbar">
-            <h3 style={{ margin: 0 }}>Plot {selected.block}-{selected.plot_no}</h3>
+            <h3 style={{ margin: 0 }}>{formatPlotHeading(selected)}</h3>
             <Button variant="legacy" className="btn secondary small" onClick={() => setSelected(null)}>Close</Button>
           </div>
           <div className="detail-grid">
             <div className="detail-item"><span className="detail-key">Size</span><span>{formatSize(selected.size_marla)}</span></div>
-            <div className="detail-item"><span className="detail-key">Category</span><span>{selected.category}</span></div>
+            <div className="detail-item"><span className="detail-key">Category</span><span>{formatStatusLabel(selected.category)}</span></div>
             <div className="detail-item"><span className="detail-key">Base price</span><span>{formatPrice(selected.base_price)}</span></div>
-            <div className="detail-item"><span className="detail-key">Status</span><span>{selected.status}</span></div>
+            <div className="detail-item"><span className="detail-key">Status</span><span>{formatStatusLabel(selected.status)}</span></div>
           </div>
         </div>
       )}

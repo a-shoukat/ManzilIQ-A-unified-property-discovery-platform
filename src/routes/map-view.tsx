@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { fetchPlots } from "@/lib/manzil/society";
 import { fetchApprovedSocieties } from "@/lib/manzil/society";
 import { formatPrice } from "@/lib/manzil/properties";
+import { formatPlotHeading, formatStatusLabel } from "@/lib/manzil/format";
+import { plotOptionLabel } from "@/lib/manzil/bookable-plots";
 import { formatSize } from "@/lib/manzil/phase3-rules";
 import type { Plot } from "@/lib/manzil/types";
 import { mapsEmbedUrl, mapsJsConfigured } from "@/lib/manzil/maps-geo";
@@ -206,7 +208,7 @@ function MapView({ onNavigate }: { onNavigate: (p: string, arg?: string) => void
             {Object.entries(STATUS_COLOR).map(([s, c]) => (
               <span key={s} className="legend-item">
                 <i style={{ background: c }} />
-                {s}
+                {formatStatusLabel(s)}
               </span>
             ))}
           </div>
@@ -291,7 +293,7 @@ function MapView({ onNavigate }: { onNavigate: (p: string, arg?: string) => void
             <div className="card" style={{ marginTop: 16 }} ref={detailRef}>
               <div className="topbar">
                 <h3 style={{ margin: 0 }}>
-                  {t("marketplace:plotDetails")} · {selected.block}-{selected.plot_no}
+                  {t("marketplace:plotDetails")} · {plotOptionLabel(selected)}
                 </h3>
                 <Button
                   variant="legacy"

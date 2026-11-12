@@ -4,6 +4,7 @@ import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageF
 import { useState } from 'react';
 import { estimatePrice, isAiConfigured, type EstimateInput, type EstimateResult } from '@/lib/manzil/estimator';
 import { formatPrice } from '@/lib/manzil/properties';
+import { normalizeCity } from '@/lib/manzil/format';
 
 /** Module 8 — AI Price Prediction */
 function PriceEstimator({ onNavigate }: { onNavigate: (p: string) => void }) {
@@ -19,14 +20,16 @@ function PriceEstimator({ onNavigate }: { onNavigate: (p: string) => void }) {
   const run = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    const cityNorm = normalizeCity(city) || 'Narowal';
     const input: EstimateInput = {
-      city: city.trim() || 'Narowal',
-      area: area.trim() || city.trim() || 'Narowal',
+      city: cityNorm,
+      area: area.trim() || cityNorm,
       sizeMarla: parseFloat(size) || 0,
       category,
       bedrooms: bedrooms ? parseInt(bedrooms, 10) : null,
       society: society.trim(),
     };
+    setCity(cityNorm);
     setResult(await estimatePrice(input));
     setLoading(false);
   };
