@@ -15,10 +15,41 @@ export type BackendFeature =
   | "ai_remote"
   | "maps_js";
 
+export type MigrationState = "ok" | "partial" | "unknown";
+
+export interface MigrationProbe {
+  state: MigrationState;
+  /** Tables/columns expected but not detected (empty when ok/unknown). */
+  missing: string[];
+  checkedAt: string;
+}
+
 export interface BackendHealth {
   features: Record<BackendFeature, boolean>;
   mode: "demo" | "partial" | "live";
   notes: string[];
+  migrations?: MigrationProbe;
+}
+
+/** Expected public tables after 00_all + Phase 10–12 (and optional 13). */
+export const MIGRATION_PROBE_TABLES = [
+  "notification_deliveries",
+  "reminder_runs",
+  "reminder_job_runs",
+  "inquiries",
+  "inquiry_replies",
+  "price_predictions",
+  "notification_preferences",
+  "site_banners",
+  "site_content",
+  "dealer_sale_forms",
+] as const;
+
+export function summarizeMigrationProbe(present: string[], checked: string[]): MigrationProbe {
+  const missing = checked.filter((t) => !present.includes(t));
+  const state: MigrationState =
+    missing.length === 0 ? "ok" : present.length === 0 ? "unknown" : "partial";
+  return { state, missing, checkedAt: new Date().toISOString() };
 }
 
 /** Public (Vite) configuration — safe in the browser. */

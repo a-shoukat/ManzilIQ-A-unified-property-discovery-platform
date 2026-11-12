@@ -130,6 +130,27 @@ describe("system status rows", () => {
     };
     const rows = integrationRows(health);
     expect(rows.find((r) => r.key === "maps_js")?.on).toBe(true);
+    expect(rows.find((r) => r.key === "maps_js")?.modeLabel).toBe("live");
     expect(rows.find((r) => r.key === "payments_live")?.on).toBe(false);
+    expect(rows.find((r) => r.key === "payments_live")?.modeLabel).toBe("mock");
+    expect(rows.find((r) => r.key === "reminders")?.modeLabel).toBe("off");
+  });
+});
+
+describe("ops runbook docs exist", () => {
+  it("references migration order and reminder cron", async () => {
+    const fs = await import("node:fs/promises");
+    const path = await import("node:path");
+    const root = path.resolve(import.meta.dirname, "../..");
+    const runbook = await fs.readFile(path.join(root, "docs/OPS_RUNBOOK.md"), "utf8");
+    expect(runbook).toMatch(/00_all_migrations\.sql/);
+    expect(runbook).toMatch(/REMINDER_CRON_SECRET/);
+    expect(runbook).toMatch(/12_preferred_language\.sql/);
+    const e2e = await fs.readFile(
+      path.join(root, "docs/E2E_APPROVE_BOOK_CHARGE_RECEIPT_TRANSFER.md"),
+      "utf8",
+    );
+    expect(e2e).toMatch(/approve/i);
+    expect(e2e).toMatch(/transfer/i);
   });
 });

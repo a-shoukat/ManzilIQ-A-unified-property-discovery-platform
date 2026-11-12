@@ -1216,6 +1216,10 @@ textarea {
 .wallet-easypaisa { border-top-color: var(--success); }
 .wallet-brand { display: flex; align-items: center; gap: 8px; }
 .wallet-demo { margin-left: auto; font-size: 10px; font-weight: 700; letter-spacing: .08em; padding: 2px 8px; border-radius: 999px; background: var(--muted); color: var(--muted-foreground); }
+.wallet-demo.wallet-live { background: color-mix(in oklab, var(--success) 18%, transparent); color: var(--success); }
+.pins-map-section { margin: 1.25rem 0 1.75rem; }
+.pins-map-card { margin-bottom: 1.5rem; overflow: hidden; }
+.pins-map-card .leaflet-container { font: inherit; z-index: 0; }
 .wallet-amount { font-size: 26px; font-weight: 700; margin: 4px 0 6px; }
 .wallet-processing { display: flex; align-items: center; gap: 10px; padding: 18px 0; }
 .spin { animation: wallet-spin 1s linear infinite; }

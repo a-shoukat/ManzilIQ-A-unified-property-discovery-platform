@@ -6,17 +6,33 @@ import { errorText } from '@/lib/manzil/errors';
 import {
   integrationRows,
   loadSystemStatus,
+  type DeliveryRow,
   type FailedDelivery,
   type ReminderRunSummary,
 } from '@/lib/manzil/system-status';
-import type { BackendHealth } from '@/lib/manzil/features';
+import type { BackendHealth, MigrationProbe } from '@/lib/manzil/features';
 import { STATUS_COPY as C } from '@/lib/manzil/phase10-copy/status';
+
+function modeBadge(mode: 'live' | 'mock' | 'off'): string {
+  if (mode === 'live') return C.live;
+  if (mode === 'mock') return C.mock;
+  return C.off;
+}
+
+function migrationLabel(m: MigrationProbe | null): string {
+  if (!m) return C.migrationUnknown;
+  if (m.state === 'ok') return C.migrationOk;
+  if (m.state === 'partial') return C.migrationPartial;
+  return C.migrationUnknown;
+}
 
 /** Screen 7 — Admin system status (Phase 0 health + recent failures). */
 function AdminStatus({ onNavigate }: { onNavigate: (p: string) => void }) {
   const [health, setHealth] = useState<BackendHealth | null>(null);
   const [lastReminder, setLastReminder] = useState<ReminderRunSummary>(null);
   const [failed, setFailed] = useState<FailedDelivery[]>([]);
+  const [recent, setRecent] = useState<DeliveryRow[]>([]);
+  const [migrations, setMigrations] = useState<MigrationProbe | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,6 +43,8 @@ function AdminStatus({ onNavigate }: { onNavigate: (p: string) => void }) {
         setHealth(s.health);
         setLastReminder(s.lastReminder);
         setFailed(s.failedNotifications);
+        setRecent(s.recentDeliveries);
+        setMigrations(s.migrations);
       })
       .catch((e) => setError(errorText(e, C.loadError)))
       .finally(() => setLoading(false));
@@ -61,6 +79,34 @@ function AdminStatus({ onNavigate }: { onNavigate: (p: string) => void }) {
           </div>
 
           <div className="card" style={{ marginBottom: 16 }}>
+            <h3>{C.migrations}</h3>
+            <div className="detail-grid">
+              <div className="detail-item">
+                <span className="detail-key">{C.status}</span>
+                <span>
+                  <span className={`badge ${migrations?.state === 'ok' ? 'ok' : 'warn'}`}>
+                    {migrationLabel(migrations)}
+                  </span>
+                </span>
+              </div>
+              {migrations?.checkedAt && (
+                <div className="detail-item">
+                  <span className="detail-key">{C.when}</span>
+                  <span>{new Date(migrations.checkedAt).toLocaleString()}</span>
+                </div>
+              )}
+            </div>
+            {migrations?.missing && migrations.missing.length > 0 && (
+              <p className="muted small" style={{ marginTop: 8 }}>
+                {C.missing}: {migrations.missing.join(', ')}
+              </p>
+            )}
+            {migrations?.state === 'unknown' && (
+              <p className="muted small" style={{ marginTop: 8 }}>{C.migrationHint}</p>
+            )}
+          </div>
+
+          <div className="card" style={{ marginBottom: 16 }}>
             <h3>{C.integrations}</h3>
             <div className="table-wrap">
               <table className="data-table">
@@ -75,7 +121,7 @@ function AdminStatus({ onNavigate }: { onNavigate: (p: string) => void }) {
                     <tr key={r.key}>
                       <td>{r.label}</td>
                       <td>
-                        <span className={`badge ${r.on ? 'ok' : 'warn'}`}>{r.on ? C.active : C.inactive}</span>
+                        <span className={`badge ${r.on ? 'ok' : 'warn'}`}>{modeBadge(r.modeLabel)}</span>
                       </td>
                     </tr>
                   ))}
@@ -102,6 +148,59 @@ function AdminStatus({ onNavigate }: { onNavigate: (p: string) => void }) {
                   <span className="detail-key">{C.when}</span>
                   <span>{new Date(lastReminder.created_at).toLocaleString()}</span>
                 </div>
+                {lastReminder.t_minus_3 != null && (
+                  <>
+                    <div className="detail-item">
+                      <span className="detail-key">{C.countT3}</span>
+                      <span>{lastReminder.t_minus_3}</span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="detail-key">{C.countDue}</span>
+                      <span>{lastReminder.due_count ?? 0}</span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="detail-key">{C.countOverdue}</span>
+                      <span>{lastReminder.overdue_count ?? 0}</span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="detail-key">{C.countEscalated}</span>
+                      <span>{lastReminder.escalated_count ?? 0}</span>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="card" style={{ marginBottom: 16 }}>
+            <h3>{C.recentTitle}</h3>
+            <p className="muted small">{C.recentHint}</p>
+            {recent.length === 0 ? (
+              <p className="muted">{C.noRecent}</p>
+            ) : (
+              <div className="table-wrap">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>{C.when}</th>
+                      <th>{C.channel}</th>
+                      <th>{C.status}</th>
+                      <th>{C.user}</th>
+                      <th>{C.detail}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recent.map((f) => (
+                      <tr key={f.id}>
+                        <td className="small">{new Date(f.created_at).toLocaleString()}</td>
+                        <td>{f.channel}</td>
+                        <td>{f.status}</td>
+                        <td className="small">{f.user_id.slice(0, 8)}</td>
+                        <td className="small">{f.detail ?? '—'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>

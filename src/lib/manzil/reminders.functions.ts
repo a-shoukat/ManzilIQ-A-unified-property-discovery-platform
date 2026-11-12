@@ -2,7 +2,15 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { serverEnv } from "./env-server";
 import { dispatchChannels } from "./notify-channels.functions";
+import { deliveryStatusFromResult } from "./notify-status";
 import { kindsForDueDate, type ReminderKind } from "./reminder-rules";
+
+import { bumpReminderCount, emptyReminderCounts } from "./reminder-counts";
+export {
+  bumpReminderCount,
+  emptyReminderCounts,
+  type ReminderJobCounts,
+} from "./reminder-counts";
 
 function adminClient() {
   const url = serverEnv("SUPABASE_URL") ?? serverEnv("VITE_SUPABASE_URL");
@@ -17,29 +25,46 @@ function todayUtc(): string {
 
 /**
  * Installment reminder job (T-3 / due / overdue / escalate to admin).
- * Call from an external cron with Authorization: Bearer $REMINDER_CRON_SECRET.
+ * Call from an external cron with Authorization / body secret = REMINDER_CRON_SECRET.
  * Requires SUPABASE_SERVICE_ROLE_KEY; otherwise returns needs_credentials.
+ * Every authorized run inserts reminder_job_runs with kind counts.
  */
 export const runInstallmentReminders = createServerFn({ method: "POST" })
   .inputValidator((d: { secret?: string }) => ({ secret: String(d?.secret ?? "") }))
   .handler(async ({ data }) => {
     const expected = serverEnv("REMINDER_CRON_SECRET");
     if (!expected || data.secret !== expected) {
-      return { ok: false as const, reason: "unauthorized" as const, sent: 0 };
+      return { ok: false as const, reason: "unauthorized" as const, sent: 0, counts: emptyReminderCounts() };
     }
     const sb = adminClient();
     if (!sb) {
-      return { ok: false as const, reason: "needs_credentials" as const, sent: 0 };
+      return {
+        ok: false as const,
+        reason: "needs_credentials" as const,
+        sent: 0,
+        counts: emptyReminderCounts(),
+      };
     }
 
     const today = todayUtc();
+    const counts = emptyReminderCounts();
     const { data: pending, error } = await sb
       .from("payments")
       .select("id, customer_id, society_id, amount, due_date, label, status, booking_id")
       .neq("status", "confirmed")
       .not("due_date", "is", null)
       .limit(500);
-    if (error) return { ok: false as const, reason: error.message, sent: 0 };
+    if (error) {
+      await sb.from("reminder_job_runs").insert({
+        status: "error",
+        detail: error.message,
+        t_minus_3: 0,
+        due_count: 0,
+        overdue_count: 0,
+        escalated_count: 0,
+      });
+      return { ok: false as const, reason: error.message, sent: 0, counts };
+    }
 
     let sent = 0;
     const rows =
@@ -64,6 +89,8 @@ export const runInstallmentReminders = createServerFn({ method: "POST" })
         });
         if (insErr) continue; // unique (payment_id, kind) → already sent
 
+        bumpReminderCount(counts, kind);
+
         const title =
           kind === "t_minus_3"
             ? "Installment due in 3 days"
@@ -75,9 +102,12 @@ export const runInstallmentReminders = createServerFn({ method: "POST" })
         const body = `${p.label ?? "Payment"} of PKR ${Number(p.amount).toLocaleString()} (due ${p.due_date}).`;
         const targets = kind === "escalation" ? [p.society_id] : [p.customer_id];
         for (const uid of targets.filter(Boolean)) {
-          await sb
+          const { data: notifRows } = await sb
             .from("notifications")
-            .insert({ user_id: uid, title, body, type: `reminder_${kind}` });
+            .insert({ user_id: uid, title, body, type: `reminder_${kind}` })
+            .select("id")
+            .maybeSingle();
+          const notifId = (notifRows as { id?: string } | null)?.id ?? null;
           const { data: profile } = await sb
             .from("profiles")
             .select("email")
@@ -90,16 +120,35 @@ export const runInstallmentReminders = createServerFn({ method: "POST" })
             .maybeSingle();
           const email = (profile as { email?: string } | null)?.email;
           const phone = (cust as { contact_phone?: string } | null)?.contact_phone;
-          await dispatchChannels({
+          const { results } = await dispatchChannels({
             title,
             body,
             channels: ["email", "sms"],
             ...(email ? { email } : {}),
             ...(phone ? { phone } : {}),
           });
+          for (const r of results) {
+            await sb.from("notification_deliveries").insert({
+              notification_id: notifId,
+              user_id: uid,
+              channel: r.channel,
+              status: deliveryStatusFromResult(r.ok, r.detail),
+              detail: r.detail,
+            });
+          }
         }
         sent += 1;
       }
     }
-    return { ok: true as const, reason: "ok" as const, sent };
+
+    await sb.from("reminder_job_runs").insert({
+      status: "ok",
+      t_minus_3: counts.t_minus_3,
+      due_count: counts.due,
+      overdue_count: counts.overdue,
+      escalated_count: counts.escalated,
+      detail: `sent=${sent}`,
+    });
+
+    return { ok: true as const, reason: "ok" as const, sent, counts };
   });

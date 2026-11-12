@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Loader2, ShieldCheck, Smartphone } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/manzil/properties";
 import {
@@ -9,11 +10,15 @@ import {
   maskMobile,
   type WalletMethod,
 } from "@/lib/manzil/mock-gateway";
-import { chargeWallet } from "@/lib/manzil/payment-gateway.functions";
+import {
+  chargeWallet,
+  getWalletChargeMode,
+  walletUiFlags,
+} from "@/lib/manzil/payment-gateway.functions";
 
 type Step = "details" | "otp" | "processing" | "failed";
 
-/** Wallet checkout screen that behaves like JazzCash / EasyPaisa, in demo mode. */
+/** Wallet checkout for JazzCash / EasyPaisa — DEMO chrome only when mode is mock. */
 export function MockWalletCheckout({
   method,
   amount,
@@ -25,20 +30,37 @@ export function MockWalletCheckout({
   onPaid: (txnId: string) => Promise<void>;
   onCancel: () => void;
 }) {
+  const { t } = useTranslation("payments");
   const name = method === "jazzcash" ? "JazzCash" : "EasyPaisa";
   const [step, setStep] = useState<Step>("details");
   const [mobile, setMobile] = useState("");
   const [cnic, setCnic] = useState("");
   const [otp, setOtp] = useState("");
   const [err, setErr] = useState<string | null>(null);
+  const [mode, setMode] = useState<"live" | "mock">("mock");
+  const ui = walletUiFlags(mode);
+
+  useEffect(() => {
+    let cancelled = false;
+    getWalletChargeMode()
+      .then((m) => {
+        if (!cancelled) setMode(m[method]);
+      })
+      .catch(() => {
+        if (!cancelled) setMode("mock");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [method]);
 
   const sendOtp = () => {
     if (!isValidMobile(mobile)) {
-      setErr("Enter a valid mobile number, e.g. 0300 1234567");
+      setErr(t("invalidMobile"));
       return;
     }
     if (method === "jazzcash" && !isValidCnicLast6(cnic)) {
-      setErr("Enter the last 6 digits of your CNIC");
+      setErr(t("invalidCnicLast6"));
       return;
     }
     setErr(null);
@@ -49,6 +71,7 @@ export function MockWalletCheckout({
     setStep("processing");
     await new Promise((r) => setTimeout(r, 1600));
     const res = await chargeWallet({ data: { method, mobile, otp, amount, cnicLast6: cnic } });
+    if (res.mode) setMode(res.mode);
     if (!res.ok) {
       setErr(res.reason);
       setStep(res.reason.startsWith("Incorrect OTP") ? "otp" : "failed");
@@ -57,7 +80,7 @@ export function MockWalletCheckout({
     try {
       await onPaid(res.txnId);
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Could not record the payment");
+      setErr(e instanceof Error ? e.message : t("couldNotRecord"));
       setStep("failed");
     }
   };
@@ -67,14 +90,17 @@ export function MockWalletCheckout({
       <div className="wallet-brand">
         <Smartphone size={18} />
         <strong>{name}</strong>
-        <span className="wallet-demo">DEMO</span>
+        {ui.showDemoBadge && <span className="wallet-demo">DEMO</span>}
+        {!ui.showDemoBadge && (
+          <span className="wallet-demo wallet-live">{t("liveBadge")}</span>
+        )}
       </div>
       <div className="wallet-amount">{formatPrice(amount)}</div>
 
       {step === "details" && (
         <>
           <label>
-            {name} mobile number
+            {name} {t("mobileNumber")}
             <input
               inputMode="tel"
               autoFocus
@@ -85,7 +111,7 @@ export function MockWalletCheckout({
           </label>
           {method === "jazzcash" && (
             <label>
-              Last 6 digits of CNIC
+              {t("cnicLast6")}
               <input
                 inputMode="numeric"
                 maxLength={6}
@@ -98,10 +124,10 @@ export function MockWalletCheckout({
           {err && <div className="error">{err}</div>}
           <div className="link-row">
             <Button size="sm" onClick={sendOtp}>
-              Continue
+              {t("continue")}
             </Button>
             <Button size="sm" variant="outline" onClick={onCancel}>
-              Cancel
+              {t("cancel")}
             </Button>
           </div>
         </>
@@ -109,13 +135,17 @@ export function MockWalletCheckout({
 
       {step === "otp" && (
         <>
-          <p className="muted small">A 6-digit code was sent to {maskMobile(mobile)}.</p>
-          <div className="notice small">
-            Demo mode: use code <strong>{DEMO_OTP}</strong>. Numbers ending in 0000 simulate a
-            failed payment.
-          </div>
+          <p className="muted small">{t("otpSentTo", { mobile: maskMobile(mobile) })}</p>
+          {ui.showDemoOtpHint && (
+            <div className="notice small">
+              {t("demoOtpHint", { code: DEMO_OTP })}
+            </div>
+          )}
+          {!ui.showDemoOtpHint && (
+            <div className="notice small">{t("liveOtpHint")}</div>
+          )}
           <label>
-            Enter OTP
+            {t("enterOtp")}
             <input
               inputMode="numeric"
               autoFocus
@@ -127,7 +157,7 @@ export function MockWalletCheckout({
           {err && <div className="error">{err}</div>}
           <div className="link-row">
             <Button size="sm" disabled={otp.length !== 6} onClick={() => void verify()}>
-              Pay {formatPrice(amount)}
+              {t("payAmount", { amount: formatPrice(amount) })}
             </Button>
             <Button
               size="sm"
@@ -138,7 +168,7 @@ export function MockWalletCheckout({
                 setErr(null);
               }}
             >
-              Back
+              {t("back")}
             </Button>
           </div>
         </>
@@ -147,7 +177,7 @@ export function MockWalletCheckout({
       {step === "processing" && (
         <div className="wallet-processing">
           <Loader2 className="spin" size={28} />
-          <span>Processing with {name}…</span>
+          <span>{t("processingWith", { name })}</span>
         </div>
       )}
 
@@ -163,19 +193,26 @@ export function MockWalletCheckout({
                 setErr(null);
               }}
             >
-              Try again
+              {t("tryAgain")}
             </Button>
             <Button size="sm" variant="outline" onClick={onCancel}>
-              Cancel
+              {t("cancel")}
             </Button>
           </div>
         </>
       )}
 
-      <p className="muted small wallet-foot">
-        <ShieldCheck size={13} />
-        Demo payment — no money is charged.
-      </p>
+      {ui.showDemoFoot ? (
+        <p className="muted small wallet-foot">
+          <ShieldCheck size={13} />
+          {t("demoFoot")}
+        </p>
+      ) : (
+        <p className="muted small wallet-foot">
+          <ShieldCheck size={13} />
+          {t("liveFoot")}
+        </p>
+      )}
     </div>
   );
 }

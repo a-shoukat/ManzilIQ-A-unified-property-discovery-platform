@@ -1,6 +1,7 @@
 import { getSupabase } from "./supabase";
 import type { MessageTemplate, Notification } from "@/lib/manzil/types";
 import { fetchPushTokens } from "./push-tokens";
+import { deliveryStatusFromResult } from "./notify-status";
 
 /** Write an in-app notification. External channels (SMS/Email/FCM)
  *  plug in via server fn when API keys are configured; otherwise in-app only. */
@@ -67,11 +68,7 @@ async function fanOutExternal(
           notification_id: notifId,
           user_id: uid,
           channel: r.channel,
-          status: r.ok
-            ? "sent"
-            : r.detail.includes("not_configured") || r.detail.startsWith("skipped")
-              ? "skipped"
-              : "failed",
+          status: deliveryStatusFromResult(r.ok, r.detail),
           detail: r.detail,
         });
       }

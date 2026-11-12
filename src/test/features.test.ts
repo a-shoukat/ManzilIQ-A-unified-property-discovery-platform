@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { summarizeMode, type BackendFeature } from "@/lib/manzil/features";
+import {
+  summarizeMigrationProbe,
+  summarizeMode,
+  type BackendFeature,
+} from "@/lib/manzil/features";
 import { checkRateLimit, SECURITY_CHECKLIST } from "@/lib/manzil/security";
 import { buildMapPins, mapsEmbedUrl } from "@/lib/manzil/maps-geo";
 import { DEMO_OTP, simulateCharge } from "@/lib/manzil/mock-gateway";
@@ -38,6 +42,20 @@ describe("feature flags / health mode", () => {
         payments_live: true,
       }),
     ).toBe("live");
+  });
+});
+
+describe("migration probe summary", () => {
+  it("ok when all present", () => {
+    expect(summarizeMigrationProbe(["a", "b"], ["a", "b"]).state).toBe("ok");
+  });
+  it("partial when some missing", () => {
+    const p = summarizeMigrationProbe(["a"], ["a", "b"]);
+    expect(p.state).toBe("partial");
+    expect(p.missing).toEqual(["b"]);
+  });
+  it("unknown when none present", () => {
+    expect(summarizeMigrationProbe([], ["a", "b"]).state).toBe("unknown");
   });
 });
 
