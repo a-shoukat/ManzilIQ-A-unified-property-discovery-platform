@@ -1,11 +1,12 @@
 import { getSupabase } from './supabase';
 import type { MapRegion } from './master-plan-rules';
 
+import { IMAGE_TYPES, MAP_ACCEPT, validateMasterPlanFile } from './master-plan-upload';
+
 const BUCKET = 'society-maps';
 const PDF_NAME = 'master-plan.pdf';
 const SVG_NAME = 'master-plan.svg';
-export const IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
-export const MAP_ACCEPT = ['application/pdf', ...IMAGE_TYPES].join(',');
+export { IMAGE_TYPES, MAP_ACCEPT, validateMasterPlanFile };
 
 /** True when a master-plan URL points at the SVG-wrapped raster map. */
 export const isSvgMapUrl = (url: string) => url.split('?')[0]!.toLowerCase().endsWith('.svg');
@@ -39,11 +40,9 @@ export async function rasterToSvg(file: File): Promise<Blob> {
 export async function uploadMasterPlan(societyId: string, file: File): Promise<void> {
   const sb = getSupabase();
   if (!sb) throw new Error('Database not connected');
-  const isPdf = file.type === 'application/pdf';
-  const isImage = IMAGE_TYPES.includes(file.type);
-  if (!isPdf && !isImage) throw new Error('Please choose a PDF, PNG, JPG or WEBP file');
-  if (isPdf && file.size > 25 * 1024 * 1024) throw new Error('PDF must be under 25 MB');
-  if (isImage && file.size > 10 * 1024 * 1024) throw new Error('Image must be under 10 MB');
+  const check = validateMasterPlanFile(file);
+  if (!check.ok) throw new Error(check.reason);
+  const isPdf = check.kind === 'pdf';
   const name = isPdf ? PDF_NAME : SVG_NAME;
   const body = isPdf ? file : await rasterToSvg(file);
   const { error } = await sb.storage.from(BUCKET).upload(`${societyId}/${name}`, body, { upsert: true, contentType: isPdf ? 'application/pdf' : 'image/svg+xml' });

@@ -3,6 +3,8 @@ import {
   resolveGrantSocietyId,
   SOCIETY_PROFILE_REQUIRED,
   societyAdminsWithProfile,
+  subscriptionConflictTarget,
+  subscriptionWritePayload,
 } from "@/lib/manzil/subscription-grant";
 
 describe("subscription grant society_id", () => {
@@ -63,4 +65,30 @@ describe("subscription grant society_id", () => {
     ];
     expect(societyAdminsWithProfile(users, ["s2"]).map((u) => u.id)).toEqual(["b1", "s2"]);
   });
+
+  it("conflicts on society_id for society grants and omits null society_id", () => {
+    expect(subscriptionConflictTarget("soc-1")).toBe("society_id");
+    expect(subscriptionConflictTarget(null)).toBe("user_id");
+    const withSoc = subscriptionWritePayload({
+      user_id: "u",
+      role: "society_admin",
+      plan_id: "society_growth",
+      status: "active",
+      current_period_start: "a",
+      current_period_end: "b",
+      society_id: "soc-1",
+    });
+    expect(withSoc.society_id).toBe("soc-1");
+    const buyer = subscriptionWritePayload({
+      user_id: "u",
+      role: "buyer",
+      plan_id: "buyer_plus",
+      status: "active",
+      current_period_start: "a",
+      current_period_end: "b",
+      society_id: null,
+    });
+    expect(buyer).not.toHaveProperty("society_id");
+  });
 });
+

@@ -6,7 +6,8 @@
 
 1. `00_all_migrations.sql` — consolidated idempotent script (admin-setup through phase12 + backend parity).
 2. `10_phase10_ui_support.sql` → `10_5_*.sql` → `11_dealer_sale_forms.sql` → `12_preferred_language.sql` → `13_ops_parity.sql` → `14_subscription_society_grant.sql` → `15_anon_public_read.sql` (additive after tip).
-3. `verify_schema.sql` — read-only checks (missing tables, subscription uniqueness, RLS).
+3. `16_dev_seed_test_society_growth.sql` — **DEV-ONLY** optional seed (set email/UUID); grants Growth after society_details exists.
+4. `verify_schema.sql` — read-only checks (missing tables, subscription uniqueness, RLS).
 
 See `docs/OPS_RUNBOOK.md` for the full owner order. Individual historical scripts remain under `reference/*.sql`; prefer the consolidated file for new environments.
 

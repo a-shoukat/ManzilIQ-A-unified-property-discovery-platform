@@ -49,3 +49,16 @@ export type SubscriptionUpsertRow = {
   current_period_end: string;
   society_id: string | null;
 };
+
+/** Society rows conflict on society_id; buyer/dealer on user_id. Never upsert society with null society_id. */
+export function subscriptionConflictTarget(societyId: string | null): "user_id" | "society_id" {
+  if (societyId) return "society_id";
+  return "user_id";
+}
+
+/** Strip society_id from buyer/dealer payloads so we never insert null into NOT NULL legacy columns when avoidable. */
+export function subscriptionWritePayload(row: SubscriptionUpsertRow): Record<string, unknown> {
+  if (row.society_id) return { ...row };
+  const { society_id: _omit, ...rest } = row;
+  return rest;
+}

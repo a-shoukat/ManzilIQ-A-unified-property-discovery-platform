@@ -2,7 +2,13 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import { getSupabase } from './supabase';
 import { useAuth } from './auth';
 import { canUse as canUseFor, effectivePlan, type Feature, type Plan, type SubscriptionRow } from './plans';
-import { resolveGrantSocietyId, type SubscriptionUpsertRow } from './subscription-grant';
+import {
+  resolveGrantSocietyId,
+  SOCIETY_PROFILE_REQUIRED,
+  subscriptionConflictTarget,
+  subscriptionWritePayload,
+  type SubscriptionUpsertRow,
+} from './subscription-grant';
 import { writeAudit } from './audit';
 
 interface SubState { sub: SubscriptionRow | null; plan: Plan | null; expired: boolean; ready: boolean; canUse: (f: Feature) => boolean; reload: () => Promise<void> }
@@ -69,6 +75,9 @@ export async function saveSubscription(
 
   const start = new Date();
   const end = new Date(start.getTime() + days * 86400000);
+  if (role === 'society_admin' && !societyId) {
+    throw new Error(SOCIETY_PROFILE_REQUIRED);
+  }
   const row: SubscriptionUpsertRow = {
     user_id: userId,
     role,
@@ -78,7 +87,14 @@ export async function saveSubscription(
     current_period_end: end.toISOString(),
     society_id: societyId,
   };
-  const { error } = await db.from('subscriptions').upsert(row, { onConflict: 'user_id' });
+  const payload = subscriptionWritePayload(row);
+  const onConflict = subscriptionConflictTarget(societyId);
+  // Prefer conflict target that matches live hybrid unique keys.
+  let { error } = await db.from('subscriptions').upsert(payload, { onConflict });
+  if (error && onConflict === 'society_id') {
+    // Fallback when society_id unique index is missing / unnamed for PostgREST
+    ({ error } = await db.from('subscriptions').upsert({ ...payload, user_id: userId }, { onConflict: 'user_id' }));
+  }
   if (error) throw new Error(error.message);
 
   if (opts.actorId !== undefined) {
