@@ -69,7 +69,7 @@ export async function saveSubscription(
   const societyId = resolveGrantSocietyId({
     role,
     userId,
-    explicitSocietyId: opts.societyId,
+    explicitSocietyId: opts.societyId ?? null,
     hasSocietyProfile,
   });
 

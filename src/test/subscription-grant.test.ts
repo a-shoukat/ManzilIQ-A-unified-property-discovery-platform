@@ -78,7 +78,7 @@ describe("subscription grant society_id", () => {
       current_period_end: "b",
       society_id: "soc-1",
     });
-    expect(withSoc.society_id).toBe("soc-1");
+    expect(withSoc["society_id"]).toBe("soc-1");
     const buyer = subscriptionWritePayload({
       user_id: "u",
       role: "buyer",
