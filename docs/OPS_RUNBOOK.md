@@ -14,7 +14,9 @@ In **Supabase → SQL Editor**, run each file top-to-bottom. Prefer one-shot con
 6. `reference/migrations/12_preferred_language.sql` — `profiles.preferred_language` (`en`|`ur`).
 7. `reference/migrations/13_ops_parity.sql` — `reminder_job_runs` summary rows for cron counts (Task 3).
 8. `reference/migrations/14_subscription_society_grant.sql` — nullable `society_id` + backfill so society plan grants succeed on hybrid live schema.
-9. `reference/migrations/verify_schema.sql` — **read-only** checks; fix any reported missing tables/columns before go-live.
+9. `reference/migrations/15_anon_public_read.sql` — anon SELECT for plots/properties + `list_societies` (no KYC/doc columns) so guests can open `/master-plan`.
+10. `reference/migrations/verify_schema.sql` — **read-only** checks; fix any reported missing tables/columns before go-live.
+11. *(optional DEV-ONLY)* `reference/migrations/16_dev_seed_test_society_growth.sql` — set test society email/UUID; seeds `society_details` + Growth grant for map unlock.
 
 All scripts are idempotent (`IF NOT EXISTS` / `ADD COLUMN IF NOT EXISTS`). Re-running is safe.
 
