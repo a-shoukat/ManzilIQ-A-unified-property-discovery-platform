@@ -85,10 +85,10 @@ function PropertyDetail({
         <p className="muted">Property not found.</p>
         <Button
           variant="legacy"
-          className="btn secondary small"
+          className="btn back-results"
           onClick={() => onNavigate("marketplace")}
         >
-          Back to marketplace
+          Back to results
         </Button>
       </div>
     );
@@ -111,10 +111,10 @@ function PropertyDetail({
     <div className="container">
       <Button
         variant="legacy"
-        className="btn secondary small"
+        className="btn back-results"
         onClick={() => onNavigate("marketplace")}
       >
-        ← Back
+        ← Back to results
       </Button>
       <div className="detail-hero">
         <Gallery

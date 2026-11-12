@@ -122,7 +122,7 @@ function ProfilePage() {
             <label>{t('auth:profilePhoto')}<input type="file" accept="image/*" onChange={(e) => setPhoto(e.target.files?.[0] ?? null)} /></label>
           </>}
           {!isBuyer && <p className="muted small">{t('auth:businessDetailsNote')}</p>}
-          <Button disabled={saving}>{saving ? t('auth:saving') : t('auth:saveProfile')}</Button>
+          <Button type="submit" className="btn" disabled={saving}>{saving ? t('auth:saving') : t('auth:saveProfile')}</Button>
         </form>
         <h3>{t('auth:cnicVerification')}</h3>
         <p className="small">
@@ -147,7 +147,9 @@ function ProfilePage() {
             <label>{t('auth:confirmNewPassword')}<PasswordInput required autoComplete="new-password" value={pw2} onChange={(e) => setPw2(e.target.value)} /></label>
           </div>
           {pw2 && pw2 !== pw && <div className="error" role="alert">{passwordMismatch}</div>}
-          <Button variant="outline">{t('auth:changePassword')}</Button>
+          <Button type="submit" variant="outline" className="btn secondary">
+            {t('auth:changePassword')}
+          </Button>
         </form>
       </div>
     </div>

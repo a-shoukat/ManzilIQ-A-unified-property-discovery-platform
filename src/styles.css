@@ -162,17 +162,66 @@ input:focus {
   background: var(--primary);
 }
 
-.btn:disabled {
-  opacity: 0.6;
-  cursor: default;
+.btn:disabled,
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.2);
 }
 
 .btn.secondary {
   background: var(--border);
+  color: var(--foreground);
 }
 
-.btn.secondary:hover {
+.btn.secondary:hover:not(:disabled) {
   background: var(--input);
+}
+
+.btn.tertiary {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--foreground);
+}
+
+.btn.tertiary:hover:not(:disabled) {
+  background: var(--muted);
+}
+
+/* WCAG AA back navigation — dark text on light surface, not low-contrast muted */
+.btn.back-results {
+  background: var(--card);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+.btn.back-results:hover:not(:disabled) {
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+.admin-manage-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  text-align: left;
+}
+
+.users-header { align-items: flex-start; }
+.users-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin: 12px 0;
+}
+.users-filters input,
+.users-filters select {
+  margin: 0;
+  min-width: 0;
+  flex: 1 1 160px;
 }
 
 .link {

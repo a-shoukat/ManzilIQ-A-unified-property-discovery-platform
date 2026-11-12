@@ -120,10 +120,11 @@ function AdminOverview({ onNavigate }: { onNavigate: (p: string) => void }) {
       </div>
       <AttentionPanel onNavigate={onNavigate} />
       <h3>Manage platform</h3>
-      <div className="hub-grid">
+      <div className="hub-grid admin-manage-grid">
         {areas.map(([page, label]) => (
-          <Button variant="legacy" key={page} className="hub-card" onClick={() => onNavigate(page)}>
+          <Button variant="legacy" key={page} className="hub-card admin-manage-card" onClick={() => onNavigate(page)}>
             <strong>{label}</strong>
+            <span className="muted small">Open workspace</span>
           </Button>
         ))}
       </div>
@@ -184,11 +185,6 @@ function Dashboard({ onNavigate }: { onNavigate: (p: string) => void }) {
           <RoleOverview role={profile.role} userId={profile.id} onNavigate={onNavigate} />
         )}
 
-        <div className="link-row">
-          <Button variant="legacy" className="btn small" onClick={() => onNavigate('marketplace')}>Browse marketplace</Button>
-          <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('map-view')}>Society map</Button>
-          <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('compare')}>Compare plots</Button>
-        </div>
       </div>
     </div>
   );
