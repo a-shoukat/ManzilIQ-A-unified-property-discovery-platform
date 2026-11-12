@@ -1,7 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { serverEnv, normPhonePk } from "./env-server";
 
+import { deliveryStatusFromResult } from "./notify-status";
+
 export type NotifyChannel = "email" | "sms" | "fcm";
+export { deliveryStatusFromResult };
 
 export async function sendEmailChannel(
   to: string,

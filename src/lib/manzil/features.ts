@@ -35,6 +35,7 @@ export interface BackendHealth {
 export const MIGRATION_PROBE_TABLES = [
   "notification_deliveries",
   "reminder_runs",
+  "reminder_job_runs",
   "inquiries",
   "inquiry_replies",
   "price_predictions",

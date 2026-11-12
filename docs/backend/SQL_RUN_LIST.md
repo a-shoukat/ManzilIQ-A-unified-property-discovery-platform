@@ -20,5 +20,8 @@
 13. Backend parity section (notifications, reminders, inquiries, AI log, geo, moderation, gateway cols)
 14. `reference/migrations/11_dealer_sale_forms.sql` — dealer sale forms / serial allocation
 15. `reference/migrations/12_preferred_language.sql` — profiles.preferred_language (en|ur)
+16. `reference/migrations/13_ops_parity.sql` — `reminder_job_runs` cron summary counts
 
 **Never run** `reference/source-schema.sql` against an existing live database.
+
+Full owner checklist: `docs/OPS_RUNBOOK.md`.
