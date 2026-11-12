@@ -211,3 +211,21 @@ export function paymentGatewayConfigured(method?: WalletMethod): boolean {
   if (method === "easypaisa") return easyConfigured();
   return jazzConfigured() || easyConfigured();
 }
+
+/** Pure helper for checkout chrome — hide DEMO when merchant env is live. */
+export function walletUiFlags(mode: "live" | "mock"): {
+  showDemoBadge: boolean;
+  showDemoOtpHint: boolean;
+  showDemoFoot: boolean;
+} {
+  const demo = mode === "mock";
+  return { showDemoBadge: demo, showDemoOtpHint: demo, showDemoFoot: demo };
+}
+
+/** Client probe: which wallet methods are live vs mock (no secrets returned). */
+export const getWalletChargeMode = createServerFn({ method: "GET" }).handler(
+  async (): Promise<{ jazzcash: "live" | "mock"; easypaisa: "live" | "mock" }> => ({
+    jazzcash: jazzConfigured() ? "live" : "mock",
+    easypaisa: easyConfigured() ? "live" : "mock",
+  }),
+);

@@ -67,5 +67,22 @@
   "paymentRecorded": "Payment recorded — the society confirms it once received.",
   "bankTransfer": "Bank transfer (proof upload)",
   "cashManual": "Cash (manual)",
-  "chequeManual": "Cheque (manual)"
+  "chequeManual": "Cheque (manual)",
+  "liveBadge": "LIVE",
+  "mobileNumber": "mobile number",
+  "cnicLast6": "Last 6 digits of CNIC",
+  "invalidMobile": "Enter a valid mobile number, e.g. 0300 1234567",
+  "invalidCnicLast6": "Enter the last 6 digits of your CNIC",
+  "couldNotRecord": "Could not record the payment",
+  "continue": "Continue",
+  "cancel": "Cancel",
+  "back": "Back",
+  "tryAgain": "Try again",
+  "otpSentTo": "A 6-digit code was sent to {{mobile}}.",
+  "demoOtpHint": "Demo mode: use code {{code}}. Numbers ending in 0000 simulate a failed payment.",
+  "liveOtpHint": "Enter the OTP from your JazzCash or EasyPaisa app.",
+  "enterOtp": "Enter OTP",
+  "processingWith": "Processing with {{name}}…",
+  "demoFoot": "Demo payment — no money is charged.",
+  "liveFoot": "Live wallet charge — your account will be billed."
 }
