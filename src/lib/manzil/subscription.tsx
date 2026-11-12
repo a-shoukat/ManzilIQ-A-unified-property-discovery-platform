@@ -2,6 +2,14 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import { getSupabase } from './supabase';
 import { useAuth } from './auth';
 import { canUse as canUseFor, effectivePlan, type Feature, type Plan, type SubscriptionRow } from './plans';
+import {
+  resolveGrantSocietyId,
+  SOCIETY_PROFILE_REQUIRED,
+  subscriptionConflictTarget,
+  subscriptionWritePayload,
+  type SubscriptionUpsertRow,
+} from './subscription-grant';
+import { writeAudit } from './audit';
 
 interface SubState { sub: SubscriptionRow | null; plan: Plan | null; expired: boolean; ready: boolean; canUse: (f: Feature) => boolean; reload: () => Promise<void> }
 const Ctx = createContext<SubState>({ sub: null, plan: null, expired: false, ready: false, canUse: () => false, reload: async () => {} });
@@ -25,12 +33,77 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
 export const useSubscription = () => useContext(Ctx);
 
-/** Save a plan for the signed-in user for the next 30 days (demo checkout). */
-export async function saveSubscription(userId: string, role: string, planId: string, status: SubscriptionRow['status'] = 'active', days = 30) {
+export type SaveSubscriptionOpts = {
+  /** Required for society_admin when the admin selects a society; otherwise looked up from society_details. */
+  societyId?: string | null;
+  status?: SubscriptionRow['status'];
+  days?: number;
+  /** When set, write subscription.grant audit (admin grants). */
+  actorId?: string | null;
+};
+
+/** Save a plan for a user for the next N days. Society grants always send society_id. */
+export async function saveSubscription(
+  userId: string,
+  role: string,
+  planId: string,
+  statusOrOpts: SubscriptionRow['status'] | SaveSubscriptionOpts = 'active',
+  daysArg = 30,
+) {
+  const opts: SaveSubscriptionOpts =
+    typeof statusOrOpts === 'string'
+      ? { status: statusOrOpts, days: daysArg }
+      : statusOrOpts;
+  const status = opts.status ?? 'active';
+  const days = opts.days ?? 30;
   const db = getSupabase();
   if (!db) throw new Error('Not connected');
+
+  let hasSocietyProfile = false;
+  if (role === 'society_admin') {
+    const societyKey = opts.societyId || userId;
+    const { data } = await db.from('society_details').select('profile_id').eq('profile_id', societyKey).maybeSingle();
+    hasSocietyProfile = !!data;
+  }
+
+  const societyId = resolveGrantSocietyId({
+    role,
+    userId,
+    explicitSocietyId: opts.societyId ?? null,
+    hasSocietyProfile,
+  });
+
   const start = new Date();
   const end = new Date(start.getTime() + days * 86400000);
-  const { error } = await db.from('subscriptions').upsert({ user_id: userId, role, plan_id: planId, status, current_period_start: start.toISOString(), current_period_end: end.toISOString() }, { onConflict: 'user_id' });
+  if (role === 'society_admin' && !societyId) {
+    throw new Error(SOCIETY_PROFILE_REQUIRED);
+  }
+  const row: SubscriptionUpsertRow = {
+    user_id: userId,
+    role,
+    plan_id: planId,
+    status,
+    current_period_start: start.toISOString(),
+    current_period_end: end.toISOString(),
+    society_id: societyId,
+  };
+  const payload = subscriptionWritePayload(row);
+  const onConflict = subscriptionConflictTarget(societyId);
+  // Prefer conflict target that matches live hybrid unique keys.
+  let { error } = await db.from('subscriptions').upsert(payload, { onConflict });
+  if (error && onConflict === 'society_id') {
+    // Fallback when society_id unique index is missing / unnamed for PostgREST
+    ({ error } = await db.from('subscriptions').upsert({ ...payload, user_id: userId }, { onConflict: 'user_id' }));
+  }
   if (error) throw new Error(error.message);
+
+  if (opts.actorId !== undefined) {
+    await writeAudit({
+      actorId: opts.actorId,
+      action: 'subscription.grant',
+      entityType: 'subscriptions',
+      entityId: userId,
+      meta: { plan_id: planId, society_id: societyId, role },
+    });
+  }
 }

@@ -85,10 +85,10 @@ function PropertyDetail({
         <p className="muted">Property not found.</p>
         <Button
           variant="legacy"
-          className="btn secondary small"
+          className="btn back-results"
           onClick={() => onNavigate("marketplace")}
         >
-          Back to marketplace
+          Back to results
         </Button>
       </div>
     );
@@ -111,10 +111,10 @@ function PropertyDetail({
     <div className="container">
       <Button
         variant="legacy"
-        className="btn secondary small"
+        className="btn back-results"
         onClick={() => onNavigate("marketplace")}
       >
-        ← Back
+        ← Back to results
       </Button>
       <div className="detail-hero">
         <Gallery
@@ -187,7 +187,7 @@ function PropertyDetail({
       </div>
       {p.description && <p className="desc">{p.description}</p>}
       <Amenities p={p} />
-      <InquiryBox p={p} />
+      <InquiryBox p={p} onNavigate={onNavigate} />
       <div className="spec-table">
         {rows.map(([k, v]) => (
           <div key={k} className="spec-row">
@@ -201,7 +201,7 @@ function PropertyDetail({
   );
 }
 
-function InquiryBox({ p }: { p: Property }) {
+function InquiryBox({ p, onNavigate }: { p: Property; onNavigate: (page: string) => void }) {
   const { session, profile } = useAuth();
   const [msg, setMsg] = useState(`Is "${p.title}" still available?`);
   const [phone, setPhone] = useState("");
@@ -212,6 +212,10 @@ function InquiryBox({ p }: { p: Property }) {
       <div className="card card-full" style={{ margin: "16px 0" }}>
         <strong>Interested?</strong>
         <p className="muted small">Sign in to send an inquiry to the seller.</p>
+        <div className="link-row" style={{ marginTop: 10 }}>
+          <Button variant="legacy" className="btn small" onClick={() => onNavigate("login")}>Sign in</Button>
+          <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate("marketplace")}>Browse marketplace</Button>
+        </div>
       </div>
     );
   const send = async (e: React.FormEvent) => {

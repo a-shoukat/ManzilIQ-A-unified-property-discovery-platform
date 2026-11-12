@@ -66,7 +66,7 @@ export function RoleOverview({ role, userId, onNavigate }: { role: string; userI
         {cfg.stats.map((t) => (
           <Button variant="legacy" key={t.key} className="stat-tile" onClick={() => onNavigate(t.page)}>
             <span className="muted small">{t.label}</span>
-            <strong>{stats[t.key] == null ? '—' : t.sum ? `PKR ${stats[t.key]!.toLocaleString()}` : stats[t.key]}</strong>
+            <strong>{stats[t.key] == null ? <span className="skeleton-line short" style={{ display: 'inline-block', width: 48, margin: 0 }} aria-label="Loading" /> : t.sum ? `PKR ${stats[t.key]!.toLocaleString()}` : stats[t.key]}</strong>
           </Button>
         ))}
       </div>

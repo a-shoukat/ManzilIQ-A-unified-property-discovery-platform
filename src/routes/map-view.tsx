@@ -2,13 +2,17 @@ import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { PageFrame, useAppNavigation, pageHead } from "@/components/manzil/PageFrame";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { fetchPlots } from "@/lib/manzil/society";
 import { fetchApprovedSocieties } from "@/lib/manzil/society";
 import { formatPrice } from "@/lib/manzil/properties";
+import { formatPlotHeading, formatStatusLabel } from "@/lib/manzil/format";
+import { plotOptionLabel } from "@/lib/manzil/bookable-plots";
+import { formatSize } from "@/lib/manzil/phase3-rules";
 import type { Plot } from "@/lib/manzil/types";
 import { mapsEmbedUrl, mapsJsConfigured } from "@/lib/manzil/maps-geo";
 import { PropertyPinsMap } from "@/components/manzil/PropertyPinsMap";
+import { plotHoverTipLines, plotIsBookable } from "@/lib/manzil/plot-map-tip";
 
 const STATUS_COLOR: Record<Plot["status"], string> = {
   available: "var(--success)",
@@ -30,7 +34,11 @@ function MapView({ onNavigate }: { onNavigate: (p: string, arg?: string) => void
   const [status, setStatus] = useState("");
   const [zoom, setZoom] = useState(1);
   const [selected, setSelected] = useState<Plot | null>(null);
+  const [tip, setTip] = useState<{ plot: Plot; x: number; y: number } | null>(null);
   const [loading, setLoading] = useState(true);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const detailRef = useRef<HTMLDivElement>(null);
+  const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     fetchApprovedSocieties().then((list) => {
@@ -48,9 +56,12 @@ function MapView({ onNavigate }: { onNavigate: (p: string, arg?: string) => void
       setPlots(p);
       setBlock("");
       setSelected(null);
+      setTip(null);
       setLoading(false);
     });
   }, [societyId]);
+
+  useEffect(() => () => { if (hideTimer.current) clearTimeout(hideTimer.current); }, []);
 
   const blocks = [...new Set(plots.map((p) => p.block))].sort();
   const activeBlock = block || blocks[0] || "";
@@ -64,6 +75,32 @@ function MapView({ onNavigate }: { onNavigate: (p: string, arg?: string) => void
   });
 
   const embedCode = `<iframe src="${typeof window !== "undefined" ? window.location.origin : ""}/map-view?society=${societyId}" width="100%" height="600" style="border:0" title="Society plot map"></iframe>`;
+
+  const cancelHide = () => {
+    if (hideTimer.current) {
+      clearTimeout(hideTimer.current);
+      hideTimer.current = null;
+    }
+  };
+  const scheduleHide = (plotId: string) => {
+    cancelHide();
+    hideTimer.current = setTimeout(() => setTip((t) => (t?.plot.id === plotId ? null : t)), 250);
+  };
+  const showTip = (plot: Plot, clientX: number, clientY: number) => {
+    const r = gridRef.current?.getBoundingClientRect();
+    if (!r) {
+      setTip({ plot, x: 12, y: 12 });
+      return;
+    }
+    setTip({ plot, x: clientX - r.left, y: clientY - r.top });
+  };
+  const openDetails = (plot: Plot) => {
+    setSelected(plot);
+    setTip(null);
+    setTimeout(() => detailRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
+  };
+
+  const tipLines = tip ? plotHoverTipLines(tip.plot) : null;
 
   return (
     <div className="container">
@@ -97,24 +134,32 @@ function MapView({ onNavigate }: { onNavigate: (p: string, arg?: string) => void
           <option value="reserved">{t("marketplace:reserved")}</option>
           <option value="sold">{t("marketplace:sold")}</option>
         </select>
-        <input
-          type="number"
-          placeholder={t("marketplace:minSize")}
-          value={minSize}
-          onChange={(e) => setMinSize(e.target.value)}
-          style={{ marginTop: 0 }}
-          dir="ltr"
-          className="ltr-isolate"
-        />
-        <input
-          type="number"
-          placeholder={t("marketplace:maxSizeMarla")}
-          value={maxSize}
-          onChange={(e) => setMaxSize(e.target.value)}
-          style={{ marginTop: 0 }}
-          dir="ltr"
-          className="ltr-isolate"
-        />
+        <label className="map-size-field">
+          <span className="muted small">Min Marla</span>
+          <input
+            type="number"
+            placeholder={t("marketplace:minSize")}
+            value={minSize}
+            onChange={(e) => setMinSize(e.target.value)}
+            style={{ marginTop: 0 }}
+            dir="ltr"
+            className="ltr-isolate"
+            aria-label="Min Marla"
+          />
+        </label>
+        <label className="map-size-field">
+          <span className="muted small">Max Marla</span>
+          <input
+            type="number"
+            placeholder={t("marketplace:maxSizeMarla")}
+            value={maxSize}
+            onChange={(e) => setMaxSize(e.target.value)}
+            style={{ marginTop: 0 }}
+            dir="ltr"
+            className="ltr-isolate"
+            aria-label="Max Marla"
+          />
+        </label>
       </div>
 
       <PropertyPinsMap
@@ -128,7 +173,15 @@ function MapView({ onNavigate }: { onNavigate: (p: string, arg?: string) => void
       <p className="muted small">{t("marketplace:layer2Subtitle")}</p>
 
       {loading ? (
-        <p className="muted">{t("marketplace:loadingPlots")}</p>
+        <div className="hub-grid" aria-busy="true" aria-label={t("marketplace:loadingPlots")}>
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="hub-card discover-skeleton">
+              <span className="skeleton-line wide" />
+              <span className="skeleton-line" />
+              <span className="skeleton-line short" />
+            </div>
+          ))}
+        </div>
       ) : (
         <>
           <div className="map-toolbar">
@@ -141,6 +194,7 @@ function MapView({ onNavigate }: { onNavigate: (p: string, arg?: string) => void
                   onClick={() => {
                     setBlock(b);
                     setSelected(null);
+                    setTip(null);
                   }}
                 >
                   Block {b}
@@ -170,7 +224,7 @@ function MapView({ onNavigate }: { onNavigate: (p: string, arg?: string) => void
             {Object.entries(STATUS_COLOR).map(([s, c]) => (
               <span key={s} className="legend-item">
                 <i style={{ background: c }} />
-                {s}
+                {formatStatusLabel(s)}
               </span>
             ))}
           </div>
@@ -178,65 +232,127 @@ function MapView({ onNavigate }: { onNavigate: (p: string, arg?: string) => void
           {shown.length === 0 ? (
             <p className="muted">{t("marketplace:noPlots")}</p>
           ) : (
-            <div className="map-grid" style={{ transform: `scale(${zoom})` }}>
-              {shown.map((p) => (
-                <Button
-                  variant="legacy"
-                  key={p.id}
-                  className={`map-cell${selected?.id === p.id ? " selected" : ""}`}
-                  style={{ background: STATUS_COLOR[p.status] }}
-                  onClick={() => setSelected(p)}
-                  title={`${p.block}-${p.plot_no}`}
+            <div className="map-grid-wrap" ref={gridRef} style={{ position: "relative" }}>
+              <div className="map-grid" style={{ transform: `scale(${zoom})` }}>
+                {shown.map((p) => (
+                  <Button
+                    variant="legacy"
+                    key={p.id}
+                    className={`map-cell${selected?.id === p.id ? " selected" : ""}`}
+                    style={{ background: STATUS_COLOR[p.status] }}
+                    onPointerEnter={(e) => {
+                      if (e.pointerType === "mouse") {
+                        cancelHide();
+                        showTip(p, e.clientX, e.clientY);
+                      }
+                    }}
+                    onPointerLeave={(e) => {
+                      if (e.pointerType === "mouse") scheduleHide(p.id);
+                    }}
+                    onClick={(e) => {
+                      cancelHide();
+                      showTip(p, e.clientX, e.clientY);
+                      setSelected(p);
+                    }}
+                    aria-label={plotHoverTipLines(p).title}
+                  >
+                    {p.plot_no}
+                  </Button>
+                ))}
+              </div>
+              {tip && tipLines && (
+                <div
+                  className="mp-tip map-grid-tip"
+                  data-tip
+                  style={{
+                    left: Math.min(Math.max(tip.x + 12, 4), 240),
+                    top: Math.max(tip.y + 12, 4),
+                  }}
+                  onPointerEnter={cancelHide}
+                  onPointerLeave={(e) => {
+                    if (e.pointerType === "mouse") scheduleHide(tip.plot.id);
+                  }}
                 >
-                  {p.plot_no}
-                </Button>
-              ))}
+                  <strong>{tipLines.title}</strong>
+                  {tipLines.rows.map((row) => (
+                    <div key={row.label} className="mp-tip-row">
+                      <span>{row.label === "Size" ? t("marketplace:size") : row.label === "Status" ? t("marketplace:status") : t("marketplace:price")}</span>
+                      <span style={{ textTransform: row.label === "Status" ? "capitalize" : undefined }}>{row.value}</span>
+                    </div>
+                  ))}
+                  <Button
+                    size="sm"
+                    style={{ marginTop: 8, width: "100%" }}
+                    onClick={() => openDetails(tip.plot)}
+                  >
+                    {t("marketplace:viewDetails")}
+                  </Button>
+                  {plotIsBookable(tip.plot) && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      style={{ marginTop: 6, width: "100%" }}
+                      onClick={() => onNavigate("book-plot")}
+                    >
+                      {t("marketplace:bookThisPlot")}
+                    </Button>
+                  )}
+                  <button type="button" className="mp-tip-close" aria-label={t("common:close")} onClick={() => setTip(null)}>
+                    ×
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
           {selected && (
-            <div className="card" style={{ marginTop: 16 }}>
+            <div className="card" style={{ marginTop: 16 }} ref={detailRef}>
               <div className="topbar">
                 <h3 style={{ margin: 0 }}>
-                  Plot {selected.block}-{selected.plot_no}
+                  {t("marketplace:plotDetails")} · {plotOptionLabel(selected)}
                 </h3>
                 <Button
                   variant="legacy"
                   className="btn secondary small"
                   onClick={() => setSelected(null)}
                 >
-                  Close
+                  {t("common:close")}
                 </Button>
               </div>
               <div className="detail-grid">
                 <div className="detail-item">
-                  <span className="detail-key">Size</span>
-                  <span>{selected.size_marla} Marla</span>
+                  <span className="detail-key">{t("marketplace:size")}</span>
+                  <span>{formatSize(selected.size_marla)}</span>
                 </div>
                 <div className="detail-item">
-                  <span className="detail-key">Category</span>
+                  <span className="detail-key">{t("marketplace:category")}</span>
                   <span>{selected.category}</span>
                 </div>
                 <div className="detail-item">
-                  <span className="detail-key">Base price</span>
+                  <span className="detail-key">{t("marketplace:basePrice")}</span>
                   <span>{formatPrice(selected.base_price)}</span>
                 </div>
                 <div className="detail-item">
-                  <span className="detail-key">Status</span>
-                  <span>{selected.status}</span>
+                  <span className="detail-key">{t("marketplace:status")}</span>
+                  <span style={{ textTransform: "capitalize" }}>{selected.status}</span>
                 </div>
               </div>
-              {selected.status === "available" && (
-                <p className="muted small" style={{ marginTop: 12 }}>
-                  Booking opens in v7 — for now note this plot number.
-                </p>
-              )}
+              <div className="link-row" style={{ marginTop: 12 }}>
+                <Button variant="legacy" className="btn secondary small" onClick={() => openDetails(selected)}>
+                  {t("marketplace:viewDetails")}
+                </Button>
+                {plotIsBookable(selected) && (
+                  <Button variant="legacy" className="btn small" onClick={() => onNavigate("book-plot")}>
+                    {t("marketplace:bookThisPlot")}
+                  </Button>
+                )}
+              </div>
             </div>
           )}
 
           <div className="card" style={{ marginTop: 24 }}>
-            <h3>Embed this map</h3>
-            <p className="muted small">Paste this on any website to embed the live plot map:</p>
+            <h3>{t("marketplace:embedMap")}</h3>
+            <p className="muted small">{t("marketplace:embedMapHint")}</p>
             <textarea
               readOnly
               rows={3}

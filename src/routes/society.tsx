@@ -36,6 +36,9 @@ function SocietyHub({ onNavigate }: { onNavigate: (p: string) => void }) {
     <div className="container">
       <h1>{t('hubTitle')}</h1>
       <p className="muted">{t('hubSubtitle')}</p>
+      <p className="muted small">
+        Society hub is the launchpad. Plot Inventory (/society-inventory) is the editable plot table — kept separate so map and bookings stay focused.
+      </p>
       <div className="hub-grid">
         {cards.map((c) => (
           <Button variant="legacy" key={c.page} className="hub-card" onClick={() => onNavigate(c.page)}>

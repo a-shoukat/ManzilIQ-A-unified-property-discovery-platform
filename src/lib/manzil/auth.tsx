@@ -131,11 +131,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = async () => {
+    setLoading(true);
     const supabase = getSupabase();
     if (supabase) await supabase.auth.signOut();
     setSession(null);
     setProfile(null);
     setDetails(null);
+    setLoading(false);
   };
 
   return (

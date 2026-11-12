@@ -2,10 +2,10 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { ArrowUpRight } from 'lucide-react';
-import iconAsset from '@/assets/manziliq-icon.png.asset.json';
 import { Button } from '@/components/ui/button';
 import { getSupabase } from '@/lib/manzil/supabase';
 import { PageFrame, pageHead, useAppNavigation } from '@/components/manzil/PageFrame';
+import { BrandLogo } from '@/components/manzil/BrandLogo';
 import { PasswordInput } from '@/components/manzil/PasswordInput';
 import { errorText } from '@/lib/manzil/errors';
 
@@ -51,7 +51,7 @@ function ResetPassword() {
   return (
     <PageFrame publicPage>
       <div className="login-layout"><div className="login-form">
-        <span className="login-icon"><img src={iconAsset.url} alt="ManzilIQ" /></span>
+        <span className="login-icon"><BrandLogo compact /></span>
         <span className="eyebrow">{t('auth:resetEyebrow')}</span>
         <h1>{t('auth:setNewPassword')}</h1>
         {done ? <>

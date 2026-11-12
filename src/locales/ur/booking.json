@@ -14,6 +14,7 @@
   "statusRejected": "مسترد",
   "statusCancelled": "منسوخ",
   "noBookings": "ابھی کوئی بکنگ نہیں۔",
+  "noAvailablePlots": "اس سوسائٹی میں کوئی دستیاب پلاٹ نہیں۔",
   "selectPlot": "پلاٹ منتخب کریں",
   "buyerDetails": "خریدار کی تفصیلات",
   "bookingRef": "بکنگ ریفرنس",

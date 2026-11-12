@@ -6,6 +6,7 @@ import { formatPrice } from '@/lib/manzil/properties';
 import { formatSize } from '@/lib/manzil/phase3-rules';
 import { mapStatus, MAP_STATUS_LABEL, rectToPct, isUnlinked, type MapRegion } from '@/lib/manzil/master-plan-rules';
 import { isSvgMapUrl } from '@/lib/manzil/master-plan';
+import { plotIsBookable } from '@/lib/manzil/plot-map-tip';
 
 type PdfDoc = { numPages: number; getPage: (n: number) => Promise<any> };
 const MIN = 0.5, MAX = 6;
@@ -23,6 +24,7 @@ export interface MasterPlanMapProps {
   onDraw?: (rect: ReturnType<typeof rectToPct>, page: number) => void;
   onSelectRegion?: (r: MapRegion) => void;
   onViewDetails?: (p: Plot) => void;
+  onBook?: (p: Plot) => void;
   page: number;
   onPageCount?: (n: number) => void;
 }
@@ -227,6 +229,7 @@ export function MasterPlanMap(props: MasterPlanMapProps) {
               <div className="mp-tip-row"><span>Price</span><span>{formatPrice(tipPlot.base_price)}</span></div>
               <div className="mp-tip-row"><span>Status</span><span className={`mp-pill st-${mapStatus(tipPlot.status)}`}>{MAP_STATUS_LABEL[mapStatus(tipPlot.status)]}</span></div>
               {props.onViewDetails && <Button size="sm" style={{ marginTop: 8, width: '100%' }} onClick={() => { props.onViewDetails!(tipPlot); setTip(null); }}>View details</Button>}
+              {props.onBook && plotIsBookable(tipPlot) && <Button size="sm" variant="secondary" style={{ marginTop: 6, width: '100%' }} onClick={() => { props.onBook!(tipPlot); setTip(null); }}>Book</Button>}
             </>) : <span className="muted small">This region is not linked to a plot in inventory.</span>}
             <button type="button" className="mp-tip-close" aria-label="Close" onClick={() => setTip(null)}>×</button>
           </div>

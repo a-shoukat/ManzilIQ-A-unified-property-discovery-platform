@@ -12,14 +12,29 @@ import { freshness, similarProperties, REPORT_REASONS } from '@/lib/manzil/listi
 import { reportListing } from '@/lib/manzil/phase4';
 import { errorText } from '@/lib/manzil/errors';
 import type { Property } from '@/lib/manzil/types';
+import { isFlaggedListingImage } from '@/lib/manzil/listing-flags';
 
 export function Gallery({ p, fallback }: { p: Property; fallback: string | null }) {
-  const photos = p.images?.length ? p.images : p.image_url ? [p.image_url] : fallback ? [fallback] : [];
+  const raw = p.images?.length ? p.images : p.image_url ? [p.image_url] : fallback ? [fallback] : [];
+  const photos = isFlaggedListingImage(p) ? (fallback ? [fallback] : []) : raw;
   const [i, setI] = useState(0);
-  if (!photos.length) return <div className="prop-img large"><div className="prop-img-fallback">{p.category === 'commercial' ? '🏢' : '🏠'}</div></div>;
+  const [failed, setFailed] = useState<Record<number, boolean>>({});
+  const showFallback = !photos.length || failed[i];
+  if (showFallback && !fallback) {
+    return <div className="prop-img large"><div className="prop-img-fallback">{p.category === 'commercial' ? 'Commercial' : 'Residence'}</div></div>;
+  }
+  const src = showFallback ? fallback! : photos[i]!;
   return (
     <div className="gallery">
-      <div className="prop-img large"><img src={photos[i]} alt={`${p.title} — photo ${i + 1}`} width={1024} height={768} /></div>
+      <div className="prop-img large">
+        <img
+          src={src}
+          alt={`${p.title} — photo ${i + 1}`}
+          width={1024}
+          height={768}
+          onError={() => setFailed((f) => ({ ...f, [i]: true }))}
+        />
+      </div>
       {photos.length > 1 && <div className="gallery-thumbs">{photos.map((u, k) => (
         <button key={u} type="button" className={k === i ? 'active' : ''} aria-label={`Show photo ${k + 1}`} onClick={() => setI(k)}><img src={u} alt="" loading="lazy" /></button>
       ))}</div>}
@@ -43,9 +58,11 @@ export function ContactReveal({ p, onNavigate }: { p: Property; onNavigate: (pag
 }
 
 export function Amenities({ p }: { p: Property }) {
-  if (!p.amenities?.length) return null;
+  // Only show amenities that are explicitly present/true — ignore blank or "false" defaults.
+  const list = (p.amenities ?? []).map((a) => String(a).trim()).filter((a) => a && a.toLowerCase() !== 'false' && a !== '0');
+  if (!list.length) return null;
   return <section className="card card-full" style={{ margin: '16px 0' }}><h3>Amenities & features</h3>
-    <div className="amenity-list">{p.amenities.map((a) => <span key={a}><Check size={14} />{a}</span>)}</div></section>;
+    <div className="amenity-list">{list.map((a) => <span key={a}><Check size={14} />{a}</span>)}</div></section>;
 }
 
 export function ReportListing({ p }: { p: Property }) {

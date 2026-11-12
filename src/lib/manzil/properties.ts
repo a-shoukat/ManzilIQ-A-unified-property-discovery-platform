@@ -135,11 +135,8 @@ export async function createProperty(
   if (error) throw error;
 }
 
-export function formatPrice(n: number): string {
-  if (n >= 10000000) return `PKR ${(n / 10000000).toFixed(2)} Cr`;
-  if (n >= 100000) return `PKR ${(n / 100000).toFixed(1)} Lakh`;
-  return `PKR ${n.toLocaleString()}`;
-}
+export { formatPkr as formatPrice } from './format';
+
 
 export async function updateProperty(id: string, patch: Partial<Property>): Promise<void> {
   const supabase = getSupabase();

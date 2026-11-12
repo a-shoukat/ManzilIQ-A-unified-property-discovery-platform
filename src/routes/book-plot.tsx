@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/manzil/auth';
 import { fetchApprovedSocieties } from '@/lib/manzil/society';
 import { fetchSocietyDealers } from '@/lib/manzil/society';
 import { createBooking, fetchAvailablePlots } from '@/lib/manzil/booking';
+import { plotOptionLabel } from '@/lib/manzil/bookable-plots';
 import { formatPrice } from '@/lib/manzil/properties';
 import { INSTALLMENT_PLANS, type Booking } from '@/lib/manzil/types';
 
@@ -107,12 +108,12 @@ function BookPlot({ onNavigate }: { onNavigate: (p: string) => void }) {
                 <option value="">{plotsLoading ? 'Loading plots…' : 'Choose a plot…'}</option>
                 {!plotsLoading && plots.map((p) => (
                   <option key={p.id} value={p.id}>
-                    {p.block}-{p.plot_no} · {p.size_marla}M · {formatPrice(p.base_price)}
+                    {plotOptionLabel(p)} · {p.size_marla} Marla · {formatPrice(p.base_price)}
                   </option>
                 ))}
               </select>
             </label>
-            {!plotsLoading && plots.length === 0 && <p className="muted small">No available plots in this society.</p>}
+            {!plotsLoading && plots.length === 0 && <p className="muted small">{t('booking:noAvailablePlots', { defaultValue: 'No available plots in this society.' })}</p>}
             <Button variant="legacy" className="btn" disabled={!canNext1} onClick={() => setStep(2)}>Continue</Button>
           </>
         )}
