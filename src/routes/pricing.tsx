@@ -23,8 +23,19 @@ function Pricing() {
   const choose = async (p: Plan) => {
     setMsg(null);
     if (!session || !profile) return;
-    if (p.price === 0) { await saveSubscription(profile.id, profile.role, p.id); await reload(); setMsg(`You are now on ${p.name}.`); return; }
-    setCheckout({ plan: p, method: null });
+    try {
+      if (p.price === 0) {
+        await saveSubscription(profile.id, profile.role, p.id, {
+          societyId: profile.role === 'society_admin' ? profile.id : null,
+        });
+        await reload();
+        setMsg(`You are now on ${p.name}.`);
+        return;
+      }
+      setCheckout({ plan: p, method: null });
+    } catch (e) {
+      setMsg(e instanceof Error ? e.message : 'Could not update plan');
+    }
   };
 
   return (
@@ -64,7 +75,18 @@ function Pricing() {
               </div>
             ) : (
               <MockWalletCheckout method={checkout.method} amount={checkout.plan.price} onCancel={() => setCheckout(null)}
-                onPaid={async () => { await saveSubscription(profile.id, profile.role, checkout.plan.id); await reload(); setMsg(`Payment received. ${checkout.plan.name} is active for 30 days.`); setCheckout(null); }} />
+                onPaid={async () => {
+                  try {
+                    await saveSubscription(profile.id, profile.role, checkout.plan.id, {
+                      societyId: profile.role === 'society_admin' ? profile.id : null,
+                    });
+                    await reload();
+                    setMsg(`Payment received. ${checkout.plan.name} is active for 30 days.`);
+                    setCheckout(null);
+                  } catch (e) {
+                    setMsg(e instanceof Error ? e.message : 'Could not activate plan');
+                  }
+                }} />
             )}
           </div>
         )}

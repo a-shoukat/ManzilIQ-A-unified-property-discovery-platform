@@ -1,4 +1,7 @@
 {
+  "masterPlansPublicTitle": "Society master plans",
+  "masterPlansPublicSubtitle": "Live plot availability on each society's official layout",
+  "noSocietiesYet": "No societies available yet.",
   "hubTitle": "Society portal",
   "hubSubtitle": "Manage inventory, map and dealers",
   "inventoryTitle": "Plot inventory",
