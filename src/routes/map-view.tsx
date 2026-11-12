@@ -8,6 +8,7 @@ import { fetchApprovedSocieties } from "@/lib/manzil/society";
 import { formatPrice } from "@/lib/manzil/properties";
 import type { Plot } from "@/lib/manzil/types";
 import { mapsEmbedUrl, mapsJsConfigured } from "@/lib/manzil/maps-geo";
+import { PropertyPinsMap } from "@/components/manzil/PropertyPinsMap";
 
 const STATUS_COLOR: Record<Plot["status"], string> = {
   available: "var(--success)",
@@ -18,7 +19,7 @@ const STATUS_COLOR: Record<Plot["status"], string> = {
 };
 
 /** WBS: Customer Portal — Interactive Map View (5 features) */
-function MapView({ onNavigate }: { onNavigate: (p: string) => void }) {
+function MapView({ onNavigate }: { onNavigate: (p: string, arg?: string) => void }) {
   const { t } = useTranslation(["marketplace", "common"]);
   const [societies, setSocieties] = useState<{ id: string; name: string }[]>([]);
   const [societyId, setSocietyId] = useState("");
@@ -116,7 +117,15 @@ function MapView({ onNavigate }: { onNavigate: (p: string) => void }) {
         />
       </div>
 
+      <PropertyPinsMap
+        onOpenProperty={(id) => onNavigate("property", id)}
+        className="card card-full pins-map-card"
+      />
+
       <PunjabMap />
+
+      <h2 style={{ marginTop: 8 }}>{t("marketplace:layer2Title")}</h2>
+      <p className="muted small">{t("marketplace:layer2Subtitle")}</p>
 
       {loading ? (
         <p className="muted">{t("marketplace:loadingPlots")}</p>
