@@ -2,11 +2,11 @@ import { useState, type ReactNode } from 'react';
 import { useNavigate, useLocation } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { Building2, LayoutGrid, Map, Sparkles, ArrowLeftRight, Wallet, CalendarDays, FileText, ChartNoAxesCombined, Bell, ChevronRight, LogOut, Menu, Plus, ShieldCheck, Users, House, ArrowUpRight, Heart, UserRound, type LucideIcon } from 'lucide-react';
-import logoAsset from '@/assets/manziliq-logo.jpg.asset.json';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/manzil/auth';
 import { useCompare } from '@/lib/manzil/compare';
 import AiAssistant from './AiAssistant';
+import { BrandLogo } from './BrandLogo';
 import { GatedFeature, RenewalBanner } from './GatedFeature';
 import { PAGE_FEATURES } from '@/lib/manzil/plans';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
@@ -66,7 +66,7 @@ export function PageFrame({children, publicPage=false}: {children:ReactNode; pub
   return <div className="app-shell">
    {open && <div className="mobile-scrim" onClick={()=>setOpen(false)}/>}
    <aside className={`sidebar${open?' open':''}`}>
-    <Button variant="legacy" className="brand" onClick={()=>go('marketplace')} aria-label="ManzilIQ home"><img src={logoAsset.url} alt="ManzilIQ" className="brand-logo" /></Button>
+    <Button variant="legacy" className="brand" onClick={()=>go('marketplace')} aria-label="ManzilIQ home"><BrandLogo /></Button>
     <div className="workspace-label">{t('yourPropertyPartner')}</div>
     <div className="nav-group"><div className="nav-section-label">{t('discover')}</div>{links(mainLinkDefs)}</div>
     {session && profile && <div className="nav-group"><div className="nav-section-label">{workspaceSectionLabel(profile.role, t)}</div>
