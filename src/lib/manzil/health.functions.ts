@@ -1,14 +1,48 @@
 import { createServerFn } from "@tanstack/react-start";
+import { createClient } from "@supabase/supabase-js";
 import {
+  MIGRATION_PROBE_TABLES,
   publicFeatureFlags,
+  summarizeMigrationProbe,
   summarizeMode,
   type BackendFeature,
   type BackendHealth,
+  type MigrationProbe,
 } from "./features";
 
 function env(k: string): string | undefined {
   const v = process.env[k];
   return v && v.trim() ? v.trim() : undefined;
+}
+
+async function probeMigrations(): Promise<MigrationProbe> {
+  const url = env("SUPABASE_URL") ?? env("VITE_SUPABASE_URL");
+  const key = env("SUPABASE_SERVICE_ROLE_KEY");
+  const checked = [...MIGRATION_PROBE_TABLES];
+  if (!url || !key) {
+    return { state: "unknown", missing: [], checkedAt: new Date().toISOString() };
+  }
+  const sb = createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  const present: string[] = [];
+  for (const table of checked) {
+    const { error } = await sb.from(table).select("*", { head: true, count: "exact" }).limit(0);
+    if (!error) present.push(table);
+    else if (/does not exist|Could not find the table/i.test(error.message)) {
+      /* missing */
+    } else {
+      // Permission / other errors: treat as present (table exists).
+      present.push(table);
+    }
+  }
+  // preferred_language column (Phase 12)
+  const { error: colErr } = await sb.from("profiles").select("preferred_language").limit(0);
+  const colName = "profiles.preferred_language";
+  const checkedWithCol = [...checked, colName];
+  if (!colErr) present.push(colName);
+  else if (!/does not exist|column/i.test(colErr.message)) present.push(colName);
+  return summarizeMigrationProbe(present, checkedWithCol);
 }
 
 function serverSecretsReady(): Record<
@@ -53,7 +87,13 @@ export const getBackendHealth = createServerFn({ method: "GET" }).handler(
       notes.push("Reminder cron secret or messaging env missing — scheduler inert.");
     if (!features.ai_remote) notes.push("VITE_AI_ESTIMATE_URL unset — local estimator only.");
     if (!features.maps_js)
-      notes.push("VITE_GOOGLE_MAPS_API_KEY unset — iframe/embed fallback only.");
-    return { features, mode: summarizeMode(features), notes };
+      notes.push("VITE_GOOGLE_MAPS_API_KEY unset — Layer-1 uses Leaflet OSM fallback.");
+    const migrations = await probeMigrations();
+    if (migrations.state === "partial") {
+      notes.push(`Migrations partial — missing: ${migrations.missing.join(", ")}`);
+    } else if (migrations.state === "unknown") {
+      notes.push("Migration state unknown — set SUPABASE_SERVICE_ROLE_KEY to probe.");
+    }
+    return { features, mode: summarizeMode(features), notes, migrations };
   },
 );

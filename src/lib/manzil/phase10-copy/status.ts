@@ -67,4 +67,52 @@ export const STATUS_COPY = {
   get loadError() {
     return t('statusLoadError');
   },
+  get migrations() {
+    return t('migrations');
+  },
+  get migrationOk() {
+    return t('migrationOk');
+  },
+  get migrationPartial() {
+    return t('migrationPartial');
+  },
+  get migrationUnknown() {
+    return t('migrationUnknown');
+  },
+  get migrationHint() {
+    return t('migrationHint');
+  },
+  get missing() {
+    return t('missing');
+  },
+  get live() {
+    return t('live');
+  },
+  get mock() {
+    return t('mock');
+  },
+  get off() {
+    return t('off');
+  },
+  get recentTitle() {
+    return t('recentTitle');
+  },
+  get recentHint() {
+    return t('recentHint');
+  },
+  get noRecent() {
+    return t('noRecent');
+  },
+  get countT3() {
+    return t('countT3');
+  },
+  get countDue() {
+    return t('countDue');
+  },
+  get countOverdue() {
+    return t('countOverdue');
+  },
+  get countEscalated() {
+    return t('countEscalated');
+  },
 } as const;
