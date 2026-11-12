@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, Eye, EyeOff, ArrowLeft, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,16 +12,32 @@ import { PasswordInput } from '@/components/manzil/PasswordInput';
 import { ForgotPasswordForm } from '@/components/manzil/ForgotPasswordForm';
 import { DEMO_OTP } from '@/lib/manzil/mock-gateway';
 import { sendSignupOtp, verifySignupOtp } from '@/lib/manzil/otp.functions';
-export const Route=createFileRoute('/login')({head:()=>pageHead('Sign in'),component:Login});
+import { safeReturnPath } from '@/lib/manzil/public-pages';
+export const Route=createFileRoute('/login')({
+ head:()=>pageHead('Sign in'),
+ validateSearch:(s: Record<string, unknown>): { next?: string } => {
+  const next = typeof s['next'] === 'string' ? safeReturnPath(s['next']) ?? undefined : undefined;
+  return next ? { next } : {};
+ },
+ component:Login,
+});
 function Login(){
  const { t } = useTranslation(['auth', 'common']);
- const navigate=useAppNavigation(); const [step,setStep]=useState('signin'); const [role,setRole]=useState<UserRole>('buyer'); const [email,setEmail]=useState('');const [password,setPassword]=useState('');const [password2,setPassword2]=useState('');const [show,setShow]=useState(false);const [loading,setLoading]=useState(false);const [error,setError]=useState('');const [notice,setNotice]=useState('');const [phone,setPhone]=useState('');const [otp,setOtp]=useState('');const [otpInfo,setOtpInfo]=useState<{mode:'live'|'mock';token:string;channels:string[]}|null>(null);
+ const { next } = Route.useSearch();
+ const routerNavigate = useNavigate();
+ const navigate=useAppNavigation();
+ const afterAuth = () => {
+  const dest = safeReturnPath(next);
+  if (dest) { void routerNavigate({ to: dest }); return; }
+  navigate('dashboard');
+ };
+ const [step,setStep]=useState('signin'); const [role,setRole]=useState<UserRole>('buyer'); const [email,setEmail]=useState('');const [password,setPassword]=useState('');const [password2,setPassword2]=useState('');const [show,setShow]=useState(false);const [loading,setLoading]=useState(false);const [error,setError]=useState('');const [notice,setNotice]=useState('');const [phone,setPhone]=useState('');const [otp,setOtp]=useState('');const [otpInfo,setOtpInfo]=useState<{mode:'live'|'mock';token:string;channels:string[]}|null>(null);
  const passwordMismatch = t('auth:passwordMismatch');
  const startOtp=async()=>{const r=await sendSignupOtp({data:{email,phone}});setOtpInfo(r);setOtp('');setStep('otp');};
  const createAccount=async(db:NonNullable<ReturnType<typeof getSupabase>>)=>{const {data,error}=await db.auth.signUp({email,password,options:{emailRedirectTo:window.location.origin+'/dashboard',data:{role}}});if(error)throw error;if(!data.user)throw new Error(t('auth:accountNotCreated'));if(!data.session){setNotice(t('auth:verifyEmailNotice'));setStep('signin');return;}const {error:pErr}=await db.from('profiles').insert({id:data.user.id,email,role,verification_status:'pending'});if(pErr)throw pErr;setStep('details');};
  const verifyOtp=async(e:FormEvent)=>{e.preventDefault();setError('');const db=getSupabase();if(!db||!otpInfo)return;setLoading(true);try{if(otpInfo.mode==='mock'){if(otp!==DEMO_OTP)throw new Error(t('auth:otpIncorrect'));}else{const v=await verifySignupOtp({data:{email,phone,code:otp,token:otpInfo.token}});if(!v.ok)throw new Error(v.reason);}await createAccount(db);}catch(err){setError(err instanceof Error?err.message:t('common:tryAgain'))}finally{setLoading(false)}};
- const submit=async(e:FormEvent)=>{e.preventDefault();setError('');setNotice('');const db=getSupabase();if(!db){setError(t('auth:dbUnavailable'));return;}if(step==='signup'&&password!==password2){setError(passwordMismatch);return;}setLoading(true);try{if(step==='signin'){const {error}=await db.auth.signInWithPassword({email,password});if(error)throw error;navigate('dashboard');}else{await startOtp();}}catch(err){setError(err instanceof Error?err.message:t('common:tryAgain'))}finally{setLoading(false)}};
- const done=()=>{navigate('dashboard')};
+ const submit=async(e:FormEvent)=>{e.preventDefault();setError('');setNotice('');const db=getSupabase();if(!db){setError(t('auth:dbUnavailable'));return;}if(step==='signup'&&password!==password2){setError(passwordMismatch);return;}setLoading(true);try{if(step==='signin'){const {error}=await db.auth.signInWithPassword({email,password});if(error)throw error;afterAuth();}else{await startOtp();}}catch(err){setError(err instanceof Error?err.message:t('common:tryAgain'))}finally{setLoading(false)}};
+ const done=()=>{afterAuth()};
  const title = step==='signin'?t('auth:signInTitle'):step==='forgot'?t('auth:forgotTitle'):step==='details'?t('auth:detailsTitle'):t('auth:signUpTitle');
  const subtitle = step==='signin'?t('auth:signInSubtitle'):step==='forgot'?t('auth:forgotSubtitle'):t('auth:signUpSubtitle');
  const channelLabel = (channels: string[]) => channels.map(c => c === 'sms' ? t('auth:channelPhone') : t('auth:channelEmail')).join(` ${t('common:and')} `);

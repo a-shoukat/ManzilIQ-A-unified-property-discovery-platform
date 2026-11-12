@@ -3,11 +3,12 @@ import { Button } from '@/components/ui/button';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
 import { useEffect, useState } from 'react';
-import { fetchPlots } from '@/lib/manzil/society';
+import { fetchApprovedSocieties, fetchPlots } from '@/lib/manzil/society';
 import { formatPrice } from '@/lib/manzil/properties';
 import type { Plot } from '@/lib/manzil/types';
 import { useSocietyId } from './society';
 import { MasterPlanWorkspace } from '@/components/manzil/MasterPlanWorkspace';
+import { useAuth } from '@/lib/manzil/auth';
 
 const STATUS_COLOR: Record<Plot['status'], string> = {
   available: 'var(--success)',
@@ -17,13 +18,31 @@ const STATUS_COLOR: Record<Plot['status'], string> = {
   blocked: 'var(--destructive)',
 };
 
-/** WBS: Society Portal — Interactive Plot Map (5 features) */
+/** WBS: Society Portal — Interactive Plot Map (5 features). Guests: view-only. */
 function PlotMap({ onNavigate }: { onNavigate: (p: string) => void }) {
-  const { societyId, societies } = useSocietyId();
+  const { session, profile } = useAuth();
+  const societyCtx = useSocietyId();
+  const [guestSocieties, setGuestSocieties] = useState<{ id: string; name: string }[]>([]);
+  const [guestSocietyId, setGuestSocietyId] = useState('');
   const [plots, setPlots] = useState<Plot[]>([]);
   const [block, setBlock] = useState('');
   const [zoom, setZoom] = useState(1);
   const [selected, setSelected] = useState<Plot | null>(null);
+
+  const isEditor = profile?.role === 'society_admin' || profile?.role === 'super_admin';
+  const societies = isEditor ? societyCtx.societies : guestSocieties;
+  const societyId = isEditor ? societyCtx.societyId : (guestSocietyId || null);
+  const societyName = societies.find((x) => x.id === societyId)?.name
+    ?? (profile?.role === 'society_admin' ? 'My society' : 'Society');
+
+  useEffect(() => {
+    if (isEditor) return;
+    fetchApprovedSocieties().then((list) => {
+      const mapped = list.map((s) => ({ id: s.id, name: s.name }));
+      setGuestSocieties(mapped);
+      if (mapped[0]) setGuestSocietyId(mapped[0].id);
+    });
+  }, [isEditor]);
 
   useEffect(() => { if (societyId) fetchPlots(societyId).then(setPlots); }, [societyId]);
 
@@ -36,12 +55,33 @@ function PlotMap({ onNavigate }: { onNavigate: (p: string) => void }) {
       <div className="topbar">
         <div>
           <h1>Interactive plot map</h1>
-          <p className="muted" style={{ margin: 0 }}>Color-coded availability</p>
+          <p className="muted" style={{ margin: 0 }}>{isEditor ? 'Color-coded availability' : 'View-only · sign in to book or upload'}</p>
         </div>
-        <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('society')}>Society portal</Button>
+        {isEditor ? (
+          <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('society')}>Society portal</Button>
+        ) : (
+          <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate(session ? 'dashboard' : 'login')}>
+            {session ? 'Dashboard' : 'Sign in'}
+          </Button>
+        )}
       </div>
 
-      {societyId && <div style={{ marginBottom: 24 }}><MasterPlanWorkspace societyId={societyId} societyName={societies.find((x) => x.id === societyId)?.name ?? 'My society'} editable /></div>}
+      {!isEditor && (
+        <select className="input" style={{ maxWidth: 280, marginBottom: 16 }} value={guestSocietyId} onChange={(e) => setGuestSocietyId(e.target.value)} aria-label="Society">
+          {guestSocieties.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+        </select>
+      )}
+      {isEditor && profile?.role === 'super_admin' && societies.length > 0 && (
+        <select className="input" style={{ maxWidth: 280, marginBottom: 16 }} value={societyId ?? ''} onChange={(e) => societyCtx.setSocietyId(e.target.value)} aria-label="Society">
+          {societies.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+        </select>
+      )}
+
+      {societyId && (
+        <div style={{ marginBottom: 24 }}>
+          <MasterPlanWorkspace societyId={societyId} societyName={societyName} editable={!!isEditor} />
+        </div>
+      )}
       <h3>Block grid view</h3>
       <div className="map-toolbar">
         <div className="block-tabs">
@@ -101,4 +141,4 @@ function PlotMap({ onNavigate }: { onNavigate: (p: string) => void }) {
 }
 
 export const Route = createFileRoute("/society-map")({ head: () => pageHead("Society Map"), component: RoutePage });
-function RoutePage() { const onNavigate = useAppNavigation(); return <PageFrame ><PlotMap onNavigate={onNavigate} /></PageFrame>; }
+function RoutePage() { const onNavigate = useAppNavigation(); return <PageFrame publicPage><PlotMap onNavigate={onNavigate} /></PageFrame>; }
