@@ -93,7 +93,9 @@ function MyBookings({ onNavigate }: { onNavigate: (p: string) => void }) {
       {loading ? <p className="muted">Loading…</p> : list.length === 0 ? (
         <p className="muted">No bookings yet.</p>
       ) : (
-        list.map((b) => <BookingCard key={b.id} b={b} actions={<CancelControls b={b} onNavigate={onNavigate} />} />)
+        <div className="booking-list-gap">
+          {list.map((b) => <BookingCard key={b.id} b={b} actions={<CancelControls b={b} onNavigate={onNavigate} />} />)}
+        </div>
       )}
     </div>
   );

@@ -134,24 +134,32 @@ function MapView({ onNavigate }: { onNavigate: (p: string, arg?: string) => void
           <option value="reserved">{t("marketplace:reserved")}</option>
           <option value="sold">{t("marketplace:sold")}</option>
         </select>
-        <input
-          type="number"
-          placeholder={t("marketplace:minSize")}
-          value={minSize}
-          onChange={(e) => setMinSize(e.target.value)}
-          style={{ marginTop: 0 }}
-          dir="ltr"
-          className="ltr-isolate"
-        />
-        <input
-          type="number"
-          placeholder={t("marketplace:maxSizeMarla")}
-          value={maxSize}
-          onChange={(e) => setMaxSize(e.target.value)}
-          style={{ marginTop: 0 }}
-          dir="ltr"
-          className="ltr-isolate"
-        />
+        <label className="map-size-field">
+          <span className="muted small">Min Marla</span>
+          <input
+            type="number"
+            placeholder={t("marketplace:minSize")}
+            value={minSize}
+            onChange={(e) => setMinSize(e.target.value)}
+            style={{ marginTop: 0 }}
+            dir="ltr"
+            className="ltr-isolate"
+            aria-label="Min Marla"
+          />
+        </label>
+        <label className="map-size-field">
+          <span className="muted small">Max Marla</span>
+          <input
+            type="number"
+            placeholder={t("marketplace:maxSizeMarla")}
+            value={maxSize}
+            onChange={(e) => setMaxSize(e.target.value)}
+            style={{ marginTop: 0 }}
+            dir="ltr"
+            className="ltr-isolate"
+            aria-label="Max Marla"
+          />
+        </label>
       </div>
 
       <PropertyPinsMap
@@ -165,7 +173,15 @@ function MapView({ onNavigate }: { onNavigate: (p: string, arg?: string) => void
       <p className="muted small">{t("marketplace:layer2Subtitle")}</p>
 
       {loading ? (
-        <p className="muted">{t("marketplace:loadingPlots")}</p>
+        <div className="hub-grid" aria-busy="true" aria-label={t("marketplace:loadingPlots")}>
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="hub-card discover-skeleton">
+              <span className="skeleton-line wide" />
+              <span className="skeleton-line" />
+              <span className="skeleton-line short" />
+            </div>
+          ))}
+        </div>
       ) : (
         <>
           <div className="map-toolbar">
