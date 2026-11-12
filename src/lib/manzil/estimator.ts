@@ -16,7 +16,9 @@ export interface EstimateResult {
   method: "ai" | "local";
   reasoning: string;
   samples: number;
-  confidence: number; // 0..100
+  /** Model fit (0..1). Prefer this over raw confidence for “how well data explains price”. */
+  r2?: number;
+  confidence: number; // 0..100 — sample-size / UX score, not the same as R²
 }
 
 interface Sample {
@@ -226,7 +228,8 @@ export async function estimateLocal(input: EstimateInput): Promise<EstimateResul
     mid,
     high,
     method: "local",
-    reasoning: `Regression model trained on ${samples.length} local records (R² ${(r2 * 100).toFixed(0)}%).${drivers.length ? " Key drivers: " + drivers.join(", ") + "." : ""}`,
+    r2,
+    reasoning: `Regression model trained on ${samples.length} local records (R² ${(r2 * 100).toFixed(0)}%). Confidence score (${Math.round(40 + r2 * 55 + Math.min(samples.length / 40, 1) * 5)}%) reflects sample size + fit — not the same as R².${drivers.length ? " Key drivers: " + drivers.join(", ") + "." : ""}`,
     samples: samples.length,
     confidence: Math.min(confidence, 97),
   };

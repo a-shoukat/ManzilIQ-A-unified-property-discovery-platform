@@ -195,7 +195,12 @@ export async function listPublicSocieties(): Promise<{ id: string; email: string
   const rpc = await supabase.rpc('list_societies');
   if (!rpc.error && Array.isArray(rpc.data)) {
     return (rpc.data as { id: string; email: string | null; society_name: string | null }[])
-      .map((r) => ({ id: r.id, email: r.email ?? '', name: r.society_name ?? r.email ?? 'Society' }));
+      .map((r) => {
+        const raw = (r.society_name ?? '').trim();
+        const email = r.email ?? '';
+        const name = raw && !raw.includes('@') ? raw : 'Unnamed society';
+        return { id: r.id, email, name };
+      });
   }
   const { data } = await supabase.from('profiles').select('id, email').eq('role', 'society_admin').eq('verification_status', 'approved');
   const profiles = (data as { id: string; email: string }[]) ?? [];
@@ -205,9 +210,9 @@ export async function listPublicSocieties(): Promise<{ id: string; email: string
   const nameById = new Map(
     ((details as { profile_id: string; society_name: string | null }[]) ?? []).map((d) => [d.profile_id, d.society_name]),
   );
-  return profiles.map((p) => ({
-    id: p.id,
-    email: p.email,
-    name: nameById.get(p.id) ?? p.email,
-  }));
+  return profiles.map((p) => {
+    const raw = (nameById.get(p.id) ?? '').trim();
+    const name = raw && !raw.includes('@') ? raw : 'Unnamed society';
+    return { id: p.id, email: p.email, name };
+  });
 }

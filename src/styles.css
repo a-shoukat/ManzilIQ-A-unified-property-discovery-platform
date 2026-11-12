@@ -224,6 +224,24 @@ button:disabled {
   flex: 1 1 160px;
 }
 
+.inbox-bell { position: relative; }
+.inbox-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--destructive, #b42318);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+}
+
 .link {
   display: block;
   width: 100%;
