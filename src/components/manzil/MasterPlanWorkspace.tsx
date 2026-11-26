@@ -142,7 +142,8 @@ export function MasterPlanWorkspace({ societyId, societyName, editable, onBook }
           selectedRegionId={selected?.id ?? null}
           onDraw={(rect, pg) => { setPending({ rect, page: pg }); setLinkQuery(''); }}
           onSelectRegion={(r) => editable && setSelected(r)}
-          onViewDetails={(p) => { setDetail(p); setTimeout(() => detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50); }} />
+          onViewDetails={(p) => { setDetail(p); setTimeout(() => detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50); }}
+          {...(onBook ? { onBook } : {})} />
 
         {editable && pending && (
           <div className="card card-full">

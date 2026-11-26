@@ -1,4 +1,5 @@
 import type { UserRole } from './types';
+import { isPublicPage } from './public-pages';
 const permissions: Record<string, UserRole[]> = {
  'add-property':['dealer','society_admin','super_admin'],
  'admin-verification':['super_admin'], 'admin-users':['super_admin'], 'admin':['super_admin'], 'admin-disputes':['super_admin'], 'admin-templates':['super_admin'], 'admin-analytics':['super_admin'], 'admin-bookings':['super_admin'], 'admin-fraud':['super_admin'], 'admin-reports':['super_admin'], 'admin-subscriptions':['super_admin'],
@@ -10,10 +11,15 @@ const permissions: Record<string, UserRole[]> = {
  'inquiries':['dealer','society_admin','super_admin'],
  'payment-history':['buyer','society_admin','super_admin'],
  'settings':['buyer','dealer','society_admin','super_admin'],
- 'master-plan':['buyer','dealer','society_admin','super_admin'],
+ // master-plan is guest-public (view-only); omit role list so canAccessPage allows undefined
  'dealer-analytics':['dealer','super_admin'], 'my-activity':['buyer','super_admin'],
 };
 export function canAccessPage(page:string, role:UserRole | undefined):boolean {
+ if (role === undefined && isPublicPage(page)) return true;
+ // society-map: guests / buyers / dealers view-only; society + super admin edit (Growth-gated in UI)
+ if (page === 'society-map') {
+  return role === undefined || role === 'buyer' || role === 'dealer' || role === 'society_admin' || role === 'super_admin';
+ }
  const roles=permissions[page];
  return !roles || (role !== undefined && roles.includes(role));
 }
