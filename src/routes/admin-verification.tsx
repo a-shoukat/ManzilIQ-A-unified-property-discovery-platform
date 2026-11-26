@@ -5,6 +5,16 @@ import { useEffect, useState } from 'react';
 import { getSupabase } from '@/lib/manzil/supabase';
 import { getDocumentUrl } from '@/lib/manzil/storage';
 import type { VerificationStatus } from '@/lib/manzil/types';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface QueueItem {
   id: string;
@@ -52,6 +62,7 @@ function AdminVerification({ onNavigate }: { onNavigate: (p: string) => void }) 
 
   const [reasons, setReasons] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
+  const [confirm, setConfirm] = useState<{ id: string; status: VerificationStatus; email: string } | null>(null);
   const setStatus = async (id: string, status: VerificationStatus) => {
     const supabase = getSupabase();
     if (!supabase) return;
@@ -70,6 +81,12 @@ function AdminVerification({ onNavigate }: { onNavigate: (p: string) => void }) 
     });
     setActing(null);
     load();
+  };
+  const requestStatus = (i: QueueItem, status: VerificationStatus) => {
+    if (status === 'approved') { void setStatus(i.id, status); return; }
+    const reason = reasons[i.id]?.trim();
+    if (!reason) { setError('Please write a reason before rejecting.'); return; }
+    setConfirm({ id: i.id, status, email: i.email });
   };
 
   const openDoc = async (path: string | null) => {
@@ -116,14 +133,14 @@ function AdminVerification({ onNavigate }: { onNavigate: (p: string) => void }) 
       {i.verification_status === 'pending' && (
         <div className="queue-actions">
           <input placeholder="Reason (required to reject)" value={reasons[i.id] ?? ''} onChange={(e) => setReasons({ ...reasons, [i.id]: e.target.value })} />
-          <Button variant="legacy" className="btn small" disabled={acting === i.id} onClick={() => setStatus(i.id, 'approved')}>
+          <Button variant="legacy" className="btn small" disabled={acting === i.id} onClick={() => requestStatus(i, 'approved')}>
             Approve
           </Button>
-          <Button variant="legacy" className="btn secondary small" disabled={acting === i.id} onClick={() => setStatus(i.id, 'rejected')}>
+          <Button variant="legacy" className="btn secondary small" disabled={acting === i.id} onClick={() => requestStatus(i, 'rejected')}>
             Reject
           </Button>
           {i.role === 'dealer' && (
-            <Button variant="legacy" className="btn danger small" disabled={acting === i.id} onClick={() => setStatus(i.id, 'blacklisted')}>
+            <Button variant="legacy" className="btn danger small" disabled={acting === i.id} onClick={() => requestStatus(i, 'blacklisted')}>
               Blacklist
             </Button>
           )}
@@ -161,6 +178,22 @@ function AdminVerification({ onNavigate }: { onNavigate: (p: string) => void }) 
           </>
         )}
       </div>
+      <AlertDialog open={!!confirm} onOpenChange={(open) => { if (!open) setConfirm(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{confirm?.status === 'blacklisted' ? 'Blacklist this account?' : 'Reject this account?'}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirm ? `${confirm.status === 'blacklisted' ? 'Blacklist' : 'Reject'} ${confirm.email}?` : null}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { if (confirm) void setStatus(confirm.id, confirm.status); setConfirm(null); }}>
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

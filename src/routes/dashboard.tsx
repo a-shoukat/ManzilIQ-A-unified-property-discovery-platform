@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
 import { useAuth } from '@/lib/manzil/auth';
 import { ROLE_LABELS } from '@/lib/manzil/types';
+import { joinDisplay, titleCase } from '@/lib/manzil/format';
 import { useEffect, useState } from 'react';
 import { getSupabase } from '@/lib/manzil/supabase';
 import { CustomerRegistrationForm, DealerRegistrationForm, SocietyRegistrationForm } from '@/components/manzil/RegistrationForms';
@@ -119,10 +120,11 @@ function AdminOverview({ onNavigate }: { onNavigate: (p: string) => void }) {
       </div>
       <AttentionPanel onNavigate={onNavigate} />
       <h3>Manage platform</h3>
-      <div className="hub-grid">
+      <div className="hub-grid admin-manage-grid">
         {areas.map(([page, label]) => (
-          <Button variant="legacy" key={page} className="hub-card" onClick={() => onNavigate(page)}>
+          <Button variant="legacy" key={page} className="hub-card admin-manage-card" onClick={() => onNavigate(page)}>
             <strong>{label}</strong>
+            <span className="muted small">Open workspace</span>
           </Button>
         ))}
       </div>
@@ -152,7 +154,9 @@ function Dashboard({ onNavigate }: { onNavigate: (p: string) => void }) {
           <div>
             <h1>{isAdmin ? 'Super admin dashboard' : 'ManzilIQ'}</h1>
             <p className="muted" style={{ margin: 0 }}>
-              {profile ? ROLE_LABELS[profile.role] : ''} {isAdmin ? '· full platform control' : 'dashboard'}
+              {isAdmin
+                ? joinDisplay(ROLE_LABELS.super_admin, 'Full platform control')
+                : joinDisplay(profile ? ROLE_LABELS[profile.role] : '', titleCase('dashboard'))}
             </p>
           </div>
           <Button variant="legacy" className="btn secondary small" onClick={async () => { await signOut(); onNavigate('login'); }}>
@@ -181,11 +185,6 @@ function Dashboard({ onNavigate }: { onNavigate: (p: string) => void }) {
           <RoleOverview role={profile.role} userId={profile.id} onNavigate={onNavigate} />
         )}
 
-        <div className="link-row">
-          <Button variant="legacy" className="btn small" onClick={() => onNavigate('marketplace')}>Browse marketplace</Button>
-          <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('map-view')}>Society map</Button>
-          <Button variant="legacy" className="btn secondary small" onClick={() => onNavigate('compare')}>Compare plots</Button>
-        </div>
       </div>
     </div>
   );

@@ -2,22 +2,41 @@ import { listPublicSocieties } from './society';
 import { getSupabase } from './supabase';
 import type { Booking, Lead, LeadActivity, Lot, Plot, SocietySummary } from '@/lib/manzil/types';
 
+/** Load society cards with plot counts in two queries (avoids N+1 hang on Discover). */
 export async function fetchSocietySummaries(): Promise<SocietySummary[]> {
   const supabase = getSupabase();
   if (!supabase) return [];
-  const out: SocietySummary[] = [];
-  for (const p of await listPublicSocieties()) {
-    const { count: total } = await supabase.from('plots').select('id', { count: 'exact', head: true }).eq('society_id', p.id);
-    const { count: avail } = await supabase.from('plots').select('id', { count: 'exact', head: true }).eq('society_id', p.id).eq('status', 'available');
-    out.push({
-      id: p.id,
-      email: p.email,
-      name: p.name,
-      plots_available: avail ?? 0,
-      plots_total: total ?? 0,
-    });
+  const societies = await listPublicSocieties();
+  if (societies.length === 0) return [];
+  const ids = societies.map((p) => p.id);
+  const { data: plots, error } = await supabase.from('plots').select('society_id, status').in('society_id', ids);
+  if (error) throw new Error(error.message);
+  const totals = new Map<string, { total: number; avail: number }>();
+  for (const id of ids) totals.set(id, { total: 0, avail: 0 });
+  for (const row of (plots as { society_id: string; status: string }[]) ?? []) {
+    const t = totals.get(row.society_id);
+    if (!t) continue;
+    t.total += 1;
+    if (row.status === 'available') t.avail += 1;
   }
-  return out;
+  return societies.map((p) => ({
+    id: p.id,
+    email: p.email,
+    name: p.name,
+    plots_available: totals.get(p.id)?.avail ?? 0,
+    plots_total: totals.get(p.id)?.total ?? 0,
+  }));
+}
+
+/** Race a promise against a timeout; rejects with a clear message. */
+export function withTimeout<T>(promise: Promise<T>, ms: number, label = 'Request'): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`${label} timed out after ${Math.round(ms / 1000)}s`)), ms);
+    promise.then(
+      (v) => { clearTimeout(timer); resolve(v); },
+      (e) => { clearTimeout(timer); reject(e); },
+    );
+  });
 }
 
 export async function sendJoinRequest(dealerId: string, societyId: string): Promise<void> {

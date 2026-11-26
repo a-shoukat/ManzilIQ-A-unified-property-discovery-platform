@@ -4,6 +4,7 @@ import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageF
 import { useState } from 'react';
 import { estimatePrice, isAiConfigured, type EstimateInput, type EstimateResult } from '@/lib/manzil/estimator';
 import { formatPrice } from '@/lib/manzil/properties';
+import { normalizeCity } from '@/lib/manzil/format';
 
 /** Module 8 — AI Price Prediction */
 function PriceEstimator({ onNavigate }: { onNavigate: (p: string) => void }) {
@@ -19,14 +20,16 @@ function PriceEstimator({ onNavigate }: { onNavigate: (p: string) => void }) {
   const run = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    const cityNorm = normalizeCity(city) || 'Narowal';
     const input: EstimateInput = {
-      city: city.trim() || 'Narowal',
-      area: area.trim() || city.trim() || 'Narowal',
+      city: cityNorm,
+      area: area.trim() || cityNorm,
       sizeMarla: parseFloat(size) || 0,
       category,
       bedrooms: bedrooms ? parseInt(bedrooms, 10) : null,
       society: society.trim(),
     };
+    setCity(cityNorm);
     setResult(await estimatePrice(input));
     setLoading(false);
   };
@@ -69,10 +72,21 @@ function PriceEstimator({ onNavigate }: { onNavigate: (p: string) => void }) {
           <div style={{ marginTop: 20 }}>
             <div className="badge ok">{result.method === 'ai' ? 'AI estimate' : 'Local estimate'}</div>
             <p className="price big" style={{ margin: '8px 0' }}>{formatPrice(result.mid)}</p>
+            <p className="estimate-range" style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 600 }}>
+              Range {formatPrice(result.low)} – {formatPrice(result.high)}
+            </p>
+            {((result.mid > 0 && (result.high - result.low) / result.mid > 0.6) || (result.r2 != null && result.r2 < 0.35)) && (
+              <div className="notice warn-box" style={{ marginBottom: 12 }}>
+                {result.r2 != null && result.r2 < 0.35
+                  ? `Low model fit (R² ${Math.round(result.r2 * 100)}%). Treat the mid-point as directional only.`
+                  : 'Wide price band — local comparables disagree. Prefer the range over the mid-point.'}
+              </div>
+            )}
             <div className="detail-grid">
               <div className="detail-item"><span className="detail-key">Low</span><span>{formatPrice(result.low)}</span></div>
               <div className="detail-item"><span className="detail-key">High</span><span>{formatPrice(result.high)}</span></div>
-              <div className="detail-item"><span className="detail-key">Confidence</span><span>{result.confidence}%</span></div>
+              <div className="detail-item"><span className="detail-key">Confidence score</span><span>{result.confidence}%</span></div>
+              <div className="detail-item"><span className="detail-key">R² fit</span><span>{result.r2 != null ? `${Math.round(result.r2 * 100)}%` : '—'}</span></div>
               <div className="detail-item"><span className="detail-key">Data points</span><span>{result.samples}</span></div>
             </div>
             <p className="muted small" style={{ marginTop: 12 }}>{result.reasoning}</p>

@@ -184,7 +184,7 @@ function Leads({ onNavigate }: { onNavigate: (p: string) => void }) {
               <label>Assign plot
                 <select value={fPlot} onChange={(e) => setFPlot(e.target.value)}>
                   <option value="">— none —</option>
-                  {plots.map((p) => <option key={p.id} value={p.id}>{p.block}-{p.plot_no} ({p.size_marla}M)</option>)}
+                  {plots.map((p) => <option key={p.id} value={p.id}>{p.block}-{p.plot_no} ({p.size_marla} Marla)</option>)}
                 </select>
               </label>
               <label>Follow-up date<input type="date" value={fFollowUp} onChange={(e) => setFFollowUp(e.target.value)} /></label>

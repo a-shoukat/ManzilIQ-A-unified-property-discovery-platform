@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { createFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { PageFrame, useAppNavigation, pageHead } from '@/components/manzil/PageFrame';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/lib/manzil/auth';
 import { calcLateFee, fetchMyPayments } from '@/lib/manzil/payment';
 import { fetchInbox, markAllRead, markRead } from '@/lib/manzil/notify';
@@ -19,6 +19,7 @@ function Inbox({ onNavigate }: { onNavigate: (p: string) => void }) {
   const [items, setItems] = useState<Notification[]>([]);
   const [reminders, setReminders] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const marking = useRef<Set<string>>(new Set());
 
   const load = async () => {
     if (!session) return;
@@ -27,16 +28,34 @@ function Inbox({ onNavigate }: { onNavigate: (p: string) => void }) {
       fetchInbox(session.user.id),
       fetchMyPayments(session.user.id),
     ]);
-    setItems(inbox);
+    // Dedupe identical title+body notifications that double-fired.
+    const seen = new Set<string>();
+    const deduped: Notification[] = [];
+    for (const n of inbox) {
+      const key = `${n.title}::${n.body ?? ''}::${n.read}`;
+      if (seen.has(key) && !n.read) continue;
+      if (seen.has(`${n.title}::${n.body ?? ''}`)) continue;
+      seen.add(`${n.title}::${n.body ?? ''}`);
+      seen.add(key);
+      deduped.push(n);
+    }
+    setItems(deduped);
     const now = new Date();
     const soon = new Date();
     soon.setDate(soon.getDate() + 3);
     const r: string[] = [];
     for (const p of payments) {
       if (p.status !== 'pending' || !p.due_date) continue;
+      if (!(Number(p.amount) > 0)) continue;
       const due = new Date(p.due_date);
+      const late = calcLateFee(p);
       if (due < now) {
-        r.push(t('notifications:lateAlert', { label: p.label, amount: formatPrice(p.amount + calcLateFee(p)) }));
+        // Hide "Late PKR 0" noise when late fee is zero — still surface overdue principal.
+        if (late <= 0) {
+          r.push(t('notifications:dueSoon', { label: p.label, amount: formatPrice(p.amount), date: p.due_date }));
+        } else {
+          r.push(t('notifications:lateAlert', { label: p.label, amount: formatPrice(p.amount + late) }));
+        }
       } else if (due <= soon) {
         r.push(t('notifications:dueSoon', { label: p.label, amount: formatPrice(p.amount), date: p.due_date }));
       }
@@ -46,31 +65,42 @@ function Inbox({ onNavigate }: { onNavigate: (p: string) => void }) {
   };
 
   useEffect(() => {
-    load();
+    void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [language]);
+  }, [language, session?.user.id]);
 
   const read = async (id: string) => {
-    await markRead(id);
+    if (marking.current.has(id)) return;
+    marking.current.add(id);
     setItems((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
+    try {
+      await markRead(id);
+    } finally {
+      marking.current.delete(id);
+    }
   };
+
+  const unread = items.filter((n) => !n.read).length;
 
   return (
     <div className="container">
       <div className="topbar">
         <div>
-          <h1>{t('notifications:inboxTitle')}</h1>
+          <h1>
+            {t('notifications:inboxTitle')}
+            {unread > 0 && <span className="side-count" style={{ marginLeft: 8 }}>{unread}</span>}
+          </h1>
           <p className="muted" style={{ margin: 0 }}>{t('notifications:reminders')}</p>
         </div>
         <div className="link-row" style={{ margin: 0 }}>
-          {items.some((n) => !n.read) && (
-            <Button variant="legacy"
+          {unread > 0 && (
+            <Button
+              variant="legacy"
               className="btn secondary small"
               onClick={async () => {
-                if (session) {
-                  await markAllRead(session.user.id);
-                  load();
-                }
+                if (!session) return;
+                setItems((prev) => prev.map((n) => ({ ...n, read: true })));
+                await markAllRead(session.user.id);
               }}
             >
               {t('notifications:markAllRead')}
@@ -90,15 +120,26 @@ function Inbox({ onNavigate }: { onNavigate: (p: string) => void }) {
         <p className="muted">{t('notifications:empty')}</p>
       ) : (
         items.map((n) => (
-          <div key={n.id} className={`queue-card${n.read ? ' read-dim' : ''}`}>
+          <div
+            key={n.id}
+            className={`queue-card${n.read ? ' read-dim' : ''}`}
+            role="button"
+            tabIndex={0}
+            onClick={() => { if (!n.read) void read(n.id); }}
+            onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && !n.read) { e.preventDefault(); void read(n.id); } }}
+          >
             <div className="queue-head">
               <div>
-                <strong>{n.title}</strong>
+                <strong>{n.title}{!n.read && <span className="badge warn" style={{ marginLeft: 8 }}>Unread</span>}</strong>
                 <div className="muted small">{formatAppDate(n.created_at, language, { dateStyle: 'medium', timeStyle: 'short' })}</div>
                 {n.body && <p style={{ margin: '8px 0 0' }}>{n.body}</p>}
               </div>
               {!n.read && (
-                <Button variant="legacy" className="btn secondary small" onClick={() => read(n.id)}>
+                <Button
+                  variant="legacy"
+                  className="btn secondary small"
+                  onClick={(e) => { e.stopPropagation(); void read(n.id); }}
+                >
                   {t('notifications:markRead')}
                 </Button>
               )}
@@ -110,5 +151,8 @@ function Inbox({ onNavigate }: { onNavigate: (p: string) => void }) {
   );
 }
 
-export const Route = createFileRoute("/inbox")({ head: () => pageHead("Inbox"), component: RoutePage });
-function RoutePage() { const onNavigate = useAppNavigation(); return <PageFrame ><Inbox onNavigate={onNavigate} /></PageFrame>; }
+export const Route = createFileRoute('/inbox')({ head: () => pageHead('Inbox'), component: RoutePage });
+function RoutePage() {
+  const onNavigate = useAppNavigation();
+  return <PageFrame><Inbox onNavigate={onNavigate} /></PageFrame>;
+}

@@ -14,6 +14,7 @@
   "statusRejected": "Rejected",
   "statusCancelled": "Cancelled",
   "noBookings": "No bookings yet.",
+  "noAvailablePlots": "No available plots in this society.",
   "selectPlot": "Select plot",
   "buyerDetails": "Buyer details",
   "bookingRef": "Booking reference",

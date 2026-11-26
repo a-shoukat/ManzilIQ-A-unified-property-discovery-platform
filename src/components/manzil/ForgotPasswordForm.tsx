@@ -11,21 +11,47 @@ export function ForgotPasswordForm() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
-  const submit = async (e: FormEvent) => {
-    e.preventDefault(); setError('');
+
+  const send = async () => {
+    setError('');
+    const trimmed = email.trim();
+    if (!trimmed) { setError(t('auth:emailAddress')); return; }
     const db = getSupabase(); if (!db) { setError(t('auth:connectionUnavailable')); return; }
     setLoading(true);
-    const { error: err } = await db.auth.resetPasswordForEmail(email.trim(), { redirectTo: `${window.location.origin}/reset-password` });
+    const { error: err } = await db.auth.resetPasswordForEmail(trimmed, { redirectTo: `${window.location.origin}/reset-password` });
     setLoading(false);
     if (err && /rate|too many/i.test(err.message)) { setError(t('auth:tooManyRequests')); return; }
     setSent(true);
   };
-  if (sent) return <div className="notice" role="status">{t('auth:resetSent', { email })}</div>;
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    await send();
+  };
+
+  if (sent) {
+    return (
+      <div>
+        <div className="notice" role="status">{t('auth:resetSent', { email })}</div>
+        {error && <div className="error" role="alert">{error}</div>}
+        <Button
+          type="button"
+          variant="outline"
+          className="btn secondary"
+          style={{ marginTop: 12 }}
+          disabled={loading}
+          onClick={() => void send()}
+        >
+          {loading ? t('common:pleaseWait') : t('auth:resendCode')}
+        </Button>
+      </div>
+    );
+  }
   return (
     <form onSubmit={submit}>
       <label>{t('auth:emailAddress')}<input type="email" required autoComplete="email" placeholder={t('auth:emailPlaceholder')} value={email} onChange={(e) => setEmail(e.target.value)} dir="ltr" className="ltr-isolate" /></label>
       {error && <div className="error" role="alert">{error}</div>}
-      <Button className="login-submit" disabled={loading}>{loading ? t('common:pleaseWait') : t('auth:sendResetLink')}<ArrowUpRight className="dir-flip" /></Button>
+      <Button className="login-submit" disabled={loading || !email.trim()}>{loading ? t('common:pleaseWait') : t('auth:sendResetLink')}<ArrowUpRight className="dir-flip" /></Button>
     </form>
   );
 }

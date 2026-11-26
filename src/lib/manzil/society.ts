@@ -195,13 +195,24 @@ export async function listPublicSocieties(): Promise<{ id: string; email: string
   const rpc = await supabase.rpc('list_societies');
   if (!rpc.error && Array.isArray(rpc.data)) {
     return (rpc.data as { id: string; email: string | null; society_name: string | null }[])
-      .map((r) => ({ id: r.id, email: r.email ?? '', name: r.society_name ?? r.email ?? 'Society' }));
+      .map((r) => {
+        const raw = (r.society_name ?? '').trim();
+        const email = r.email ?? '';
+        const name = raw && !raw.includes('@') ? raw : 'Unnamed society';
+        return { id: r.id, email, name };
+      });
   }
   const { data } = await supabase.from('profiles').select('id, email').eq('role', 'society_admin').eq('verification_status', 'approved');
-  const out: { id: string; email: string; name: string }[] = [];
-  for (const p of (data as { id: string; email: string }[]) ?? []) {
-    const { data: d } = await supabase.from('society_details').select('society_name').eq('profile_id', p.id).maybeSingle();
-    out.push({ id: p.id, email: p.email, name: (d as { society_name: string } | null)?.society_name ?? p.email });
-  }
-  return out;
+  const profiles = (data as { id: string; email: string }[]) ?? [];
+  if (profiles.length === 0) return [];
+  const ids = profiles.map((p) => p.id);
+  const { data: details } = await supabase.from('society_details').select('profile_id, society_name').in('profile_id', ids);
+  const nameById = new Map(
+    ((details as { profile_id: string; society_name: string | null }[]) ?? []).map((d) => [d.profile_id, d.society_name]),
+  );
+  return profiles.map((p) => {
+    const raw = (nameById.get(p.id) ?? '').trim();
+    const name = raw && !raw.includes('@') ? raw : 'Unnamed society';
+    return { id: p.id, email: p.email, name };
+  });
 }

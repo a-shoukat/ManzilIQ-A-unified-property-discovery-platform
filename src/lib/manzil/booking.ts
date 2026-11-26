@@ -3,7 +3,8 @@ import { generateSchedule } from './payment';
 import { generateDocument } from './legal';
 import { notify } from './notify';
 import type { Booking } from '@/lib/manzil/types';
-import { ACTIVE_BOOKING_STATUSES, PLOT_UNAVAILABLE, plotLabel, bookingErrorText, filterBookablePlots } from './booking-rules';
+import { ACTIVE_BOOKING_STATUSES, BOOKABLE_PLOT_STATUSES, PLOT_UNAVAILABLE, plotLabel, bookingErrorText, filterBookablePlots } from './booking-rules';
+import { BOOKABLE_PLOT_SELECT, bookablePlotsFromInventory, normalizePlotStatus } from './bookable-plots';
 
 /** Plot ids held by an active booking (blocks double booking even when plot status is stale). */
 export async function fetchHeldPlotIds(plotIds: string[]): Promise<string[]> {
@@ -158,18 +159,40 @@ export async function completeTransfer(b: Booking): Promise<void> {
   }
 }
 
+/**
+ * Same bookable set the map would offer for booking: available + assigned,
+ * minus plots held by an active booking. Shared helper keeps wizard ↔ map aligned.
+ */
 export async function fetchAvailablePlots(societyId: string) {
   const supabase = getSupabase();
   if (!supabase) return [];
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('plots')
-    .select('id, block, plot_no, size_marla, base_price, status')
+    .select(BOOKABLE_PLOT_SELECT)
     .eq('society_id', societyId)
-    .eq('status', 'available')
+    .in('status', [...BOOKABLE_PLOT_STATUSES])
     .order('block')
     .order('plot_no');
-  const list = (data as { id: string; block: string; plot_no: string; size_marla: number; base_price: number; status: string }[]) ?? [];
-  return filterBookablePlots(list, await fetchHeldPlotIds(list.map((p) => p.id)));
+  if (error) {
+    // Fallback: some DBs store mixed-case status; load society plots and filter client-side.
+    const { data: all } = await supabase
+      .from('plots')
+      .select(BOOKABLE_PLOT_SELECT)
+      .eq('society_id', societyId)
+      .order('block')
+      .order('plot_no');
+    const raw = ((all as { id: string; block: string; plot_no: string; size_marla: number; base_price: number; status: string }[]) ?? []).map((p) => ({
+      ...p,
+      status: normalizePlotStatus(p.status),
+    }));
+    const candidates = raw.filter((p) => (BOOKABLE_PLOT_STATUSES as readonly string[]).includes(p.status));
+    return bookablePlotsFromInventory(candidates, await fetchHeldPlotIds(candidates.map((p) => p.id)));
+  }
+  const list = ((data as { id: string; block: string; plot_no: string; size_marla: number; base_price: number; status: string }[]) ?? []).map((p) => ({
+    ...p,
+    status: normalizePlotStatus(p.status),
+  }));
+  return bookablePlotsFromInventory(list, await fetchHeldPlotIds(list.map((p) => p.id)));
 }
 
 /** Everything the booking detail view needs: payments and documents linked to one booking. */
